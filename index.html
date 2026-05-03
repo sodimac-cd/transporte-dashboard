@@ -669,7 +669,7 @@ main{margin-left:220px;padding-top:calc(var(--nav-h) + 24px);padding-bottom:40px
       <div style="display:flex;flex-direction:column;gap:12px">
         <div>
           <div class="section-label" style="margin-bottom:6px">URL hoja "Programación / Fecha" (columnas: FILA, FECHA, HORARIO, CONTENEDOR...)</div>
-          <input type="text" id="url-prog" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=1915864069" class="sheet-input" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=0&single=true&output=csv">
+          <input type="text" id="url-prog" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=PROGRAMACION" class="sheet-input" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=0&single=true&output=csv">
         </div>
         <div>
           <div class="section-label" style="margin-bottom:6px">URL hoja "Asignaciones" (columnas: TTE, CC512, NOMBRE, RUT...)</div>
@@ -683,7 +683,7 @@ main{margin-left:220px;padding-top:calc(var(--nav-h) + 24px);padding-bottom:40px
       <div style="display:flex;flex-direction:column;gap:12px">
         <div>
           <div class="section-label" style="margin-bottom:6px">URL hoja "Sitrans SAI" (CONTENEDOR, CHOFER, PATENTE, GPS...)</div>
-          <input type="text" id="url-sitrans" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=3262129" class="sheet-input" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=2&single=true&output=csv">
+          <input type="text" id="url-sitrans" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=TRANSITO" class="sheet-input" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=2&single=true&output=csv">
         </div>
         <div>
           <div class="section-label" style="margin-bottom:6px">URL hoja "Medlog Valp / CIS SAI" (mismo formato)</div>
@@ -698,11 +698,11 @@ main{margin-left:220px;padding-top:calc(var(--nav-h) + 24px);padding-bottom:40px
       <div style="display:flex;flex-direction:column;gap:12px">
         <div>
           <div class="section-label" style="margin-bottom:6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)">URL hoja "Retiro Puerto" (Google Sheet donde los transportistas guardan sus asignaciones)</div>
-          <input type="text" id="url-retiro" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=490028503" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=X&single=true&output=csv">
+          <input type="text" id="url-retiro" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=ASIGNACIONES_RETIRO" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=X&single=true&output=csv">
         </div>
         <div>
           <div class="section-label" style="margin-bottom:6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)">URL hoja "Devoluciones Vacíos" (mismo Sheet, hoja de devoluciones)</div>
-          <input type="text" id="url-devoluciones" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=983915046" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=Y&single=true&output=csv">
+          <input type="text" id="url-devoluciones" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=DEVOLUCIONES" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=Y&single=true&output=csv">
         </div>
       </div>
     </div>
@@ -882,9 +882,10 @@ function parseCSV(text) {
 async function fetchSheet(url) {
   if (!url) return [];
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, { redirect: 'follow' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const text = await res.text();
+    if (!text || text.trim().length < 10) return [];
     return parseCSV(text);
   } catch(e) {
     console.warn('Error fetching sheet:', url, e);
@@ -956,12 +957,12 @@ async function loadAllData() {
 // Configuración automática Sheet CD Transporte Lo Espejo
 (function() {
   var cfg = {
-    prog:         'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=1915864069',
-    sitrans:      'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=3262129',
+    prog:         'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=PROGRAMACION',
+    sitrans:      'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=TRANSITO',
     otros:        '',
     asig:         '',
-    retiro:       'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=490028503',
-    devoluciones: 'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=983915046'
+    retiro:       'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=ASIGNACIONES_RETIRO',
+    devoluciones: 'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=DEVOLUCIONES'
   };
   localStorage.setItem('cd_transport_urls', JSON.stringify(cfg));
 })();
@@ -1406,12 +1407,12 @@ function renderMetricas() {
 // Configuración automática Sheet CD Transporte Lo Espejo
 (function() {
   var cfg = {
-    prog:         'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=1915864069',
-    sitrans:      'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=3262129',
+    prog:         'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=PROGRAMACION',
+    sitrans:      'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=TRANSITO',
     otros:        '',
     asig:         '',
-    retiro:       'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=490028503',
-    devoluciones: 'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=983915046'
+    retiro:       'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=ASIGNACIONES_RETIRO',
+    devoluciones: 'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/gviz/tq?tqx=out:csv&sheet=DEVOLUCIONES'
   };
   localStorage.setItem('cd_transport_urls', JSON.stringify(cfg));
 })();
