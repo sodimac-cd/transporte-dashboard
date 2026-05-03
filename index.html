@@ -193,22 +193,31 @@ input[type=text]:focus{outline:none;border-color:var(--blue)}
     <svg viewBox="0 0 16 16"><path d="M1 1h6v6H1zm8 0h6v6H9zM1 9h6v6H1zm8 0h6v6H9z"/></svg>
     Dashboard
   </button>
+
   <div class="s-sec">Módulos</div>
-  <button class="s-btn" onclick="showTab('programacion',null);setActive(this)">
+  <button class="s-btn" onclick="showTab('programacion',null);setActive(this)" style="opacity:.5;cursor:not-allowed">
     <svg viewBox="0 0 16 16"><path d="M1 2h14v2H1zm1 3h12l-1 9H3L2 5zm4 2v5h1V7H6zm3 0v5h1V7H9z"/></svg>
-    Programación RM <small style="opacity:.6;margin-left:3px">AT</small>
+    Abastecimiento Tienda <small style="opacity:.6;margin-left:3px">AT</small>
   </button>
-  <button class="s-btn" onclick="showTab('transito',null);setActive(this)">
+
+  <button class="s-btn active-parent" id="btn-ctn" onclick="toggleCtn()" style="border-left:3px solid var(--blue);background:var(--blue3);color:var(--blue);font-weight:600">
     <svg viewBox="0 0 16 16"><path d="M1 5h10l3 3.5V12h-2a2 2 0 01-4 0H5a2 2 0 01-4 0H1V5z"/></svg>
-    Programa Puerto <small style="opacity:.6;margin-left:3px">PP</small>
+    Contenedores <small style="opacity:.6;margin-left:3px">CTN</small>
   </button>
-  <button class="s-sub" onclick="showTab('transito',null);setActive(this)">Retiro Puerto</button>
-  <button class="s-sub" onclick="showTab('asignaciones',null);setActive(this)">Asignaciones</button>
-  <button class="s-sub" onclick="showTab('metricas',null);setActive(this)">Métricas</button>
-  <button class="s-btn" onclick="showTab('metricas',null);setActive(this)">
+
+  <div id="ctn-submenu">
+    <button class="s-sub" onclick="showTab('dashboard',null);setActive(this)">Dashboard</button>
+    <button class="s-sub" onclick="showTab('programacion',null);setActive(this)">Programación RM</button>
+    <button class="s-sub" onclick="showTab('transito',null);setActive(this)">Programa Puerto</button>
+    <button class="s-sub" onclick="showTab('asignaciones',null);setActive(this)">Asignaciones</button>
+    <button class="s-sub" onclick="showTab('metricas',null);setActive(this)">Métricas</button>
+  </div>
+
+  <button class="s-btn" style="opacity:.5;cursor:not-allowed">
     <svg viewBox="0 0 16 16"><path d="M2 13h2V6H2zm3 0h2V3H5zm3 0h2V8H8zm3 0h2V1h-2z"/></svg>
     Despacho a Domicilio <small style="opacity:.6;margin-left:3px">DAD</small>
   </button>
+
   <div class="s-sec">Sistema</div>
   <button class="s-btn" onclick="showTab('config',null);setActive(this)">
     <svg viewBox="0 0 16 16"><path d="M8 5a3 3 0 100 6A3 3 0 008 5zm5.5 2l-.8-.2-.3-.6.4-.8-.9-.9-.8.4-.6-.3-.2-.8H9l-.2.8-.6.3-.8-.4-.9.9.4.8-.3.6-.8.2v1.4l.8.2.3.6-.4.8.9.9.8-.4.6.3.2.8h1.4l.2-.8.6-.3.8.4.9-.9-.4-.8.3-.6.8-.2V7z"/></svg>
@@ -419,6 +428,10 @@ function showTab(name, btn) {
   document.getElementById('sec-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
   if (name === 'asignaciones') loadAsigData();
+}
+function toggleCtn() {
+  const sub = document.getElementById('ctn-submenu');
+  sub.style.display = sub.style.display === 'none' ? 'block' : 'block';
 }
 function setActive(btn) {
   document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
