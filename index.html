@@ -455,55 +455,102 @@ select option{background:var(--bg2)}
 <!-- ASIGNACIONES -->
 <!-- ═══════════════════════════════════════════════════ -->
 <div id="sec-asignaciones" class="section">
-  <div class="grid-2">
+
+  <!-- Sub-tabs -->
+  <div style="display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:0;">
+    <button class="asig-tab active" onclick="showAsigTab('registros',this)" style="padding:8px 16px;background:transparent;border:none;border-bottom:2px solid var(--accent);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;">Registros en tiempo real</button>
+    <button class="asig-tab" onclick="showAsigTab('formulario',this)" style="padding:8px 16px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text2);font-size:13px;cursor:pointer;">Ingresar asignación</button>
+  </div>
+
+  <!-- SUB-PANEL: REGISTROS -->
+  <div id="asig-registros" class="asig-pane">
+    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px;">
+      <div class="kpi blue">
+        <div class="kpi-label">Total asignaciones</div>
+        <div class="kpi-val blue" id="ar-total">—</div>
+        <div class="kpi-sub">registradas hoy</div>
+      </div>
+      <div class="kpi green">
+        <div class="kpi-label">Con GPS activo</div>
+        <div class="kpi-val green" id="ar-gps">—</div>
+        <div class="kpi-sub">tracto + rampla</div>
+      </div>
+      <div class="kpi amber">
+        <div class="kpi-label">Transportistas activos</div>
+        <div class="kpi-val amber" id="ar-ttes">—</div>
+        <div class="kpi-sub">empresas distintas</div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-header">
-        <span class="card-title">Asignaciones CC512</span>
-        <span class="badge badge-blue" id="asig-cc512-count">—</span>
+        <span class="card-title">Asignaciones Retiro Puerto — ingresadas por transportistas</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="badge badge-blue" id="ar-count-badge">cargando...</span>
+          <button onclick="loadAsigData()" style="padding:5px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;">↻ Actualizar</button>
+        </div>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>#</th><th>Transportista</th><th>Contenedor</th><th>Chofer</th><th>Destino</th><th>Estado</th></tr>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Depósito</th>
+              <th>Transportista</th>
+              <th>Chofer</th>
+              <th>RUT</th>
+              <th>Tracto</th>
+              <th>Rampla</th>
+              <th>GPS</th>
+              <th>Creado</th>
+            </tr>
           </thead>
-          <tbody id="asig-cc512-tbody">
-            <tr><td colspan="6"><div class="loading"><div class="spinner"></div>Cargando...</div></td></tr>
+          <tbody id="ar-tbody">
+            <tr><td colspan="10"><div class="loading"><div class="spinner"></div>Configura la URL del Sheet de Retiro Puerto en la pestaña Configuración</div></td></tr>
           </tbody>
         </table>
       </div>
     </div>
+
     <div class="card">
       <div class="card-header">
-        <span class="card-title">Asignaciones Tercop</span>
-        <span class="badge badge-blue" id="asig-tercop-count">—</span>
+        <span class="card-title">Devoluciones Vacíos Navieros</span>
+        <span class="badge badge-blue" id="ar-dev-badge">—</span>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>#</th><th>Transportista</th><th>Contenedor</th><th>Chofer</th><th>Destino</th><th>Estado</th></tr>
+            <tr><th>Fecha</th><th>Depósito</th><th>Transportista</th><th>Contenedor</th><th>EIR</th><th>Creado</th></tr>
           </thead>
-          <tbody id="asig-tercop-tbody">
-            <tr><td colspan="6"><div class="loading"><div class="spinner"></div>Cargando...</div></td></tr>
+          <tbody id="ar-dev-tbody">
+            <tr><td colspan="6"><div class="loading"><div class="spinner"></div>Configura la URL del Sheet de Devoluciones en Configuración</div></td></tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- Resumen por transportista -->
-  <div class="card">
-    <div class="card-header"><span class="card-title">Resumen por transportista</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Transportista</th><th>CC512</th><th>Tercop</th><th>Otras</th><th>Total</th><th>Cumplimiento</th></tr>
-        </thead>
-        <tbody id="transp-resumen-tbody">
-          <tr><td colspan="6"><div class="loading"><div class="spinner"></div>Calculando...</div></td></tr>
-        </tbody>
-      </table>
+  <!-- SUB-PANEL: FORMULARIO (iframe del sitio actual) -->
+  <div id="asig-formulario" class="asig-pane" style="display:none;">
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">Panel de ingreso de asignaciones — transportistas</div>
+        <div style="font-size:12px;color:var(--text2);">Los transportistas completan este formulario. Los datos se guardan automáticamente en Google Sheets.</div>
+      </div>
+      <a href="https://sodimac-cd.github.io/transporte/" target="_blank" style="padding:7px 14px;background:var(--accent);color:white;border-radius:8px;font-size:12px;font-weight:500;text-decoration:none;white-space:nowrap;margin-left:16px;">Abrir en pantalla completa ↗</a>
+    </div>
+    <div style="border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);">
+      <iframe
+        id="transporte-iframe"
+        src="https://sodimac-cd.github.io/transporte/"
+        style="width:100%;height:750px;border:none;background:white;"
+        loading="lazy"
+        title="Panel de asignaciones transportistas">
+      </iframe>
     </div>
   </div>
+
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
@@ -599,7 +646,7 @@ select option{background:var(--bg2)}
       <div style="display:flex;flex-direction:column;gap:12px">
         <div>
           <div class="section-label" style="margin-bottom:6px">URL hoja "Programación / Fecha" (columnas: FILA, FECHA, HORARIO, CONTENEDOR...)</div>
-          <input type="text" id="url-prog" class="sheet-input" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=0&single=true&output=csv">
+          <input type="text" id="url-prog" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=1915864069" class="sheet-input" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=0&single=true&output=csv">
         </div>
         <div>
           <div class="section-label" style="margin-bottom:6px">URL hoja "Asignaciones" (columnas: TTE, CC512, NOMBRE, RUT...)</div>
@@ -613,7 +660,7 @@ select option{background:var(--bg2)}
       <div style="display:flex;flex-direction:column;gap:12px">
         <div>
           <div class="section-label" style="margin-bottom:6px">URL hoja "Sitrans SAI" (CONTENEDOR, CHOFER, PATENTE, GPS...)</div>
-          <input type="text" id="url-sitrans" class="sheet-input" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=2&single=true&output=csv">
+          <input type="text" id="url-sitrans" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=3262129" class="sheet-input" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=2&single=true&output=csv">
         </div>
         <div>
           <div class="section-label" style="margin-bottom:6px">URL hoja "Medlog Valp / CIS SAI" (mismo formato)</div>
@@ -622,6 +669,20 @@ select option{background:var(--bg2)}
       </div>
     </div>
   </div>
+
+    <div class="card" style="margin-top:0;">
+      <div class="card-header"><span class="card-title">Asignaciones transportistas (del sitio existente)</span></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <div class="section-label" style="margin-bottom:6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)">URL hoja "Retiro Puerto" (Google Sheet donde los transportistas guardan sus asignaciones)</div>
+          <input type="text" id="url-retiro" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=490028503" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=X&single=true&output=csv">
+        </div>
+        <div>
+          <div class="section-label" style="margin-bottom:6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)">URL hoja "Devoluciones Vacíos" (mismo Sheet, hoja de devoluciones)</div>
+          <input type="text" id="url-devoluciones" value="https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=983915046" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:11px" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=Y&single=true&output=csv">
+        </div>
+      </div>
+    </div>
 
   <div style="display:flex;gap:12px;margin-bottom:16px">
     <button onclick="saveAndLoad()" style="padding:10px 20px;background:var(--accent);border:none;border-radius:var(--radius);color:white;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--accent2)'" onmouseout="this.style.background='var(--accent)'">
@@ -661,6 +722,104 @@ function showTab(name, btn) {
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('sec-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
+  if (name === 'asignaciones') loadAsigData();
+}
+
+function showAsigTab(name, btn) {
+  document.querySelectorAll('.asig-pane').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.asig-tab').forEach(b => {
+    b.style.borderBottomColor = 'transparent';
+    b.style.color = 'var(--text2)';
+    b.style.fontWeight = '400';
+  });
+  document.getElementById('asig-' + name).style.display = 'block';
+  btn.style.borderBottomColor = 'var(--accent)';
+  btn.style.color = 'var(--text)';
+  btn.style.fontWeight = '500';
+}
+
+async function loadAsigData() {
+  const cfg = JSON.parse(localStorage.getItem('cd_transport_urls') || '{}');
+  const urlRetiro = cfg.retiro || '';
+  const urlDev    = cfg.devoluciones || '';
+
+  // Retiro Puerto
+  if (urlRetiro) {
+    const data = await fetchSheet(urlRetiro);
+    renderAsigRetiro(data);
+  }
+  // Devoluciones
+  if (urlDev) {
+    const data = await fetchSheet(urlDev);
+    renderAsigDevoluciones(data);
+  }
+}
+
+function gpsBadge(val) {
+  const v = (val||'').toUpperCase();
+  if (v.includes('RAMPLA') && v.includes('TRACTO')) return `<span class="badge badge-green">T+R</span>`;
+  if (v.includes('TRACTO')) return `<span class="badge badge-blue">Tracto</span>`;
+  if (v.includes('RAMPLA')) return `<span class="badge badge-blue">Rampla</span>`;
+  return `<span class="badge badge-gray">Sin GPS</span>`;
+}
+
+function renderAsigRetiro(data) {
+  const tbody = document.getElementById('ar-tbody');
+  const badge = document.getElementById('ar-count-badge');
+  const kTotal = document.getElementById('ar-total');
+  const kGps   = document.getElementById('ar-gps');
+  const kTtes  = document.getElementById('ar-ttes');
+
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty">Sin registros — el Sheet está vacío o la URL no es correcta</div></td></tr>`;
+    return;
+  }
+
+  badge.textContent = data.length + ' registros';
+  kTotal.textContent = data.length;
+  const gpsCount = data.filter(r => {
+    const g = (r.GPS||r['UBICACIÓN GPS']||r['UBICACION GPS']||'').toUpperCase();
+    return g.includes('TRACTO') || g.includes('RAMPLA');
+  }).length;
+  kGps.textContent = gpsCount;
+  const ttes = new Set(data.map(r => r.TRANSPORTISTA||r.TRANSPORTE||r['EMPRESA DE TRANSPORTE']||'').filter(Boolean));
+  kTtes.textContent = ttes.size;
+
+  tbody.innerHTML = data.slice().reverse().map(r => {
+    const gpsVal = r.GPS || r['UBICACIÓN GPS'] || r['UBICACION GPS'] || '';
+    const tte = r.TRANSPORTISTA || r.TRANSPORTE || r['EMPRESA DE TRANSPORTE'] || '—';
+    const tteClean = tte.replace(/^\d[\d.\-]+\s*/,''); // quitar RUT del nombre
+    return `<tr>
+      <td class="mono">${(r.FECHA||'—').substring(0,10)}</td>
+      <td><span class="badge badge-gray">${r.TIPO||r['TIPO DE REGISTRO']||'—'}</span></td>
+      <td style="font-size:11px">${r.DEPOSITO||r['DEPÓSITO']||r['DEPOSITO DE RETIRO DE CARGA']||'—'}</td>
+      <td style="font-weight:500;font-size:12px">${tteClean}</td>
+      <td style="font-size:11px">${r.CHOFER||r['NOMBRE CHOFER']||'—'}</td>
+      <td class="mono">${r.RUT||r['RUT CHOFER']||'—'}</td>
+      <td class="mono">${r.TRACTO||r['PATENTE TRACTO']||'—'}</td>
+      <td class="mono">${r.RAMPLA||r['PATENTE RAMPLA']||'—'}</td>
+      <td>${gpsBadge(gpsVal)}</td>
+      <td style="font-size:11px;color:var(--text2)">${r.CREADO||r['TIMESTAMP']||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAsigDevoluciones(data) {
+  const tbody = document.getElementById('ar-dev-tbody');
+  const badge = document.getElementById('ar-dev-badge');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty">Sin registros de devoluciones</div></td></tr>`;
+    return;
+  }
+  badge.textContent = data.length + ' registros';
+  tbody.innerHTML = data.slice().reverse().map(r => `<tr>
+    <td class="mono">${(r.FECHA||'—').substring(0,10)}</td>
+    <td style="font-size:11px">${r.DEPOSITO||r['DEPÓSITO']||'—'}</td>
+    <td style="font-weight:500;font-size:12px">${(r.TRANSPORTISTA||r.TRANSPORTE||'—').replace(/^\d[\d.\-]+\s*/,'')}</td>
+    <td class="mono">${r.CONTENEDOR||'—'}</td>
+    <td class="mono">${r.EIR||'—'}</td>
+    <td style="font-size:11px;color:var(--text2)">${r.CREADO||r['TIMESTAMP']||'—'}</td>
+  </tr>`).join('');
 }
 
 /* ─── DATE ───────────────────────────────────────────── */
@@ -711,10 +870,12 @@ async function fetchSheet(url) {
 /* ─── SAVE / LOAD CONFIG ─────────────────────────────── */
 function saveConfig() {
   const cfg = {
-    prog:     document.getElementById('url-prog').value.trim(),
-    asig:     document.getElementById('url-asig').value.trim(),
-    sitrans:  document.getElementById('url-sitrans').value.trim(),
-    otros:    document.getElementById('url-otros').value.trim()
+    prog:          document.getElementById('url-prog').value.trim(),
+    asig:          document.getElementById('url-asig').value.trim(),
+    sitrans:       document.getElementById('url-sitrans').value.trim(),
+    otros:         document.getElementById('url-otros').value.trim(),
+    retiro:        document.getElementById('url-retiro').value.trim(),
+    devoluciones:  document.getElementById('url-devoluciones').value.trim()
   };
   localStorage.setItem('cd_transport_urls', JSON.stringify(cfg));
   return cfg;
@@ -723,10 +884,12 @@ function saveConfig() {
 function loadConfig() {
   try {
     const saved = JSON.parse(localStorage.getItem('cd_transport_urls') || '{}');
-    if (saved.prog)    document.getElementById('url-prog').value    = saved.prog;
-    if (saved.asig)    document.getElementById('url-asig').value    = saved.asig;
-    if (saved.sitrans) document.getElementById('url-sitrans').value = saved.sitrans;
-    if (saved.otros)   document.getElementById('url-otros').value   = saved.otros;
+    if (saved.prog)         document.getElementById('url-prog').value          = saved.prog;
+    if (saved.asig)         document.getElementById('url-asig').value          = saved.asig;
+    if (saved.sitrans)      document.getElementById('url-sitrans').value       = saved.sitrans;
+    if (saved.otros)        document.getElementById('url-otros').value         = saved.otros;
+    if (saved.retiro)       document.getElementById('url-retiro').value        = saved.retiro;
+    if (saved.devoluciones) document.getElementById('url-devoluciones').value  = saved.devoluciones;
     return saved;
   } catch(e) { return {}; }
 }
@@ -754,7 +917,7 @@ function showConfigStatus(type, msg) {
 
 function clearAll() {
   localStorage.removeItem('cd_transport_urls');
-  ['url-prog','url-asig','url-sitrans','url-otros'].forEach(id => document.getElementById(id).value = '');
+  ['url-prog','url-asig','url-sitrans','url-otros','url-retiro','url-devoluciones'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('config-status').style.display = 'none';
 }
 
@@ -764,7 +927,24 @@ async function loadAllData() {
   btn.classList.add('spinning');
   document.getElementById('status-dot').style.background = 'var(--amber)';
 
-  const cfg = loadConfig();
+  const cfg = 
+// Auto-configurar Sheet CD Transporte Lo Espejo
+(function() {
+  var saved = JSON.parse(localStorage.getItem('cd_transport_urls') || '{}');
+  if (!saved.prog) {
+    var cfg = {
+      prog:         'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=1915864069',
+      sitrans:      'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=3262129',
+      otros:        '',
+      asig:         '',
+      retiro:       'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=490028503',
+      devoluciones: 'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=983915046'
+    };
+    localStorage.setItem('cd_transport_urls', JSON.stringify(cfg));
+  }
+})();
+
+loadConfig();
   const hasAny = Object.values(cfg).some(v => v);
 
   if (hasAny) {
@@ -1201,6 +1381,23 @@ function renderMetricas() {
 }
 
 /* ─── INIT ───────────────────────────────────────────── */
+
+// Auto-configurar Sheet CD Transporte Lo Espejo
+(function() {
+  var saved = JSON.parse(localStorage.getItem('cd_transport_urls') || '{}');
+  if (!saved.prog) {
+    var cfg = {
+      prog:         'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=1915864069',
+      sitrans:      'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=3262129',
+      otros:        '',
+      asig:         '',
+      retiro:       'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=490028503',
+      devoluciones: 'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=983915046'
+    };
+    localStorage.setItem('cd_transport_urls', JSON.stringify(cfg));
+  }
+})();
+
 loadConfig();
 // Auto-load if URLs saved
 const saved = JSON.parse(localStorage.getItem('cd_transport_urls') || '{}');
