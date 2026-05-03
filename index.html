@@ -273,19 +273,7 @@ main{margin-left:220px;padding-top:calc(var(--nav-h) + 24px);padding-bottom:40px
 <!-- ═══════════════════════════════════════════════════ -->
 <div id="sec-dashboard" class="section active">
 
-  <!-- Setup banner (visible until sheets configured) -->
-  <div class="setup-banner" id="setup-banner">
-    <div class="setup-icon">⚙️</div>
-    <div class="setup-content">
-      <h3>Conecta tus Google Sheets para ver datos en tiempo real</h3>
-      <p>Ve a <strong>Configuración</strong> e ingresa las URLs de tus Sheets publicadas. Una vez configurado, los datos se cargarán automáticamente cada vez que abras la página.</p>
-      <div class="setup-steps">
-        <div class="setup-step"><div class="setup-step-num">1</div><span>Abre tu Google Sheet → Archivo → Compartir → <strong>Publicar en la web</strong></span></div>
-        <div class="setup-step"><div class="setup-step-num">2</div><span>Selecciona la hoja deseada, formato <code>CSV</code>, copia la URL</span></div>
-        <div class="setup-step"><div class="setup-step-num">3</div><span>Pega la URL en la sección <strong>Configuración</strong> de esta página</span></div>
-      </div>
-    </div>
-  </div>
+>
 
   <!-- KPIs -->
   <div class="kpi-grid">
@@ -965,22 +953,18 @@ async function loadAllData() {
   document.getElementById('status-dot').style.background = 'var(--amber)';
 
   const cfg = 
-// Auto-configurar Sheet CD Transporte Lo Espejo
+// Configuración automática Sheet CD Transporte Lo Espejo
 (function() {
-  var saved = JSON.parse(localStorage.getItem('cd_transport_urls') || '{}');
-  if (!saved.prog) {
-    var cfg = {
-      prog:         'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=1915864069',
-      sitrans:      'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=3262129',
-      otros:        '',
-      asig:         '',
-      retiro:       'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=490028503',
-      devoluciones: 'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=983915046'
-    };
-    localStorage.setItem('cd_transport_urls', JSON.stringify(cfg));
-  }
+  var cfg = {
+    prog:         'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=1915864069',
+    sitrans:      'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=3262129',
+    otros:        '',
+    asig:         '',
+    retiro:       'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=490028503',
+    devoluciones: 'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=983915046'
+  };
+  localStorage.setItem('cd_transport_urls', JSON.stringify(cfg));
 })();
-
 loadConfig();
   const hasAny = Object.values(cfg).some(v => v);
 
@@ -1419,22 +1403,18 @@ function renderMetricas() {
 
 /* ─── INIT ───────────────────────────────────────────── */
 
-// Auto-configurar Sheet CD Transporte Lo Espejo
+// Configuración automática Sheet CD Transporte Lo Espejo
 (function() {
-  var saved = JSON.parse(localStorage.getItem('cd_transport_urls') || '{}');
-  if (!saved.prog) {
-    var cfg = {
-      prog:         'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=1915864069',
-      sitrans:      'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=3262129',
-      otros:        '',
-      asig:         '',
-      retiro:       'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=490028503',
-      devoluciones: 'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=983915046'
-    };
-    localStorage.setItem('cd_transport_urls', JSON.stringify(cfg));
-  }
+  var cfg = {
+    prog:         'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=1915864069',
+    sitrans:      'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=3262129',
+    otros:        '',
+    asig:         '',
+    retiro:       'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=490028503',
+    devoluciones: 'https://docs.google.com/spreadsheets/d/1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw/pub?single=true&output=csv&gid=983915046'
+  };
+  localStorage.setItem('cd_transport_urls', JSON.stringify(cfg));
 })();
-
 loadConfig();
 // Auto-load if URLs saved
 const saved = JSON.parse(localStorage.getItem('cd_transport_urls') || '{}');
