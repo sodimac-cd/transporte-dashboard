@@ -883,75 +883,48 @@ async function fetchSheet(url) {
   if (!url) return [];
   try {
     const res = await fetch(url, { redirect: 'follow' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (!res.ok) return [];
     const text = await res.text();
     if (!text || text.trim().length < 10) return [];
+    // Si la respuesta es JSON (Apps Script), extraer data
+    if (text.trim().startsWith('{')) {
+      try {
+        const json = JSON.parse(text);
+        if (json.ok && Array.isArray(json.data)) return json.data;
+      } catch(e) {}
+    }
+    // Si es CSV normal
     return parseCSV(text);
   } catch(e) {
-    console.warn('Error fetching sheet:', url, e);
+    console.warn('fetchSheet error:', e.message);
     return [];
   }
 }
 
-/* ─── SAVE / LOAD CONFIG ─────────────────────────────── */
-function saveConfig() {
-  const cfg = {
-    prog:          document.getElementById('url-prog').value.trim(),
-    asig:          document.getElementById('url-asig').value.trim(),
-    sitrans:       document.getElementById('url-sitrans').value.trim(),
-    otros:         document.getElementById('url-otros').value.trim(),
-    retiro:        document.getElementById('url-retiro').value.trim(),
-    devoluciones:  document.getElementById('url-devoluciones').value.trim()
-  };
-  localStorage.setItem('cd_transport_urls', JSON.stringify(cfg));
-  return cfg;
-}
-
-function loadConfig() {
+// Fetch desde Apps Script usando el nombre de hoja
+async function fetchFromScript(scriptUrl, sheetName) {
+  if (!scriptUrl) return [];
   try {
-    const saved = JSON.parse(localStorage.getItem('cd_transport_urls') || '{}');
-    if (saved.prog)         document.getElementById('url-prog').value          = saved.prog;
-    if (saved.asig)         document.getElementById('url-asig').value          = saved.asig;
-    if (saved.sitrans)      document.getElementById('url-sitrans').value       = saved.sitrans;
-    if (saved.otros)        document.getElementById('url-otros').value         = saved.otros;
-    if (saved.retiro)       document.getElementById('url-retiro').value        = saved.retiro;
-    if (saved.devoluciones) document.getElementById('url-devoluciones').value  = saved.devoluciones;
-    return saved;
-  } catch(e) { return {}; }
-}
-
-async function saveAndLoad() {
-  const cfg = saveConfig();
-  const hasAny = Object.values(cfg).some(v => v);
-  if (!hasAny) {
-    showConfigStatus('error', 'Debes ingresar al menos una URL de Google Sheet.');
-    return;
+    const url = `${scriptUrl}?sheet=${encodeURIComponent(sheetName)}`;
+    const res = await fetch(url, { redirect: 'follow' });
+    if (!res.ok) return [];
+    const json = await res.json();
+    if (json.ok && Array.isArray(json.data)) {
+      console.log(`✓ ${sheetName}: ${json.data.length} filas`);
+      return json.data;
+    }
+    return [];
+  } catch(e) {
+    console.warn(`fetchFromScript error (${sheetName}):`, e.message);
+    return [];
   }
-  showConfigStatus('loading', 'Cargando datos desde Google Sheets...');
-  await loadAllData();
-  showConfigStatus('success', 'Datos cargados correctamente. La página se actualizará automáticamente al recargar.');
 }
 
-function showConfigStatus(type, msg) {
-  const el = document.getElementById('config-status');
-  const content = document.getElementById('config-status-content');
-  el.style.display = 'block';
-  const colors = { success: 'var(--green)', error: 'var(--red)', loading: 'var(--accent)' };
-  const icons  = { success: '✓', error: '✕', loading: '...' };
-  content.innerHTML = `<span style="color:${colors[type]};font-weight:500">${icons[type]} ${msg}</span>`;
-}
-
-function clearAll() {
-  localStorage.removeItem('cd_transport_urls');
-  ['url-prog','url-asig','url-sitrans','url-otros','url-retiro','url-devoluciones'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('config-status').style.display = 'none';
-}
-
-/* ─── LOAD ALL DATA ──────────────────────────────────── */
 async function loadAllData() {
   const btn = document.getElementById('btn-refresh');
   btn.classList.add('spinning');
   document.getElementById('status-dot').style.background = 'var(--amber)';
+
 
   const cfg = 
 // Configuración automática Sheet CD Transporte Lo Espejo
@@ -970,19 +943,33 @@ loadConfig();
   const hasAny = Object.values(cfg).some(v => v);
 
   if (hasAny) {
-    const [prog, asig, sitrans, otros] = await Promise.all([
-      fetchSheet(cfg.prog),
-      fetchSheet(cfg.asig),
-      fetchSheet(cfg.sitrans),
-      fetchSheet(cfg.otros)
-    ]);
+    let prog=[], asig=[], sitrans=[], otros=[], retiro=[], devs=[];
+    if (cfg.script) {
+      // Usar Apps Script (más confiable, sin CORS)
+      [prog, sitrans, retiro, devs] = await Promise.all([
+        fetchFromScript(cfg.script, 'PROGRAMACION'),
+        fetchFromScript(cfg.script, 'TRANSITO'),
+        fetchFromScript(cfg.script, 'ASIGNACIONES_RETIRO'),
+        fetchFromScript(cfg.script, 'DEVOLUCIONES'),
+      ]);
+    } else {
+      // Fallback a URLs directas
+      [prog, sitrans] = await Promise.all([
+        fetchSheet(cfg.prog),
+        fetchSheet(cfg.sitrans),
+      ]);
+    }
+    // Actualizar estado de asignaciones
+    if (retiro.length)  STATE.asignaciones = retiro;
+    if (devs.length)    STATE.devoluciones = devs;
 
-    STATE.prog          = prog;
-    STATE.asignaciones  = asig;
-    STATE.transito      = [...sitrans, ...otros];
-    STATE.loaded        = true;
+    // Only replace if real data was fetched
+    if (prog.length > 0)              STATE.prog        = prog;
+    if ([...sitrans,...otros].length) STATE.transito    = [...sitrans, ...otros];
+    if (asig.length > 0)              STATE.asignaciones = asig;
+    STATE.loaded = true;
 
-    document.getElementById('setup-banner').style.display = 'none';
+    var sb=document.getElementById('setup-banner'); if(sb) sb.style.display='none';
     document.getElementById('status-dot').style.background = 'var(--green)';
   } else {
     // No sheets configured — keep demo data if already loaded
@@ -1029,7 +1016,7 @@ function loadDemo() {
   ];
 
   STATE.loaded = true;
-  document.getElementById('setup-banner').style.display = 'none';
+  var sb=document.getElementById('setup-banner'); if(sb) sb.style.display='none';
   document.getElementById('status-dot').style.background = 'var(--green)';
   renderAll();
   showConfigStatus('success', 'Datos demo cargados desde tus archivos Excel. Configura URLs de Google Sheets para datos en tiempo real.');
@@ -1417,14 +1404,15 @@ function renderMetricas() {
   localStorage.setItem('cd_transport_urls', JSON.stringify(cfg));
 })();
 loadConfig();
-// Auto-load if URLs saved
-const saved = JSON.parse(localStorage.getItem('cd_transport_urls') || '{}');
-if (Object.values(saved).some(v => v)) {
-  loadAllData();
-} else {
-  // Load demo to show what the dashboard looks like
-  setTimeout(loadDemo, 400);
-}
+// Siempre mostrar demo inmediatamente
+loadDemo();
+// Intentar cargar datos reales en segundo plano
+setTimeout(async () => {
+  const cfg = JSON.parse(localStorage.getItem('cd_transport_urls') || '{}');
+  if (Object.values(cfg).some(v => v)) {
+    await loadAllData();
+  }
+}, 800);
 </script>
 </body>
 </html>
