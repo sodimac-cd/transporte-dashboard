@@ -101,9 +101,9 @@ main{margin-left:var(--sidebar);padding:calc(var(--nav) + 20px) 22px 40px}
 .bx{background:var(--bg2);color:var(--text2)}
 
 /* TABLE */
-.tw{overflow-x:auto}
+.tw{overflow-x:auto;overflow-y:auto;max-height:60vh}
 table{width:100%;border-collapse:collapse;font-size:12px}
-thead th{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:2px solid var(--border);white-space:nowrap;text-align:left;background:#F8FAFC}
+thead th{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:2px solid var(--border);white-space:nowrap;text-align:left;background:#F8FAFC;position:sticky;top:0;z-index:2}
 tbody td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:var(--bg2)}
@@ -448,13 +448,14 @@ function showAsigTab(tab) {
 
 // ── BADGES ───────────────────────────────────────────────
 function estadoBadge(e) {
-  const v = (e||'').toUpperCase();
-  if (v==='ENTREGADO')   return '<span class="b bg">Entregado</span>';
-  if (v==='TRASVASIJE')  return '<span class="b bb">Trasvasije</span>';
-  if (v==='EN TRANSITO') return '<span class="b bb">En tránsito</span>';
-  if (v==='REPROGRAMADO')return '<span class="b ba">Reprogramado</span>';
-  if (v==='CANCELADO')   return '<span class="b br">Cancelado</span>';
-  return '<span class="b bx">'+(e||'Pendiente')+'</span>';
+  const v = (e||'').toUpperCase().trim();
+  if (v==='ENTREGADO')                       return '<span class="b bg">Entregado</span>';
+  if (v==='TRASVASIJE')                      return '<span class="b bb">Trasvasije</span>';
+  if (v==='EN TRANSITO'||v==='EN RUTA')      return '<span class="b bb">En ruta</span>';
+  if (v==='REPROGRAMADO'||v==='REPROGRAMAR') return '<span class="b ba">Reprogramado</span>';
+  if (v==='CANCELADO')                       return '<span class="b br">Cancelado</span>';
+  if (v==='PENDIENTE'||v==='')               return '<span class="b bx">Pendiente</span>';
+  return '<span class="b bx">'+e+'</span>';
 }
 function tipoBadge(t) {
   return t==='HC' ? '<span class="b bb">HC</span>' :
@@ -518,7 +519,7 @@ async function refreshData() {
   const btn = document.getElementById('btn-act');
   btn.classList.add('spin');
   document.getElementById('dot').style.background = '#f59e0b';
-  const script = localStorage.getItem('cd_script_url') || '';
+  const script = localStorage.getItem('cd_script_url') || APPS_SCRIPT_URL;
   if (script) {
     const [prog, trans, asig] = await Promise.all([
       fetchScript(script,'PROGRAMACION'),
@@ -535,7 +536,7 @@ async function refreshData() {
 }
 
 async function loadAsigData() {
-  const script = localStorage.getItem('cd_script_url') || '';
+  const script = localStorage.getItem('cd_script_url') || APPS_SCRIPT_URL;
   if (!script) return;
   const data = await fetchScript(script, 'ASIGNACIONES_RETIRO');
   if (data.length) {
@@ -775,6 +776,11 @@ function renderAsig() {
 }
 
 // ── INIT ──────────────────────────────────────────────────
+// URL Apps Script configurada automáticamente
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPF8GU71jDq0LwTUyLyTKtQShJs0n19TMwyNiI7KV2i0WQ_HhV-odkGxgyxQYduCKo4A/exec';
+if (!localStorage.getItem('cd_script_url')) {
+  localStorage.setItem('cd_script_url', APPS_SCRIPT_URL);
+}
 const savedScript = localStorage.getItem('cd_script_url');
 if (savedScript) document.getElementById('url-script').value = savedScript;
 // Cargar datos de los Excel inmediatamente
