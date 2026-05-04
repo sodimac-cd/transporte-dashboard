@@ -200,13 +200,12 @@ input[type=text]:focus{outline:none;border-color:var(--blue)}
     Abastecimiento Tienda <small style="opacity:.6;margin-left:3px">AT</small>
   </button>
 
-  <button class="s-btn active-parent" id="btn-ctn" onclick="toggleCtn()" style="border-left:3px solid var(--blue);background:var(--blue3);color:var(--blue);font-weight:600">
+  <button class="s-btn active-parent" id="btn-ctn" onclick="showTab('dashboard',null);setActive(this)" style="border-left:3px solid var(--blue);background:var(--blue3);color:var(--blue);font-weight:600">
     <svg viewBox="0 0 16 16"><path d="M1 5h10l3 3.5V12h-2a2 2 0 01-4 0H5a2 2 0 01-4 0H1V5z"/></svg>
     Contenedores <small style="opacity:.6;margin-left:3px">CTN</small>
   </button>
 
   <div id="ctn-submenu">
-    <button class="s-sub" onclick="showTab('dashboard',null);setActive(this)">Dashboard</button>
     <button class="s-sub" onclick="showTab('programacion',null);setActive(this)">Programación RM</button>
     <button class="s-sub" onclick="showTab('transito',null);setActive(this)">Programa Puerto</button>
     <button class="s-sub" onclick="showTab('asignaciones',null);setActive(this)">Asignaciones</button>
@@ -237,7 +236,7 @@ input[type=text]:focus{outline:none;border-color:var(--blue)}
     <div class="kpi b"><div class="kpi-lbl">Total programado</div><div class="kpi-val b" id="k-total">—</div><div class="kpi-sub">contenedores</div></div>
     <div class="kpi g"><div class="kpi-lbl">Entregados / OK</div><div class="kpi-val g" id="k-ok">—</div><div class="kpi-sub">confirmados</div></div>
     <div class="kpi a"><div class="kpi-lbl">Pendientes</div><div class="kpi-val a" id="k-pend">—</div><div class="kpi-sub">sin confirmar arribo</div></div>
-    <div class="kpi r"><div class="kpi-lbl">Demurrage crítico</div><div class="kpi-val r" id="k-dem">—</div><div class="kpi-sub">contenedores ≥ −35 días</div></div>
+    <div class="kpi r"><div class="kpi-lbl">Demurrage crítico</div><div class="kpi-val r" id="k-dem">—</div><div class="kpi-sub">con &lt;10 días libres</div></div>
   </div>
   <div class="g2">
     <div class="card">
@@ -308,7 +307,7 @@ input[type=text]:focus{outline:none;border-color:var(--blue)}
   </div>
   <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
     <div class="kpi b"><div class="kpi-lbl">Total sin despacho</div><div class="kpi-val b" id="t-total">—</div><div class="kpi-sub">contenedores</div></div>
-    <div class="kpi r"><div class="kpi-lbl">Demurrage crítico</div><div class="kpi-val r" id="t-dem">—</div><div class="kpi-sub">≥ −38 días</div></div>
+    <div class="kpi r"><div class="kpi-lbl">Demurrage crítico</div><div class="kpi-val r" id="t-dem">—</div><div class="kpi-sub">&lt;10 días libres</div></div>
     <div class="kpi a"><div class="kpi-lbl">Depósitos activos</div><div class="kpi-val a" id="t-deps">—</div><div class="kpi-sub">con contenedores</div></div>
   </div>
   <div class="card">
@@ -357,7 +356,7 @@ input[type=text]:focus{outline:none;border-color:var(--blue)}
   <div class="kpi-grid">
     <div class="kpi g"><div class="kpi-lbl">Cumplimiento</div><div class="kpi-val g" id="m-cumpl">—</div><div class="kpi-sub">% entregado vs programado</div></div>
     <div class="kpi b"><div class="kpi-lbl">Total programa</div><div class="kpi-val b" id="m-total">—</div><div class="kpi-sub">contenedores</div></div>
-    <div class="kpi r"><div class="kpi-lbl">Demurrage crítico</div><div class="kpi-val r" id="m-dem">—</div><div class="kpi-sub">≥ −38 días</div></div>
+    <div class="kpi r"><div class="kpi-lbl">Demurrage crítico</div><div class="kpi-val r" id="m-dem">—</div><div class="kpi-sub">&lt;10 días libres</div></div>
     <div class="kpi a"><div class="kpi-lbl">Sin asignar</div><div class="kpi-val a" id="m-sin">—</div><div class="kpi-sub">sin transportista</div></div>
   </div>
   <div class="g2">
@@ -614,7 +613,7 @@ function renderDashboard() {
 
   const ok    = p.filter(r=>(r.ESTADO||'').toUpperCase()==='ENTREGADO'||r.ESTADO==='TRASVASIJE').length;
   const pend  = p.filter(r=>(r.ESTADO||'').toUpperCase()==='PENDIENTE'||(r.ESTADO||'')==='').length;
-  const dem   = [...STATE.transito].filter(r=>parseInt(r.DEMURRAGE||0)<=-35).length;
+  const dem   = [...STATE.transito].filter(r=>parseInt(r.DEMURRAGE||0)>=-10).length;
 
   document.getElementById('k-total').textContent = total||'—';
   document.getElementById('k-ok').textContent    = ok||'0';
@@ -639,7 +638,7 @@ function renderDashboard() {
 
   // Alertas
   const alerts = [];
-  if (dem>0) alerts.push({c:'#DC2626',t:dem+' contenedor'+(dem>1?'es':'')+' con demurrage ≥ −35 días',s:'Revisar urgente',badge:'<span class="b br">Urgente</span>'});
+  if (dem>0) alerts.push({c:'#DC2626',t:dem+' contenedor'+(dem>1?'es':'')+' con demurrage &lt;10 días libres',s:'Revisar urgente',badge:'<span class="b br">Urgente</span>'});
   const sinD = STATE.transito.filter(r=>(r.STATUS||'').toUpperCase()==='SIN DESPACHO').length;
   if (sinD>0) alerts.push({c:'#D97706',t:sinD+' contenedor'+(sinD>1?'es':'')+' sin despacho',s:'En depósito de origen',badge:'<span class="b ba">Pendiente</span>'});
   if (ok===total&&total>0) alerts.push({c:'#16A34A',t:'Programa completado al 100%',s:total+'/'+total+' entregas confirmadas',badge:'<span class="b bg">OK</span>'});
@@ -707,7 +706,7 @@ function filtrarProg() {
   if (!data.length) { tbody.innerHTML=`<tr><td colspan="16"><div class="empty">Sin datos con estos filtros</div></td></tr>`; return; }
   tbody.innerHTML = data.map((r,i) => {
     const dem = parseInt(r.PESO||0);
-    const demCl = dem<=-38?'td-r':dem<=-32?'td-a':'';
+    const demCl = dem>=-10?'td-r':dem>=-20?'td-a':'';
     return `<tr>
       <td class="mono">${i+1}</td>
       <td class="mono">${fmtFecha(r.FECHA)}</td>
@@ -733,7 +732,7 @@ function filtrarProg() {
 function renderTransito() {
   const data = STATE.transito;
   document.getElementById('t-total').textContent = data.length||'0';
-  document.getElementById('t-dem').textContent   = data.filter(r=>parseInt(r.DEMURRAGE||0)<=-38).length||'0';
+  document.getElementById('t-dem').textContent   = data.filter(r=>parseInt(r.DEMURRAGE||0)>=-10).length||'0';
   document.getElementById('t-deps').textContent  = new Set(data.map(r=>r.DEPOSITO).filter(Boolean)).size||'0';
   document.getElementById('t-badge').textContent = data.length+' contenedores';
   const tbody = document.getElementById('trans-tbody');
@@ -760,7 +759,7 @@ function renderMetricas() {
   const total = p.length;
   const ok    = p.filter(r=>['ENTREGADO','TRASVASIJE'].includes(r.ESTADO)).length;
   const pct   = total ? Math.round(ok/total*100) : 0;
-  const dem   = STATE.transito.filter(r=>parseInt(r.DEMURRAGE||0)<=-38).length;
+  const dem   = STATE.transito.filter(r=>parseInt(r.DEMURRAGE||0)>=-10).length;
   const sinT  = p.filter(r=>!(r.TRANSPORTE||'').trim()).length;
   document.getElementById('m-cumpl').textContent = total ? pct+'%' : '—';
   document.getElementById('m-total').textContent = total||'—';
