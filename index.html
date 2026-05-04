@@ -498,25 +498,21 @@ async function fetchSheet(url) {
 }
 async function fetchScript(url, sheet) {
   if (!url) return [];
-  // Apps Script usa JSONP para evitar CORS — usamos callback=?
-  return new Promise((resolve) => {
-    const cbName = 'cb_' + sheet.replace(/[^a-z]/gi,'') + '_' + Date.now();
-    const script = document.createElement('script');
-    const timeout = setTimeout(() => {
-      delete window[cbName];
-      document.body.removeChild(script);
-      resolve([]);
-    }, 8000);
-    window[cbName] = (data) => {
-      clearTimeout(timeout);
-      delete window[cbName];
-      try { document.body.removeChild(script); } catch(e) {}
-      resolve((data && data.ok && data.data) ? data.data : []);
-    };
-    script.src = url + '?sheet=' + encodeURIComponent(sheet) + '&callback=' + cbName;
-    script.onerror = () => { clearTimeout(timeout); resolve([]); };
-    document.body.appendChild(script);
-  });
+  try {
+    const fullUrl = url + '?sheet=' + encodeURIComponent(sheet);
+    const res = await fetch(fullUrl, { redirect: 'follow', method: 'GET' });
+    if (!res.ok) { console.warn('fetchScript HTTP', res.status); return []; }
+    const txt = await res.text();
+    const json = JSON.parse(txt);
+    if (json.ok && Array.isArray(json.data)) {
+      console.log('✓ ' + sheet + ': ' + json.data.length + ' filas');
+      return json.data;
+    }
+    return [];
+  } catch(e) {
+    console.warn('fetchScript error (' + sheet + '):', e.message);
+    return [];
+  }
 }
 
 // ── LOAD DEMO (datos reales de tus Excel) ─────────────────
@@ -790,7 +786,7 @@ function renderAsig() {
 
 // ── INIT ──────────────────────────────────────────────────
 // URL Apps Script configurada automáticamente
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyk5b23bKaU1iOwrJH1bwIIB7ZS6itVynQESX3EZqlG4m6T2hcHvziZYUwvdnbCqzSKBg/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVuxQ9EWwyqa9jClhAGEPfXPwCzli2dOa553wJ_l13hkgbx1lLyVsw8Q6bimarqopAog/exec';
 if (!localStorage.getItem('cd_script_url')) {
   localStorage.setItem('cd_script_url', APPS_SCRIPT_URL);
 }
