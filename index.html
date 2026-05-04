@@ -498,12 +498,25 @@ async function fetchSheet(url) {
 }
 async function fetchScript(url, sheet) {
   if (!url) return [];
-  try {
-    const r = await fetch(url+'?sheet='+encodeURIComponent(sheet), {redirect:'follow'});
-    if (!r.ok) return [];
-    const j = await r.json();
-    return (j.ok && j.data) ? j.data : [];
-  } catch(e) { return []; }
+  // Apps Script usa JSONP para evitar CORS — usamos callback=?
+  return new Promise((resolve) => {
+    const cbName = 'cb_' + sheet.replace(/[^a-z]/gi,'') + '_' + Date.now();
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => {
+      delete window[cbName];
+      document.body.removeChild(script);
+      resolve([]);
+    }, 8000);
+    window[cbName] = (data) => {
+      clearTimeout(timeout);
+      delete window[cbName];
+      try { document.body.removeChild(script); } catch(e) {}
+      resolve((data && data.ok && data.data) ? data.data : []);
+    };
+    script.src = url + '?sheet=' + encodeURIComponent(sheet) + '&callback=' + cbName;
+    script.onerror = () => { clearTimeout(timeout); resolve([]); };
+    document.body.appendChild(script);
+  });
 }
 
 // ── LOAD DEMO (datos reales de tus Excel) ─────────────────
@@ -522,8 +535,8 @@ async function refreshData() {
   const script = localStorage.getItem('cd_script_url') || APPS_SCRIPT_URL;
   if (script) {
     const [prog, trans, asig] = await Promise.all([
-      fetchScript(script,'PROGRAMACION'),
-      fetchScript(script,'TRANSITO'),
+      fetchScript(script,'PROGRAMACION RM'),
+      fetchScript(script,'PROGRAMA PUERTO'),
       fetchScript(script,'ASIGNACIONES_RETIRO'),
     ]);
     if (prog.length)  STATE.prog     = prog;
@@ -777,7 +790,7 @@ function renderAsig() {
 
 // ── INIT ──────────────────────────────────────────────────
 // URL Apps Script configurada automáticamente
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPF8GU71jDq0LwTUyLyTKtQShJs0n19TMwyNiI7KV2i0WQ_HhV-odkGxgyxQYduCKo4A/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyk5b23bKaU1iOwrJH1bwIIB7ZS6itVynQESX3EZqlG4m6T2hcHvziZYUwvdnbCqzSKBg/exec';
 if (!localStorage.getItem('cd_script_url')) {
   localStorage.setItem('cd_script_url', APPS_SCRIPT_URL);
 }
