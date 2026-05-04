@@ -277,8 +277,6 @@ input[type=text]:focus{outline:none;border-color:var(--blue)}
     <span class="flbl">Fecha:</span>
     <select id="f-fecha" onchange="filtrarProg()">
       <option value="">Todas las fechas</option>
-      <option value="2026-05-02">Sáb 02-05-2026</option>
-      <option value="2026-05-04">Lun 04-05-2026</option>
     </select>
     <span class="flbl">Tipo:</span>
     <select id="f-tipo" onchange="filtrarProg()">
@@ -649,13 +647,31 @@ function renderDashboard() {
 
 // ── RENDER PROGRAMACION ───────────────────────────────────
 let filteredProg = [];
-function renderProg() { filteredProg = [...STATE.prog]; filtrarProg(); }
+function renderProg() {
+  // Poblar filtro de fechas dinámicamente
+  const sel = document.getElementById('f-fecha');
+  const currentVal = sel.value;
+  const fechas = [...new Set(STATE.prog.map(r => (r.FECHA||r.fecha||'').substring(0,10)).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">Todas las fechas (' + STATE.prog.length + ')</option>';
+  const dias = {'0':'Dom','1':'Lun','2':'Mar','3':'Mié','4':'Jue','5':'Vie','6':'Sáb'};
+  fechas.forEach(f => {
+    const d = new Date(f + 'T12:00:00');
+    const label = dias[d.getDay()] + ' ' + f.split('-').reverse().join('-');
+    const opt = document.createElement('option');
+    opt.value = f;
+    opt.textContent = label;
+    if (f === currentVal) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  filteredProg = [...STATE.prog];
+  filtrarProg();
+}
 function filtrarProg() {
   const fecha  = document.getElementById('f-fecha').value;
   const tipo   = document.getElementById('f-tipo').value;
   const estado = document.getElementById('f-estado').value;
   let data = STATE.prog.filter(r => {
-    if (fecha  && (r.FECHA||'')   !== fecha)  return false;
+    if (fecha  && (r.FECHA||r.fecha||'').substring(0,10) !== fecha) return false;
     if (tipo   && (r.TIPO||'')    !== tipo)   return false;
     if (estado && (r.ESTADO||'') !== estado) return false;
     return true;
