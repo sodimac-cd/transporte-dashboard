@@ -757,29 +757,75 @@ function filtrarProg() {
   }).join('');
 }
 
-// ── RENDER TRANSITO ───────────────────────────────────────
+// ── RENDER TRANSITO ───────────────────────────────────────────────────────────
 function renderTransito() {
   const data = STATE.transito;
-  document.getElementById('t-total').textContent = data.length||'0';
-  document.getElementById('t-dem').textContent   = data.filter(r=>parseInt(r.DEMURRAGE||0)>=-10).length||'0';
-  document.getElementById('t-deps').textContent  = new Set(data.map(r=>r.DEPOSITO).filter(Boolean)).size||'0';
-  document.getElementById('t-badge').textContent = data.length+' contenedores';
+  document.getElementById('t-total').textContent = data.length || '0';
+  document.getElementById('t-dem').textContent   = data.filter(r => parseInt(r.DEMURRAGE||0) >= -10).length || '0';
+  document.getElementById('t-deps').textContent  = new Set(data.map(r => r.DEPOSITO).filter(Boolean)).size || '0';
+  document.getElementById('t-badge').textContent = data.length + ' contenedores';
+
   const tbody = document.getElementById('trans-tbody');
-  if (!data.length) { tbody.innerHTML=`<tr><td colspan="9"><div class="empty">Sin datos de tránsito</div></td></tr>`; return; }
-  tbody.innerHTML = data.map((r,i) => {
-    const dem = parseInt(r.DEMURRAGE||0);
-    return `<tr>
-      <td class="mono">${i+1}</td>
-      <td style="font-size:11px">${r.DEPOSITO||'—'}</td>
-      <td class="mono">${r.CONTENEDOR||'—'}</td>
-      <td><span class="b bx">${r.TIPO||'—'}ft</span></td>
-      <td class="mono">${r.CC||'—'}</td>
-      <td class="mono ${dem<=-38?'td-r':dem<=-32?'td-a':''}">${r.DEMURRAGE||'—'}</td>
-      <td style="font-size:11px">${r.DESTINO||'—'}</td>
-      <td style="font-weight:500;font-size:12px">${r.TRANSPORTE||'—'}</td>
-      <td>${estadoBadge(r.STATUS)}</td>
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty">Sin datos de tránsito</div></td></tr>`;
+    return;
+  }
+
+  // Agrupar por FECHA_PROG
+  const byFecha = {};
+  data.forEach(r => {
+    const f = normFecha(r.FECHA_PROG || r.FECHA || '') || 'Sin fecha';
+    if (!byFecha[f]) byFecha[f] = [];
+    byFecha[f].push(r);
+  });
+
+  // Ordenar fechas — más reciente primero
+  const fechasOrdenadas = Object.keys(byFecha).sort((a,b) => {
+    if (a === 'Sin fecha') return 1;
+    if (b === 'Sin fecha') return -1;
+    return new Date(b+' 12:00:00') - new Date(a+' 12:00:00');
+  });
+
+  let html = '';
+  fechasOrdenadas.forEach(f => {
+    const rows = byFecha[f];
+    const label = f === 'Sin fecha' ? 'Sin fecha asignada' : 'Programa ' + fmtFecha(f);
+    const sinDesp  = rows.filter(r => (r.STATUS||'').toUpperCase().includes('SIN DESPACHO')).length;
+    const retirado = rows.filter(r => (r.STATUS||'').toUpperCase().includes('RETIRADO') || (r.STATUS||'').toUpperCase().includes('ENTREGADO')).length;
+
+    // Fila de separador de fecha
+    html += `<tr>
+      <td colspan="9" style="background:#EFF6FF;padding:8px 12px;border-bottom:2px solid var(--blue)">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;font-weight:600;color:var(--blue)">${label}</span>
+          <div style="display:flex;gap:8px">
+            <span class="b bb">${rows.length} total</span>
+            ${sinDesp  > 0 ? `<span class="b ba">${sinDesp} sin despacho</span>` : ''}
+            ${retirado > 0 ? `<span class="b bg">${retirado} retirados</span>`   : ''}
+          </div>
+        </div>
+      </td>
     </tr>`;
-  }).join('');
+
+    // Filas de contenedores
+    rows.forEach((r, i) => {
+      const dem = parseInt(r.DEMURRAGE || 0);
+      const demCl = dem >= -10 ? 'td-r' : dem >= -20 ? 'td-a' : '';
+      html += `<tr>
+        <td class="mono">${i+1}</td>
+        <td style="font-size:11px">${r.DEPOSITO||'—'}</td>
+        <td class="mono">${r.CONTENEDOR||'—'}</td>
+        <td><span class="b bx">${r.TIPO||'—'}ft</span></td>
+        <td class="mono">${r.CC||'—'}</td>
+        <td class="mono ${demCl}">${r.DEMURRAGE||'—'}</td>
+        <td style="font-size:11px">${r.DESTINO||'—'}</td>
+        <td style="font-weight:500;font-size:12px">${r.TRANSPORTE||'—'}</td>
+        <td>${estadoBadge(r.STATUS)}</td>
+      </tr>`;
+    });
+  });
+
+  tbody.innerHTML = html;
 }
 
 // ── RENDER METRICAS ───────────────────────────────────────
