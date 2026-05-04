@@ -653,10 +653,9 @@ function renderProg() {
   const currentVal = sel.value;
   const fechas = [...new Set(STATE.prog.map(r => (r.FECHA||r.fecha||'').substring(0,10)).filter(Boolean))].sort();
   sel.innerHTML = '<option value="">Todas las fechas (' + STATE.prog.length + ')</option>';
-  const dias = {'0':'Dom','1':'Lun','2':'Mar','3':'Mié','4':'Jue','5':'Vie','6':'Sáb'};
   fechas.forEach(f => {
-    const d = new Date(f + 'T12:00:00');
-    const label = dias[d.getDay()] + ' ' + f.split('-').reverse().join('-');
+    const parts = f.split('-');
+    const label = (parts[2]||'') + '-' + (parts[1]||'') + '-' + (parts[0]||'');
     const opt = document.createElement('option');
     opt.value = f;
     opt.textContent = label;
