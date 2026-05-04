@@ -445,6 +445,33 @@ function showAsigTab(tab) {
 }
 
 // ── BADGES ───────────────────────────────────────────────
+// Normaliza cualquier formato de fecha a YYYY-MM-DD
+function normFecha(val) {
+  if (!val) return '';
+  const s = String(val).trim();
+  // Ya está en formato correcto
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // Intentar parsear
+  try {
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      return y + '-' + m + '-' + dd;
+    }
+  } catch(e) {}
+  return s.substring(0,10);
+}
+
+// Formatea fecha para mostrar: DD-MM-YYYY
+function fmtFecha(val) {
+  const f = normFecha(val);
+  if (!f) return '—';
+  const p = f.split('-');
+  return p.length === 3 ? p[2]+'-'+p[1]+'-'+p[0] : f;
+}
+
 function estadoBadge(e) {
   const v = (e||'').toUpperCase().trim();
   if (v==='ENTREGADO')                       return '<span class="b bg">Entregado</span>';
@@ -583,7 +610,7 @@ function renderDashboard() {
   // Mostrar programa más reciente si no hay de hoy
   const fechas = [...new Set(p.map(r=>r.FECHA||r.fecha||''))].filter(Boolean).sort();
   const ultimaFecha = fechas[fechas.length-1] || '';
-  document.getElementById('prog-fecha-badge').textContent = ultimaFecha ? 'Programa ' + ultimaFecha : '—';
+  document.getElementById('prog-fecha-badge').textContent = ultimaFecha ? 'Programa ' + fmtFecha(ultimaFecha) : '—';
 
   const ok    = p.filter(r=>(r.ESTADO||'').toUpperCase()==='ENTREGADO'||r.ESTADO==='TRASVASIJE').length;
   const pend  = p.filter(r=>(r.ESTADO||'').toUpperCase()==='PENDIENTE'||(r.ESTADO||'')==='').length;
@@ -651,7 +678,7 @@ function renderProg() {
   // Poblar filtro de fechas dinámicamente
   const sel = document.getElementById('f-fecha');
   const currentVal = sel.value;
-  const fechas = [...new Set(STATE.prog.map(r => (r.FECHA||r.fecha||'').substring(0,10)).filter(Boolean))].sort();
+  const fechas = [...new Set(STATE.prog.map(r => normFecha(r.FECHA||r.fecha||'')).filter(Boolean))].sort();
   sel.innerHTML = '<option value="">Todas las fechas (' + STATE.prog.length + ')</option>';
   fechas.forEach(f => {
     const parts = f.split('-');
@@ -670,7 +697,7 @@ function filtrarProg() {
   const tipo   = document.getElementById('f-tipo').value;
   const estado = document.getElementById('f-estado').value;
   let data = STATE.prog.filter(r => {
-    if (fecha  && (r.FECHA||r.fecha||'').substring(0,10) !== fecha) return false;
+    if (fecha  && normFecha(r.FECHA||r.fecha||'') !== fecha) return false;
     if (tipo   && (r.TIPO||'')    !== tipo)   return false;
     if (estado && (r.ESTADO||'') !== estado) return false;
     return true;
@@ -683,7 +710,7 @@ function filtrarProg() {
     const demCl = dem<=-38?'td-r':dem<=-32?'td-a':'';
     return `<tr>
       <td class="mono">${i+1}</td>
-      <td class="mono">${r.FECHA||'—'}</td>
+      <td class="mono">${fmtFecha(r.FECHA)}</td>
       <td class="mono" style="font-weight:500">${(r.HORARIO||'').substring(0,5)}</td>
       <td style="font-size:11px">${r.DEPOSITO||'—'}</td>
       <td>${tipoBadge(r.TIPO)}</td>
@@ -763,7 +790,7 @@ function renderMetricas() {
     const fok = fp.filter(r=>['ENTREGADO','TRASVASIJE'].includes(r.ESTADO)).length;
     const fpct = fp.length ? Math.round(fok/fp.length*100) : 0;
     const c = fpct>=90?'var(--green)':fpct>=60?'var(--amber)':'var(--red)';
-    return `<tr><td class="mono">${f}</td><td class="mono">${fp.length}</td><td class="mono td-g">${fok}</td><td class="mono">${fp.length-fok}</td><td style="color:${c};font-weight:500">${fpct}%</td></tr>`;
+    return `<tr><td class="mono">${fmtFecha(f)}</td><td class="mono">${fp.length}</td><td class="mono td-g">${fok}</td><td class="mono">${fp.length-fok}</td><td style="color:${c};font-weight:500">${fpct}%</td></tr>`;
   }).join('');
 }
 
