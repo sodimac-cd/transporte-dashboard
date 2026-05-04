@@ -602,73 +602,102 @@ function renderAll() {
   renderAsig();
 }
 
-// ── RENDER DASHBOARD ──────────────────────────────────────
+// ── RENDER DASHBOARD ──────────────────────────────────────────────────────────
 function renderDashboard() {
   const p = STATE.prog;
-  const total = p.length;
-  // Mostrar programa más reciente si no hay de hoy
-  const fechas = [...new Set(p.map(r=>r.FECHA||r.fecha||''))].filter(Boolean).sort();
-  const ultimaFecha = fechas[fechas.length-1] || '';
-  document.getElementById('prog-fecha-badge').textContent = ultimaFecha ? 'Programa ' + fmtFecha(ultimaFecha) : '—';
+  if (!p.length) return;
 
-  const ok    = p.filter(r=>(r.ESTADO||'').toUpperCase()==='ENTREGADO'||r.ESTADO==='TRASVASIJE').length;
-  const pend  = p.filter(r=>(r.ESTADO||'').toUpperCase()==='PENDIENTE'||(r.ESTADO||'')==='').length;
-  const dem   = [...STATE.transito].filter(r=>parseInt(r.DEMURRAGE||0)>=-10).length;
+  // Separar por fecha — más reciente = programa activo
+  // Obtener fechas únicas y ordenar correctamente (más reciente = mayor)
+  const fechasSet = [...new Set(p.map(r => normFecha(r.FECHA||r.fecha||'')).filter(Boolean))];
+  // Ordenar por fecha real (mayor = más reciente = va primero como activo)
+  fechasSet.sort((a,b) => new Date(a+' 12:00:00') - new Date(b+' 12:00:00'));
+  const fechaActual   = fechasSet[fechasSet.length - 1] || '';  // más reciente
+  const fechaAnterior = fechasSet.length > 1 ? fechasSet[fechasSet.length - 2] : ''; // anterior
 
-  document.getElementById('k-total').textContent = total||'—';
-  document.getElementById('k-ok').textContent    = ok||'0';
-  document.getElementById('k-pend').textContent  = pend||'0';
-  document.getElementById('k-dem').textContent   = dem||'0';
+  const progActual   = p.filter(r => normFecha(r.FECHA||r.fecha||'') === fechaActual);
+  const progAnterior = p.filter(r => normFecha(r.FECHA||r.fecha||'') === fechaAnterior);
 
-  // Timeline por horario
+  // KPIs del programa ACTIVO (más reciente)
+  const total = progActual.length;
+  const ok    = progActual.filter(r => ['ENTREGADO','TRASVASIJE'].includes((r.ESTADO||'').toUpperCase())).length;
+  const pend  = progActual.filter(r => !['ENTREGADO','TRASVASIJE','CANCELADO'].includes((r.ESTADO||'').toUpperCase())).length;
+  const dem   = STATE.transito.filter(r => parseInt(r.DEMURRAGE||0) >= -10).length;
+
+  document.getElementById('prog-fecha-badge').textContent = fechaActual ? 'Programa activo: ' + fmtFecha(fechaActual) : '—';
+  document.getElementById('k-total').textContent = total || '—';
+  document.getElementById('k-ok').textContent    = ok    || '0';
+  document.getElementById('k-pend').textContent  = pend  || '0';
+  document.getElementById('k-dem').textContent   = dem   || '0';
+
+  // Timeline del programa activo por horario
   const byH = {};
-  p.forEach(r=>{ const h=(r.HORARIO||'').substring(0,5); if(h){ if(!byH[h]) byH[h]=[]; byH[h].push(r); } });
+  progActual.forEach(r => {
+    const h = (r.HORARIO||'').substring(0,5);
+    if (h) { if (!byH[h]) byH[h] = []; byH[h].push(r); }
+  });
   const horas = Object.keys(byH).sort();
   const tl = document.getElementById('tl-list');
-  document.getElementById('tl-badge').textContent = horas.length + ' horarios';
-  if (!horas.length) { tl.innerHTML='<div class="empty">Sin datos de programación</div>'; }
-  else {
-    tl.innerHTML = horas.slice(0,8).map(h => {
-      const items = byH[h];
-      const tipos = [...new Set(items.map(r=>r.TIPO))].join(', ');
-      const bodegas = [...new Set(items.map(r=>r.BODEGA||r.DEPOSITO||''))].slice(0,1).join('');
-      return `<div class="tl"><span class="tl-t">${h}</span><div class="tl-b"><div class="tl-ttl">${items.length} contenedor${items.length>1?'es':''} — ${tipos}</div><div class="tl-s">${bodegas}</div></div><span class="b bb">${items.length}</span></div>`;
-    }).join('');
-  }
+  document.getElementById('tl-badge').textContent = total + ' contenedores';
+  tl.innerHTML = horas.length ? horas.slice(0,8).map(h => {
+    const items = byH[h];
+    const tipos = [...new Set(items.map(r => r.TIPO))].join(', ');
+    const bodega = [...new Set(items.map(r => r.BODEGA||r.DEPOSITO||''))].slice(0,1).join('');
+    return `<div class="tl"><span class="tl-t">${h}</span><div class="tl-b"><div class="tl-ttl">${items.length} contenedor${items.length>1?'es':''} — ${tipos}</div><div class="tl-s">${bodega}</div></div><span class="b bb">${items.length}</span></div>`;
+  }).join('') : '<div class="empty">Sin horarios cargados</div>';
 
   // Alertas
   const alerts = [];
-  if (dem>0) alerts.push({c:'#DC2626',t:dem+' contenedor'+(dem>1?'es':'')+' con demurrage &lt;10 días libres',s:'Revisar urgente',badge:'<span class="b br">Urgente</span>'});
-  const sinD = STATE.transito.filter(r=>(r.STATUS||'').toUpperCase()==='SIN DESPACHO').length;
-  if (sinD>0) alerts.push({c:'#D97706',t:sinD+' contenedor'+(sinD>1?'es':'')+' sin despacho',s:'En depósito de origen',badge:'<span class="b ba">Pendiente</span>'});
-  if (ok===total&&total>0) alerts.push({c:'#16A34A',t:'Programa completado al 100%',s:total+'/'+total+' entregas confirmadas',badge:'<span class="b bg">OK</span>'});
+  if (dem > 0) alerts.push({c:'#DC2626', t: dem+' contenedor'+(dem>1?'es':'')+' con demurrage crítico',    s:'Menos de 10 días libres — revisar urgente', badge:'<span class="b br">Urgente</span>'});
+  const sinD = STATE.transito.filter(r => (r.STATUS||'').toUpperCase() === 'SIN DESPACHO').length;
+  if (sinD > 0) alerts.push({c:'#D97706', t: sinD+' contenedor'+(sinD>1?'es':'')+' sin despacho',          s:'En depósito de origen sin transportista', badge:'<span class="b ba">Pendiente</span>'});
+  if (pend > 0) alerts.push({c:'#D97706', t: pend+' contenedor'+(pend>1?'es':'')+' pendientes de arribar', s:'Programa '+fmtFecha(fechaActual)+' sin confirmar', badge:'<span class="b ba">Pendiente</span>'});
+  if (ok === total && total > 0) alerts.push({c:'#16A34A', t:'Programa completado al 100%', s:total+'/'+total+' entregas confirmadas', badge:'<span class="b bg">OK</span>'});
 
   const alEl = document.getElementById('al-list');
   document.getElementById('al-badge').textContent = alerts.length;
   alEl.innerHTML = alerts.length
-    ? alerts.map(a=>`<div class="al"><div class="al-dot" style="background:${a.c}"></div><div class="al-body"><div class="al-title">${a.t}</div><div class="al-sub">${a.s}</div></div>${a.badge}</div>`).join('')
+    ? alerts.map(a => `<div class="al"><div class="al-dot" style="background:${a.c}"></div><div class="al-body"><div class="al-title">${a.t}</div><div class="al-sub">${a.s}</div></div>${a.badge}</div>`).join('')
     : '<div class="empty">Sin alertas activas</div>';
 
-  // Depósitos desde tránsito
+  // Depósitos
   const deps = {};
-  STATE.transito.forEach(r=>{ const d=(r.DEPOSITO||'').toUpperCase(); deps[d]=(deps[d]||0)+1; });
-  document.getElementById('d-sits').textContent = deps['SITRANS SAN ANTONIO']||'0';
-  document.getElementById('d-med').textContent  = deps['MEDLOG VALPARAISO']||'0';
-  document.getElementById('d-cis').textContent  = deps['CIS SAN ANTONIO']||'0';
-  document.getElementById('d-hgt').textContent  = deps['HGT SAN ANTONIO']||'0';
-  document.getElementById('d-terc').textContent = p.filter(r=>(r.BODEGA||'').toUpperCase().includes('TERCOP')).length||'0';
+  STATE.transito.forEach(r => { const d=(r.DEPOSITO||'').toUpperCase(); deps[d]=(deps[d]||0)+1; });
+  document.getElementById('d-sits').textContent = deps['SITRANS SAN ANTONIO'] || '0';
+  document.getElementById('d-med').textContent  = deps['MEDLOG VALPARAISO']   || '0';
+  document.getElementById('d-cis').textContent  = deps['CIS SAN ANTONIO']     || '0';
+  document.getElementById('d-hgt').textContent  = deps['HGT SAN ANTONIO']     || '0';
+  document.getElementById('d-terc').textContent = progActual.filter(r => (r.BODEGA||'').toUpperCase().includes('TERCOP')).length || '0';
 
-  // Cumplimiento
+  // Cumplimiento programa activo
   const pct = total ? Math.round(ok/total*100) : 0;
   const col = pct>=90?'var(--green)':pct>=60?'var(--amber)':'var(--red)';
-  const hc  = p.filter(r=>r.TIPO==='HC').length;
-  const std = p.filter(r=>r.TIPO==='STD').length;
-  document.getElementById('cumpl-bars').innerHTML = `
+  const hc  = progActual.filter(r => r.TIPO==='HC').length;
+  const std = progActual.filter(r => r.TIPO==='STD').length;
+
+  let cumplHtml = `
     <div class="bw"><div class="bl">Entregas confirmadas <span>${ok}/${total}</span></div><div class="bg-bar"><div class="bar" style="width:${pct}%;background:${col}"></div></div></div>
     <div class="bw"><div class="bl">HC 40ft <span>${hc}</span></div><div class="bg-bar"><div class="bar" style="width:${total?Math.round(hc/total*100):0}%;background:var(--blue)"></div></div></div>
-    <div class="bw"><div class="bl">STD 20ft <span>${std}</span></div><div class="bg-bar"><div class="bar" style="width:${total?Math.round(std/total*100):0}%;background:var(--text3)"></div></div></div>
-    <div class="ms"><span class="ms-l">Fecha más reciente</span><span class="ms-v">${ultimaFecha||'—'}</span></div>
-    <div class="ms"><span class="ms-l">Cumplimiento</span><span class="ms-v" style="color:${col}">${pct}%</span></div>`;
+    <div class="bw"><div class="bl">STD 20ft <span>${std}</span></div><div class="bg-bar"><div class="bar" style="width:${total?Math.round(std/total*100):0}%;background:var(--text3)"></div></div></div>`;
+
+  // Resumen programa ANTERIOR si existe
+  if (progAnterior.length > 0) {
+    const pOk   = progAnterior.filter(r => ['ENTREGADO','TRASVASIJE'].includes((r.ESTADO||'').toUpperCase())).length;
+    const pPend = progAnterior.filter(r => !['ENTREGADO','TRASVASIJE','CANCELADO'].includes((r.ESTADO||'').toUpperCase())).length;
+    const pCanc = progAnterior.filter(r => (r.ESTADO||'').toUpperCase() === 'CANCELADO').length;
+    const pPct  = progAnterior.length ? Math.round(pOk/progAnterior.length*100) : 0;
+    const pCol  = pPct>=90?'var(--green)':pPct>=60?'var(--amber)':'var(--red)';
+    cumplHtml += `
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px">Programa anterior — ${fmtFecha(fechaAnterior)}</div>
+        <div class="ms"><span class="ms-l">Total programado</span><span class="ms-v">${progAnterior.length}</span></div>
+        <div class="ms"><span class="ms-l">Entregados / Trasvasije</span><span class="ms-v" style="color:var(--green)">${pOk}</span></div>
+        <div class="ms"><span class="ms-l">Pendientes de arribo</span><span class="ms-v" style="color:${pPend>0?'var(--amber)':'var(--text)'};">${pPend}</span></div>
+        <div class="ms"><span class="ms-l">Cancelados</span><span class="ms-v" style="color:${pCanc>0?'var(--red)':'var(--text)'};">${pCanc}</span></div>
+        <div class="ms"><span class="ms-l">Cumplimiento final</span><span class="ms-v" style="color:${pCol};font-weight:600">${pPct}%</span></div>
+      </div>`;
+  }
+  document.getElementById('cumpl-bars').innerHTML = cumplHtml;
 }
 
 // ── RENDER PROGRAMACION ───────────────────────────────────
