@@ -4,13 +4,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CD Lo Espejo — Control de Transporte</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#f0f2f8;color:#1a1a2e;height:100vh;overflow:hidden}
 .app{display:flex;height:100vh;overflow:hidden}
 .sidebar{width:210px;min-width:210px;background:#1a3a8f;color:#fff;display:flex;flex-direction:column;overflow-y:auto}
 .sidebar-logo{padding:16px;border-bottom:1px solid rgba(255,255,255,0.15)}
-.sidebar-logo .title{font-size:14px;font-weight:600;color:#fff}
+.sidebar-logo .title{font-size:14px;font-weight:600}
 .sidebar-logo .sub{font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px}
 .sidebar-section{padding:8px 12px 4px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
 .sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:13px;color:rgba(255,255,255,0.8);cursor:pointer;transition:background .15s}
@@ -20,37 +21,40 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f2f8;color:#1a1a2e;height:1
 .sidebar-item .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.5);flex-shrink:0}
 .sidebar-item.active .dot{background:#60c8ff}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{background:#2247b8;color:#fff;padding:0 20px;height:48px;display:flex;align-items:center;gap:0;border-bottom:1px solid rgba(0,0,0,0.1);flex-shrink:0}
-.topbar-logo{font-size:13px;font-weight:600;margin-right:24px;white-space:nowrap}
+.topbar{background:#2247b8;color:#fff;padding:0 20px;height:48px;display:flex;align-items:center;flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.1)}
+.topbar-logo{font-size:13px;font-weight:600;margin-right:20px;white-space:nowrap}
 .topbar-logo span{font-size:11px;font-weight:400;opacity:.75;display:block}
-.nav-tabs{display:flex;height:100%;gap:2px;overflow-x:auto}
-.nav-tab{padding:0 14px;font-size:13px;color:rgba(255,255,255,0.75);cursor:pointer;border-bottom:2px solid transparent;height:100%;display:flex;align-items:center;transition:all .15s;white-space:nowrap}
+.nav-tabs{display:flex;height:100%;gap:0;overflow-x:auto}
+.nav-tab{padding:0 13px;font-size:13px;color:rgba(255,255,255,0.75);cursor:pointer;border-bottom:2px solid transparent;height:100%;display:flex;align-items:center;white-space:nowrap;transition:all .15s}
 .nav-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
 .nav-tab.active{color:#fff;border-bottom-color:#60c8ff;background:rgba(255,255,255,0.1)}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .topbar-time{font-size:12px;opacity:.75;white-space:nowrap}
-.btn-update{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-update{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer}
 .content{flex:1;overflow-y:auto;padding:20px;background:#f0f2f8}
 .page{display:none}
 .page.active{display:block}
 .page-header{margin-bottom:18px}
-.page-header h2{font-size:18px;font-weight:600;color:#1a1a2e}
+.page-header h2{font-size:18px;font-weight:600}
 .page-header p{font-size:13px;color:#666;margin-top:3px}
-.tabs-row{display:flex;gap:0;border-bottom:1.5px solid #e0e0e0;margin-bottom:18px}
-.tab-btn{padding:8px 16px;font-size:13px;color:#666;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1.5px;background:none;border-top:none;border-left:none;border-right:none}
+.tabs-row{display:flex;border-bottom:1.5px solid #e0e0e0;margin-bottom:18px}
+.tab-btn{padding:8px 16px;font-size:13px;color:#666;cursor:pointer;border:none;border-bottom:2px solid transparent;margin-bottom:-1.5px;background:none}
 .tab-btn.active{color:#1a3a8f;border-bottom-color:#1a3a8f;font-weight:500}
 .card{background:#fff;border:1px solid #e8eaf0;border-radius:10px;padding:16px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
 .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.card-title{font-size:14px;font-weight:600;color:#1a1a2e}
+.card-title{font-size:14px;font-weight:600}
 .badge{background:#e8f0fe;color:#1a3a8f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
-.badge.warn{background:#fff3cd;color:#856404}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th{text-align:left;padding:7px 8px;color:#888;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #eee}
 td{padding:8px 8px;border-bottom:1px solid #f5f5f5;color:#1a1a2e}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#fafbff}
 .gps-pill{background:#fff3cd;color:#856404;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;white-space:nowrap;display:inline-block}
-.gps-pill.ok{background:#d1fae5;color:#065f46}
+.estado-pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
+.estado-pendiente{background:#fff3cd;color:#856404}
+.estado-entregado{background:#d1fae5;color:#065f46}
+.estado-cancelado{background:#fee2e2;color:#991b1b}
+.estado-reprogramado{background:#e0e7ff;color:#3730a3}
 .action-btn{background:#fff;border:1px solid #d0d5e8;color:#444;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .15s}
 .action-btn:hover{background:#f0f2f8}
 .action-btn.primary{background:#1a3a8f;border-color:#1a3a8f;color:#fff}
@@ -62,32 +66,30 @@ tr:hover td{background:#fafbff}
 .form-group input:focus,.form-group select:focus{border-color:#1a3a8f;box-shadow:0 0 0 2px rgba(26,58,143,0.1)}
 .form-group.full{grid-column:1/-1}
 .form-footer{margin-top:14px;display:flex;gap:10px;justify-content:flex-end}
-.qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:4px}
-.qr-card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
-.qr-card h3{font-size:15px;font-weight:600;color:#1a1a2e;text-align:center}
-.qr-card p{font-size:12px;color:#666;text-align:center;line-height:1.5}
-.qr-wrap{background:#fff;padding:12px;border-radius:10px;border:2px solid #e8eaf0}
-.qr-label{font-size:11px;color:#888;text-align:center;font-family:monospace;word-break:break-all}
-.qr-download{background:#1a3a8f;color:#fff;border:none;padding:8px 20px;border-radius:6px;font-size:12px;cursor:pointer;margin-top:4px}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
 .stat-card{background:#fff;border-radius:8px;padding:14px;border:1px solid #e8eaf0}
 .stat-card .label{font-size:12px;color:#888;margin-bottom:4px}
-.stat-card .value{font-size:22px;font-weight:600;color:#1a1a2e}
+.stat-card .value{font-size:22px;font-weight:600}
 .stat-card .sub{font-size:11px;color:#aaa;margin-top:2px}
 .filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
-.filter-row select,.filter-row input{padding:5px 9px;border:1px solid #d0d5e8;border-radius:6px;font-size:12px;background:#fff;color:#1a1a2e}
+.filter-row select,.filter-row input{padding:5px 9px;border:1px solid #d0d5e8;border-radius:6px;font-size:12px;background:#fff}
 .empty-state{text-align:center;padding:40px;color:#aaa;font-size:13px}
 .section-divider{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
 .btn-row{display:flex;gap:10px;margin-bottom:16px}
-@media(max-width:700px){
-  .sidebar{display:none}
-  .form-grid{grid-template-columns:1fr}
-  .qr-grid{grid-template-columns:1fr}
-}
+/* QR */
+.qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.qr-card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.qr-card h3{font-size:15px;font-weight:600;text-align:center}
+.qr-card p{font-size:12px;color:#666;text-align:center;line-height:1.6}
+.qr-frame{background:#fff;padding:14px;border-radius:10px;border:2px solid #e8eaf0;display:flex;align-items:center;justify-content:center;min-height:228px;min-width:228px}
+.qr-url{font-size:11px;color:#888;text-align:center;font-family:monospace;word-break:break-all}
+.qr-dl{background:#1a3a8f;color:#fff;border:none;padding:9px 22px;border-radius:6px;font-size:13px;cursor:pointer;font-weight:500}
+.qr-dl:hover{background:#15317a}
 </style>
 </head>
 <body>
 <div class="app">
+  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-logo">
       <div style="width:32px;height:32px;background:#60c8ff;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px">
@@ -110,7 +112,7 @@ tr:hover td{background:#fafbff}
     <div class="sidebar-item" id="sb-contenedores" onclick="showPage('contenedores')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M7 7V5a2 2 0 014 0v2"/></svg> Contenedores
     </div>
-    <div class="sidebar-item sub-item active" id="sb-retiro" onclick="showPage('retiro')">
+    <div class="sidebar-item sub-item" id="sb-retiro" onclick="showPage('retiro')">
       <span class="dot"></span> Retiro Puerto
     </div>
     <div class="sidebar-item sub-item" id="sb-devolucion" onclick="showPage('devolucion')">
@@ -121,10 +123,11 @@ tr:hover td{background:#fafbff}
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h7v7H3zm11 0h7v7h-7zm-11 11h7v7H3zm11 2h2v-2h2v2h2v2h-2v2h-2v-2h-2zm0 4h2v2h-2zm4 0h2v2h-2z"/></svg> Códigos QR
     </div>
     <div class="sidebar-item" id="sb-config" onclick="showPage('config')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0-6l1.5 3h-3zm0 18l-1.5-3h3zm6-6l3 1.5v-3zm-18 0l-3-1.5v3zm15.5-9L19 8l-2-2zm-11 11L5 17l2-2zm11 0l-2 2-2-2zm-11-11l2-2 2 2z"/></svg> Configuración
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Configuración
     </div>
   </div>
 
+  <!-- MAIN -->
   <div class="main">
     <div class="topbar">
       <div class="topbar-logo">CD Lo Espejo <span>Área de Transporte</span></div>
@@ -137,32 +140,31 @@ tr:hover td{background:#fafbff}
         <div class="nav-tab" id="nt-config" onclick="showPage('config')">Configuración</div>
       </div>
       <div class="topbar-right">
-        <div class="topbar-time" id="clock">—</div>
+        <span class="topbar-time" id="clock"></span>
         <button class="btn-update" onclick="updateClock()">↻ Actualizar</button>
       </div>
     </div>
 
     <div class="content">
 
-      <!-- DASHBOARD -->
+      <!-- ===== DASHBOARD ===== -->
       <div id="page-dashboard" class="page active">
         <div class="page-header"><h2>Dashboard de Transporte</h2><p>Resumen general de todos los módulos</p></div>
         <div class="stats-grid">
-          <div class="stat-card"><div class="label">Total registros</div><div class="value">1</div><div class="sub">Activos hoy</div></div>
+          <div class="stat-card"><div class="label">Total registros</div><div class="value" id="d-total">1</div><div class="sub">activos hoy</div></div>
           <div class="stat-card"><div class="label">Contenedores</div><div class="value">1</div><div class="sub">1 retiro · 0 devolución</div></div>
-          <div class="stat-card"><div class="label">Abastecimiento Tienda</div><div class="value" style="font-size:13px;padding-top:4px">Próximo</div><div class="sub">Módulo en desarrollo</div></div>
-          <div class="stat-card"><div class="label">Despacho a Domicilio</div><div class="value" style="font-size:13px;padding-top:4px">Próximo</div><div class="sub">Módulo en desarrollo</div></div>
+          <div class="stat-card"><div class="label">Abastecimiento Tienda</div><div class="value" style="font-size:13px;padding-top:6px">Próximo</div><div class="sub">en desarrollo</div></div>
+          <div class="stat-card"><div class="label">Despacho a Domicilio</div><div class="value" style="font-size:13px;padding-top:6px">Próximo</div><div class="sub">en desarrollo</div></div>
         </div>
         <div class="card">
           <div class="card-header"><span class="card-title">Asignaciones Retiro Puerto</span><span class="badge">1</span></div>
-          <div style="overflow-x:auto">
-          <table>
+          <div style="overflow-x:auto"><table>
             <thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Creado</th></tr></thead>
-            <tbody>
-              <tr><td>02-05-2026</td><td>SITRANS SAN ANTONIO</td><td>—</td><td>H. BUSTOS</td><td>1</td><td>1</td><td>1</td><td>1</td><td><span class="gps-pill">RAMPLA-TRACTO</span></td><td style="font-size:11px;color:#999">02-05-2026, 4:28 p.m.</td></tr>
-            </tbody>
-          </table>
-          </div>
+            <tbody><tr>
+              <td>02-05-2026</td><td>SITRANS SAN ANTONIO</td><td>—</td><td>H. BUSTOS</td><td>1</td><td>1</td><td>1</td><td>1</td>
+              <td><span class="gps-pill">RAMPLA-TRACTO</span></td><td style="font-size:11px;color:#999">02-05-2026, 4:28 p.m.</td>
+            </tr></tbody>
+          </table></div>
         </div>
         <div class="card">
           <div class="card-header"><span class="card-title">Devoluciones Vacíos Navieros</span><span class="badge">0</span></div>
@@ -170,27 +172,26 @@ tr:hover td{background:#fafbff}
         </div>
       </div>
 
-      <!-- RETIRO PUERTO -->
+      <!-- ===== RETIRO PUERTO ===== -->
       <div id="page-retiro" class="page">
         <div class="page-header"><h2>Área de Transporte</h2><p>Retiro Puerto</p></div>
         <div class="btn-row">
-          <button class="action-btn primary" id="btn-retiro-reg" onclick="switchTab('retiro','registros')">≡ Registros</button>
-          <button class="action-btn" id="btn-retiro-new" onclick="switchTab('retiro','nueva')">+ Nueva Asignación</button>
+          <button class="action-btn primary" id="brr" onclick="switchTab('retiro','reg')">≡ Registros</button>
+          <button class="action-btn" id="brn" onclick="switchTab('retiro','new')">+ Nueva Asignación</button>
         </div>
-        <div id="retiro-registros">
+        <div id="retiro-reg">
           <div class="card">
             <div class="card-header"><span class="card-title">Asignaciones Retiro Puerto</span><span class="badge">1</span></div>
-            <div style="overflow-x:auto">
-            <table>
+            <div style="overflow-x:auto"><table>
               <thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Creado</th></tr></thead>
-              <tbody>
-                <tr><td>02-05-2026</td><td>SITRANS SAN ANTONIO</td><td>—</td><td>H. BUSTOS</td><td>1</td><td>1</td><td>1</td><td>1</td><td><span class="gps-pill">RAMPLA-TRACTO</span></td><td style="font-size:11px;color:#999">02-05-2026, 4:28 p.m.</td></tr>
-              </tbody>
-            </table>
-            </div>
+              <tbody><tr>
+                <td>02-05-2026</td><td>SITRANS SAN ANTONIO</td><td>—</td><td>H. BUSTOS</td><td>1</td><td>1</td><td>1</td><td>1</td>
+                <td><span class="gps-pill">RAMPLA-TRACTO</span></td><td style="font-size:11px;color:#999">02-05-2026, 4:28 p.m.</td>
+              </tr></tbody>
+            </table></div>
           </div>
         </div>
-        <div id="retiro-nueva" style="display:none">
+        <div id="retiro-new" style="display:none">
           <div class="card">
             <div class="card-title" style="margin-bottom:14px">Nueva Asignación — Retiro Puerto</div>
             <div class="section-divider">Datos Generales</div>
@@ -220,32 +221,30 @@ tr:hover td{background:#fafbff}
               </div>
             </div>
             <div class="form-footer">
-              <button class="action-btn" onclick="limpiarForm('retiro')">Limpiar</button>
+              <button class="action-btn">Limpiar</button>
               <button class="action-btn primary">Guardar en Google Sheets</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- DEVOLUCIÓN VACÍOS -->
+      <!-- ===== DEVOLUCIÓN VACÍOS ===== -->
       <div id="page-devolucion" class="page">
         <div class="page-header"><h2>Área de Transporte</h2><p>Devolución Vacíos</p></div>
         <div class="btn-row">
-          <button class="action-btn primary" id="btn-dev-reg" onclick="switchTab('dev','registros')">≡ Registros</button>
-          <button class="action-btn" id="btn-dev-new" onclick="switchTab('dev','nueva')">+ Nueva Devolución</button>
+          <button class="action-btn primary" id="bdr" onclick="switchTab('dev','reg')">≡ Registros</button>
+          <button class="action-btn" id="bdn" onclick="switchTab('dev','new')">+ Nueva Devolución</button>
         </div>
-        <div id="dev-registros">
+        <div id="dev-reg">
           <div class="card">
             <div class="card-header"><span class="card-title">Devoluciones Vacíos Navieros</span><span class="badge">0</span></div>
-            <div style="overflow-x:auto">
-            <table>
+            <div style="overflow-x:auto"><table>
               <thead><tr><th>Fecha</th><th>Depósito</th><th>Transporte</th><th>Contenedor</th><th>EIR</th><th>Creado</th></tr></thead>
               <tbody><tr><td colspan="6" class="empty-state">Sin registros de devolución</td></tr></tbody>
-            </table>
-            </div>
+            </table></div>
           </div>
         </div>
-        <div id="dev-nueva" style="display:none">
+        <div id="dev-new" style="display:none">
           <div class="card">
             <div class="card-title" style="margin-bottom:14px">Nueva Devolución de Vacío Naviero</div>
             <div class="form-grid">
@@ -260,45 +259,44 @@ tr:hover td{background:#fafbff}
               <div class="form-group"><label>EIR *</label><input type="text" placeholder="Número EIR"/></div>
             </div>
             <div class="form-footer">
-              <button class="action-btn" onclick="limpiarForm('dev')">Limpiar</button>
+              <button class="action-btn">Limpiar</button>
               <button class="action-btn primary">Guardar en Google Sheets</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ASIGNACIONES (vista transportistas) -->
+      <!-- ===== ASIGNACIONES (transportistas) ===== -->
       <div id="page-asignaciones" class="page">
         <div class="page-header"><h2>Asignaciones transportistas</h2><p>Registros ingresados por empresas de transporte</p></div>
         <div class="tabs-row">
           <button class="tab-btn active" id="dbt-real" onclick="switchDashTab('real')">Registros en tiempo real</button>
-          <button class="tab-btn" id="dbt-ingresar" onclick="switchDashTab('ingresar')">Ingresar asignación</button>
+          <button class="tab-btn" id="dbt-ing" onclick="switchDashTab('ing')">Ingresar asignación</button>
         </div>
         <div id="dt-real">
           <div class="card">
             <div class="card-header"><span class="card-title">Asignaciones Retiro Puerto</span><span class="badge">1 registros</span></div>
-            <div style="overflow-x:auto">
-            <table>
+            <div style="overflow-x:auto"><table>
               <thead><tr><th>Fecha</th><th>Tipo</th><th>Depósito</th><th>Transportista</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th></tr></thead>
-              <tbody>
-                <tr><td>02-05-2026</td><td>—</td><td>SITRANS SAN ANTONIO</td><td>H. BUSTOS</td><td>1</td><td>1</td><td>1</td><td>1</td><td><span class="gps-pill">RAMPLA-TRACTO</span></td></tr>
-              </tbody>
-            </table>
-            </div>
+              <tbody><tr>
+                <td>02-05-2026</td><td>—</td><td>SITRANS SAN ANTONIO</td><td>H. BUSTOS</td><td>1</td><td>1</td><td>1</td><td>1</td>
+                <td><span class="gps-pill">RAMPLA-TRACTO</span></td>
+              </tr></tbody>
+            </table></div>
           </div>
         </div>
-        <div id="dt-ingresar" style="display:none">
+        <div id="dt-ing" style="display:none">
           <div class="card">
             <p style="font-size:13px;color:#666;margin-bottom:12px">Los transportistas completan este formulario. Los datos se guardan automáticamente en Google Sheets.</p>
-            <a href="https://sodimac-cd.github.io/transporte/" target="_blank" style="color:#1a3a8f;font-size:13px;display:inline-block;margin-bottom:16px">Pantalla completa ↗</a>
+            <a href="https://sodimac-cd.github.io/transporte/" target="_blank" style="color:#1a3a8f;font-size:13px;display:inline-block;margin-bottom:14px">Pantalla completa ↗</a>
             <div style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden">
-              <iframe src="https://sodimac-cd.github.io/transporte/" style="width:100%;height:520px;border:none" title="Panel de ingreso transportistas"></iframe>
+              <iframe src="https://sodimac-cd.github.io/transporte/" style="width:100%;height:520px;border:none" title="Panel transportistas"></iframe>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- PROGRAMACIÓN RM -->
+      <!-- ===== PROGRAMACIÓN RM ===== -->
       <div id="page-progRM" class="page">
         <div class="page-header"><h2>Programación RM</h2><p>Contenedores programados Región Metropolitana</p></div>
         <div class="filter-row">
@@ -307,17 +305,15 @@ tr:hover td{background:#fafbff}
           <select><option>Estado: Todos</option><option>PENDIENTE</option><option>ENTREGADO</option><option>TRASVASIJE</option><option>REPROGRAMADO</option><option>CANCELADO</option></select>
         </div>
         <div class="card">
-          <div class="card-header"><span class="card-title">Contenedores programados</span><span class="badge">— registros</span></div>
-          <div style="overflow-x:auto">
-          <table>
+          <div class="card-header"><span class="card-title">Contenedores programados</span><span class="badge" id="rm-count">— registros</span></div>
+          <div style="overflow-x:auto"><table>
             <thead><tr><th>#</th><th>Fecha</th><th>Hora</th><th>Depósito</th><th>Tipo</th><th>Cap</th><th>Contenedor</th><th>Peso</th><th>Demurrage</th><th>BL</th><th>SKU</th><th>Descripción</th><th>Transporte</th><th>Bodega</th><th>Servicio</th><th>Estado</th></tr></thead>
-            <tbody><tr><td colspan="16" class="empty-state">Sin registros programados — conecta Google Sheets</td></tr></tbody>
-          </table>
-          </div>
+            <tbody><tr><td colspan="16" class="empty-state">Sin registros — conecta Google Sheets en Configuración</td></tr></tbody>
+          </table></div>
         </div>
       </div>
 
-      <!-- PROGRAMA PUERTO -->
+      <!-- ===== PROGRAMA PUERTO ===== -->
       <div id="page-progPuerto" class="page">
         <div class="page-header"><h2>Programa de Puerto</h2><p>Contenedores sin despacho por depósito de origen</p></div>
         <div class="stats-grid">
@@ -327,16 +323,14 @@ tr:hover td{background:#fafbff}
         </div>
         <div class="card">
           <div class="card-header"><span class="card-title">Detalle por depósito</span></div>
-          <div style="overflow-x:auto">
-          <table>
+          <div style="overflow-x:auto"><table>
             <thead><tr><th>#</th><th>Depósito</th><th>Contenedor</th><th>Tipo</th><th>CC</th><th>Demurrage</th><th>Destino</th><th>Transportista</th><th>Status</th></tr></thead>
-            <tbody><tr><td colspan="9" class="empty-state">Sin datos de programa de puerto</td></tr></tbody>
-          </table>
-          </div>
+            <tbody><tr><td colspan="9" class="empty-state">Sin datos — conecta Google Sheets en Configuración</td></tr></tbody>
+          </table></div>
         </div>
       </div>
 
-      <!-- MÉTRICAS -->
+      <!-- ===== MÉTRICAS ===== -->
       <div id="page-metricas" class="page">
         <div class="page-header"><h2>Métricas de cumplimiento</h2><p>Análisis del programa activo</p></div>
         <div class="stats-grid">
@@ -354,64 +348,66 @@ tr:hover td{background:#fafbff}
         </div>
       </div>
 
-      <!-- CONFIGURACIÓN -->
+      <!-- ===== CONFIGURACIÓN ===== -->
       <div id="page-config" class="page">
         <div class="page-header"><h2>Configuración</h2><p>Conexión con Google Sheets</p></div>
         <div class="card">
-          <div class="card-title" style="margin-bottom:4px">⚡ Apps Script — Conexión directa (recomendado)</div>
-          <p style="font-size:12px;color:#888;margin-bottom:14px">Una vez desplegado el Apps Script en tu Sheet, pega aquí la URL. El dashboard leerá todas las hojas sin problemas.</p>
-          <div class="form-group" style="margin-bottom:14px"><label>URL del Web App</label><input type="text" id="appsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%"/></div>
+          <div class="card-title" style="margin-bottom:6px">⚡ Apps Script — Conexión directa (recomendado)</div>
+          <p style="font-size:12px;color:#888;margin-bottom:14px">Pega la URL de tu Web App de Apps Script. El dashboard leerá todas las hojas automáticamente.</p>
+          <div class="form-group" style="margin-bottom:14px"><label>URL del Web App</label>
+            <input type="text" id="appsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%"/>
+          </div>
           <div style="display:flex;gap:10px">
             <button class="action-btn primary" onclick="guardarUrl()">Guardar y cargar datos</button>
-            <button class="action-btn" onclick="verDemo()">Ver datos demo</button>
+            <button class="action-btn">Ver datos demo</button>
           </div>
         </div>
       </div>
 
-      <!-- QR CÓDIGOS -->
+      <!-- ===== CÓDIGOS QR ===== -->
       <div id="page-qr" class="page">
         <div class="page-header"><h2>Códigos QR — Acceso transportistas</h2><p>Escanea para ingresar directamente al panel correspondiente sin ver el dashboard completo</p></div>
         <div class="qr-grid">
           <div class="qr-card">
-            <div style="width:40px;height:40px;background:#e8f0fe;border-radius:10px;display:flex;align-items:center;justify-content:center">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="#1a3a8f"><path d="M1 3h15v13H1zm15 4l5 3v6h-5z"/></svg>
+            <div style="width:44px;height:44px;background:#e8f0fe;border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#1a3a8f"><path d="M1 3h15v13H1zm15 4l5 3v6h-5z"/></svg>
             </div>
             <h3>Retiro Puerto</h3>
             <p>Acceso directo al formulario de retiro de contenedores en puerto. Solo visible este módulo.</p>
-            <div class="qr-wrap"><canvas id="qr1" width="200" height="200"></canvas></div>
-            <div class="qr-label">sodimac-cd.github.io/transporte/</div>
-            <button class="qr-download" onclick="descargarQR('qr1','QR-Retiro-Puerto')">Descargar QR</button>
+            <div class="qr-frame"><canvas id="qr1"></canvas></div>
+            <div class="qr-url">sodimac-cd.github.io/transporte/</div>
+            <button class="qr-dl" onclick="descargarQR('qr1','QR-Retiro-Puerto')">Descargar QR</button>
           </div>
           <div class="qr-card">
-            <div style="width:40px;height:40px;background:#e8f0fe;border-radius:10px;display:flex;align-items:center;justify-content:center">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="#1a3a8f"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M7 7V5a2 2 0 014 0v2"/></svg>
+            <div style="width:44px;height:44px;background:#e8f0fe;border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#1a3a8f"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M7 7V5a2 2 0 014 0v2"/></svg>
             </div>
             <h3>Devolución Vacíos</h3>
             <p>Acceso directo al formulario de devolución de contenedores vacíos navieros. Solo visible este módulo.</p>
-            <div class="qr-wrap"><canvas id="qr2" width="200" height="200"></canvas></div>
-            <div class="qr-label">sodimac-cd.github.io/transporte/#devolucion</div>
-            <button class="qr-download" onclick="descargarQR('qr2','QR-Devolucion-Vacios')">Descargar QR</button>
+            <div class="qr-frame"><canvas id="qr2"></canvas></div>
+            <div class="qr-url">sodimac-cd.github.io/transporte/#devolucion</div>
+            <button class="qr-dl" onclick="descargarQR('qr2','QR-Devolucion-Vacios')">Descargar QR</button>
           </div>
         </div>
         <div class="card" style="margin-top:20px">
           <div class="card-title" style="margin-bottom:8px">¿Cómo funcionan estos QR?</div>
-          <p style="font-size:13px;color:#666;line-height:1.7">Cada código QR lleva al transportista directamente al formulario de su módulo (Retiro Puerto o Devolución Vacíos) en <strong>sodimac-cd.github.io/transporte/</strong>. El transportista solo ve y puede ingresar datos de ese módulo específico, sin acceso al dashboard general ni a otros módulos.</p>
+          <p style="font-size:13px;color:#666;line-height:1.7">Cada código QR lleva al transportista directamente al formulario de su módulo en <strong>sodimac-cd.github.io/transporte/</strong>. El transportista solo ve y puede ingresar datos de ese módulo específico, sin acceso al dashboard general ni a otros módulos.</p>
         </div>
       </div>
 
-      <!-- ABASTECIMIENTO -->
+      <!-- ===== ABASTECIMIENTO ===== -->
       <div id="page-abastecimiento" class="page">
         <div class="page-header"><h2>Abastecimiento Tienda</h2></div>
         <div class="card"><div class="empty-state">🏗️ Módulo próximamente disponible</div></div>
       </div>
 
-      <!-- DESPACHO -->
+      <!-- ===== DESPACHO ===== -->
       <div id="page-despacho" class="page">
         <div class="page-header"><h2>Despacho a Domicilio</h2></div>
         <div class="card"><div class="empty-state">🚚 Módulo próximamente disponible</div></div>
       </div>
 
-      <!-- CONTENEDORES -->
+      <!-- ===== CONTENEDORES ===== -->
       <div id="page-contenedores" class="page">
         <div class="page-header"><h2>Contenedores</h2><p>Resumen por módulo</p></div>
         <div class="stats-grid">
@@ -424,96 +420,85 @@ tr:hover td{background:#fafbff}
         </div>
       </div>
 
-    </div>
-  </div>
-</div>
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
+// ---- CLOCK ----
 function updateClock(){
-  const now=new Date();
-  const opts={weekday:'short',day:'numeric',month:'short',year:'numeric'};
-  const d=now.toLocaleDateString('es-CL',opts);
-  const t=now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
-  document.getElementById('clock').textContent=d+' · '+t;
+  const n=new Date();
+  document.getElementById('clock').textContent=
+    n.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+
+    ' · '+n.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
 }
 updateClock();
 setInterval(updateClock,30000);
 
-const pageNavMap={
-  dashboard:'nt-dashboard',progRM:'nt-progRM',progPuerto:'nt-progPuerto',
-  asignaciones:'nt-asignaciones',metricas:'nt-metricas',config:'nt-config'
-};
-
+// ---- NAVIGATION ----
+const NAV={dashboard:'nt-dashboard',progRM:'nt-progRM',progPuerto:'nt-progPuerto',asignaciones:'nt-asignaciones',metricas:'nt-metricas',config:'nt-config'};
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const el=document.getElementById('page-'+id);
-  if(el) el.classList.add('active');
+  const pg=document.getElementById('page-'+id);
+  if(pg) pg.classList.add('active');
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  if(pageNavMap[id]) document.getElementById(pageNavMap[id]).classList.add('active');
+  if(NAV[id]) document.getElementById(NAV[id]).classList.add('active');
   document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
   const sb=document.getElementById('sb-'+id);
   if(sb) sb.classList.add('active');
-  if(id==='qr') generateQRs();
+  if(id==='qr') renderQR();
 }
 
+// ---- TABS ----
 function switchTab(mod,tab){
   if(mod==='retiro'){
-    document.getElementById('retiro-registros').style.display=tab==='registros'?'block':'none';
-    document.getElementById('retiro-nueva').style.display=tab==='nueva'?'block':'none';
-    document.getElementById('btn-retiro-reg').className='action-btn'+(tab==='registros'?' primary':'');
-    document.getElementById('btn-retiro-new').className='action-btn'+(tab==='nueva'?' primary':'');
+    document.getElementById('retiro-reg').style.display=tab==='reg'?'block':'none';
+    document.getElementById('retiro-new').style.display=tab==='new'?'block':'none';
+    document.getElementById('brr').className='action-btn'+(tab==='reg'?' primary':'');
+    document.getElementById('brn').className='action-btn'+(tab==='new'?' primary':'');
   } else {
-    document.getElementById('dev-registros').style.display=tab==='registros'?'block':'none';
-    document.getElementById('dev-nueva').style.display=tab==='nueva'?'block':'none';
-    document.getElementById('btn-dev-reg').className='action-btn'+(tab==='registros'?' primary':'');
-    document.getElementById('btn-dev-new').className='action-btn'+(tab==='nueva'?' primary':'');
+    document.getElementById('dev-reg').style.display=tab==='reg'?'block':'none';
+    document.getElementById('dev-new').style.display=tab==='new'?'block':'none';
+    document.getElementById('bdr').className='action-btn'+(tab==='reg'?' primary':'');
+    document.getElementById('bdn').className='action-btn'+(tab==='new'?' primary':'');
   }
 }
-
-function switchDashTab(tab){
-  document.getElementById('dbt-real').className='tab-btn'+(tab==='real'?' active':'');
-  document.getElementById('dbt-ingresar').className='tab-btn'+(tab==='ingresar'?' active':'');
-  document.getElementById('dt-real').style.display=tab==='real'?'block':'none';
-  document.getElementById('dt-ingresar').style.display=tab==='ingresar'?'block':'none';
+function switchDashTab(t){
+  document.getElementById('dbt-real').className='tab-btn'+(t==='real'?' active':'');
+  document.getElementById('dbt-ing').className='tab-btn'+(t==='ing'?' active':'');
+  document.getElementById('dt-real').style.display=t==='real'?'block':'none';
+  document.getElementById('dt-ing').style.display=t==='ing'?'block':'none';
 }
 
-function limpiarForm(mod){
-  const prefix=mod==='retiro'?'retiro-nueva':'dev-nueva';
-  document.querySelectorAll('#'+prefix+' input,#'+prefix+' select').forEach(el=>{
-    if(el.tagName==='SELECT') el.selectedIndex=0;
-    else el.value='';
-  });
-}
-
+// ---- CONFIG ----
 function guardarUrl(){
-  const url=document.getElementById('appsScriptUrl').value.trim();
-  if(url) localStorage.setItem('appsScriptUrl',url);
-  alert('URL guardada. Recarga para aplicar.');
+  const u=document.getElementById('appsScriptUrl').value.trim();
+  if(u){localStorage.setItem('asUrl',u);alert('URL guardada. Recarga para aplicar.');}
+}
+const su=localStorage.getItem('asUrl');
+if(su) document.getElementById('appsScriptUrl').value=su;
+
+// ---- QR ----
+var qrDone=false;
+function renderQR(){
+  if(qrDone) return;
+  if(typeof QRCode==='undefined'){setTimeout(renderQR,200);return;}
+  var opts={width:200,margin:1,color:{dark:'#1a3a8f',light:'#ffffff'}};
+  QRCode.toCanvas(document.getElementById('qr1'),'https://sodimac-cd.github.io/transporte/',opts,function(e){if(e)console.warn(e);});
+  QRCode.toCanvas(document.getElementById('qr2'),'https://sodimac-cd.github.io/transporte/#devolucion',opts,function(e){if(e)console.warn(e);});
+  qrDone=true;
+}
+function descargarQR(id,nom){
+  var a=document.createElement('a');
+  a.download=nom+'.png';
+  a.href=document.getElementById(id).toDataURL();
+  a.click();
 }
 
-function verDemo(){alert('Modo demo: los datos se cargarán desde el Apps Script configurado.');}
-
-let qrGenerated=false;
-function generateQRs(){
-  if(qrGenerated||typeof QRCode==='undefined') return;
-  QRCode.toCanvas(document.getElementById('qr1'),'https://sodimac-cd.github.io/transporte/',
-    {width:200,margin:1,color:{dark:'#1a3a8f',light:'#ffffff'}},function(){});
-  QRCode.toCanvas(document.getElementById('qr2'),'https://sodimac-cd.github.io/transporte/#devolucion',
-    {width:200,margin:1,color:{dark:'#1a3a8f',light:'#ffffff'}},function(){});
-  qrGenerated=true;
-}
-
-function descargarQR(canvasId,nombre){
-  const canvas=document.getElementById(canvasId);
-  const link=document.createElement('a');
-  link.download=nombre+'.png';
-  link.href=canvas.toDataURL();
-  link.click();
-}
-
-const saved=localStorage.getItem('appsScriptUrl');
-if(saved) document.getElementById('appsScriptUrl').value=saved;
+// Auto-render QR if page loads on QR section
+window.addEventListener('load',function(){
+  if(document.getElementById('page-qr').classList.contains('active')) renderQR();
+});
 </script>
 </body>
 </html>
