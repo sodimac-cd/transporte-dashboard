@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Devolución Vacíos — CD Lo Espejo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f0f4ff;min-height:100vh;color:#1a1a2e}
+.header{background:#1a3a8f;color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.header-icon{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header h1{font-size:16px;font-weight:600}
+.header p{font-size:11px;opacity:.75;margin-top:1px}
+.body{padding:16px;max-width:480px;margin:0 auto}
+.card{background:#fff;border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.07)}
+.section-title{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
+.form-group{margin-bottom:13px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:#444;margin-bottom:5px}
+.form-group input,.form-group select{width:100%;padding:10px 12px;border:1.5px solid #dde2f0;border-radius:8px;font-size:14px;color:#1a1a2e;background:#fff;outline:none;-webkit-appearance:none}
+.form-group input:focus,.form-group select:focus{border-color:#1a3a8f;box-shadow:0 0 0 3px rgba(26,58,143,0.1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-guardar{width:100%;background:#1a3a8f;color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+.btn-guardar:active{background:#15317a}
+.btn-limpiar{width:100%;background:#fff;color:#666;border:1.5px solid #dde2f0;padding:11px;border-radius:10px;font-size:14px;cursor:pointer;margin-top:8px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a3a8f;color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:500;display:none;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+.toast.show{display:block}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M7 7V5a2 2 0 014 0v2"/></svg>
+  </div>
+  <div>
+    <h1>Devolución Vacíos</h1>
+    <p>CD Lo Espejo — Área de Transporte</p>
+  </div>
+</div>
+<div class="body">
+  <div class="card">
+    <div class="section-title">Datos de la devolución</div>
+    <div class="form-row">
+      <div class="form-group"><label>Fecha *</label><input type="date" id="f-fecha"/></div>
+    </div>
+    <div class="form-group"><label>Depósito *</label>
+      <select id="f-deposito"><option value="">Seleccionar depósito...</option>
+        <option>SITRANS SAN ANTONIO</option><option>CIS SAN ANTONIO</option><option>HGT SAN ANTONIO</option>
+        <option>MEDLOG VALPARAISO</option><option>MEDLOG SAN ANTONIO</option><option>SITRANS VALPARAISO</option>
+        <option>HGT VALPARAISO</option><option>DEPOSITO CD</option><option>TERCOP</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Transportista *</label>
+      <select id="f-trans"><option value="">Seleccionar transporte...</option>
+        <option>85.131.900-K CASABLANCA</option><option>76.651.987-3 FR RENTAL</option>
+        <option>76107615-9 BYD</option><option>76.840.809-2 JUC CHILE</option>
+        <option>76.421.758-6 SERMOV</option><option>96.979.980-4 SAN FABIAN</option>
+        <option>76.501.883-8 CASTELLINI</option><option>77.082.997-6 CF</option>
+        <option>77.248.307-4 GLOBAL LOGISTIC</option><option>77.079.719-5 H. BUSTOS</option>
+        <option>77.304.186-5 CELMAR</option><option>96.500.950-7 SITRANS</option>
+        <option>77.090.481-1 PRECAM</option><option>76.228.166-K TRANVIAL</option>
+        <option>76.388.144-K MOVEONTRUCK</option><option>76.172.595-5 MEDLOG</option>
+        <option>76.381.392-4 JULIO HIDALGO</option>
+      </select>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">Datos del contenedor</div>
+    <div class="form-group"><label>Número de contenedor *</label><input type="text" id="f-contenedor" placeholder="XXXX0000000" style="text-transform:uppercase"/></div>
+    <div class="form-group"><label>EIR *</label><input type="text" id="f-eir" placeholder="Número EIR"/></div>
+  </div>
+  <button class="btn-guardar" onclick="guardar()">Guardar en Google Sheets</button>
+  <button class="btn-limpiar" onclick="limpiar()">Limpiar formulario</button>
+  <div style="height:30px"></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},3000);}
+function guardar(){
+  var d={fecha:document.getElementById('f-fecha').value,deposito:document.getElementById('f-deposito').value,transportista:document.getElementById('f-trans').value,contenedor:document.getElementById('f-contenedor').value,eir:document.getElementById('f-eir').value};
+  if(!d.fecha||!d.deposito||!d.transportista||!d.contenedor||!d.eir){toast('⚠️ Completa los campos obligatorios');return;}
+  var url=localStorage.getItem('asUrl');
+  if(!url){toast('Sin URL de Apps Script configurada');return;}
+  fetch(url,{method:'POST',body:JSON.stringify({modulo:'devolucion',datos:d})})
+    .then(function(){toast('✓ Guardado correctamente');limpiar();})
+    .catch(function(){toast('Error al guardar');});
+}
+function limpiar(){
+  ['f-deposito','f-trans'].forEach(function(id){document.getElementById(id).selectedIndex=0;});
+  ['f-contenedor','f-eir'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('f-fecha').valueAsDate=new Date();
+}
+document.getElementById('f-fecha').valueAsDate=new Date();
+</script>
+</body>
+</html>
