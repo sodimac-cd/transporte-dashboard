@@ -449,8 +449,18 @@ function genQR(){
   var u1='https://sodimac-cd.github.io/transporte/retiro-movil.html';
   var u2='https://sodimac-cd.github.io/transporte/devolucion-movil.html';
   var base='https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=1a237e&bgcolor=ffffff&data=';
+  
+  // Genera las imágenes
   document.getElementById('qr1-img').src=base+encodeURIComponent(u1);
   document.getElementById('qr2-img').src=base+encodeURIComponent(u2);
+  
+  // OPCIONAL: Hacer que hacer clic en la imagen abra la URL (envuelve la imagen en un enlace dinámicamente o abre en nueva pestaña)
+  document.getElementById('qr1-img').style.cursor = 'pointer';
+  document.getElementById('qr1-img').onclick = function() { window.open(u1, '_blank'); };
+  
+  document.getElementById('qr2-img').style.cursor = 'pointer';
+  document.getElementById('qr2-img').onclick = function() { window.open(u2, '_blank'); };
+  
   qrDone=true;
 }
 
