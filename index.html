@@ -1,920 +1,519 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CD Lo Espejo — Control de Transporte</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{
-  --blue:#1E56A0; --blue2:#154080; --blue3:#DBEAFE;
-  --bg:#F0F4F8; --white:#FFFFFF; --bg2:#EBF0F7; --border:#D1DCE8;
-  --text:#1A2332; --text2:#4A5568; --text3:#8A9BB0;
-  --green:#16A34A; --green-bg:#DCFCE7;
-  --amber:#D97706; --amber-bg:#FEF3C7;
-  --red:#DC2626; --red-bg:#FEE2E2;
-  --sidebar:220px; --nav:56px;
-  --r:8px; --rl:12px;
-  --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
-input,select,button{font-family:var(--font)}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px}
-
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;height:var(--nav);background:var(--blue);z-index:200;display:flex;align-items:center;padding:0 20px;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-.n-brand{display:flex;align-items:center;gap:10px;width:var(--sidebar)}
-.n-logo{width:30px;height:30px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center}
-.n-logo svg{width:16px;height:16px;fill:white}
-.n-title{font-size:13px;font-weight:600;color:white}
-.n-sub{font-size:10px;color:rgba(255,255,255,.7);margin-top:1px}
-.n-tabs{display:flex;gap:2px;flex:1}
-.n-tab{padding:6px 14px;border-radius:8px;border:none;background:transparent;color:rgba(255,255,255,.75);font-size:13px;cursor:pointer;transition:all .15s;white-space:nowrap}
-.n-tab:hover{background:rgba(255,255,255,.15);color:white}
-.n-tab.active{background:white;color:var(--blue);font-weight:600}
-.n-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.dot{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px #4ade80}
-.n-date{font-size:12px;color:rgba(255,255,255,.8)}
-.btn-act{padding:6px 14px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:white;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px}
-.btn-act:hover{background:rgba(255,255,255,.25)}
-.btn-act svg{width:12px;height:12px;fill:currentColor;transition:transform .4s}
-.btn-act.spin svg{transform:rotate(360deg)}
-
-/* SIDEBAR */
-aside{position:fixed;top:var(--nav);left:0;bottom:0;width:var(--sidebar);background:white;border-right:1px solid var(--border);overflow-y:auto;padding:8px 0;z-index:100}
-.s-sec{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);padding:14px 16px 4px}
-.s-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 16px;border:none;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;transition:all .12s;text-align:left;border-left:3px solid transparent}
-.s-btn:hover{background:var(--bg2);color:var(--text)}
-.s-btn.active{background:var(--blue3);color:var(--blue);font-weight:600;border-left-color:var(--blue)}
-.s-btn svg{width:15px;height:15px;fill:currentColor;opacity:.6;flex-shrink:0}
-.s-btn.active svg{opacity:1}
-.s-sub{padding:7px 16px 7px 42px;font-size:12px;color:var(--text2);cursor:pointer;display:block;border:none;background:transparent;width:100%;text-align:left}
-.s-sub::before{content:"· ";color:var(--text3)}
-.s-sub:hover{color:var(--blue)}
-
-/* MAIN */
-main{margin-left:var(--sidebar);padding:calc(var(--nav) + 20px) 22px 40px}
-.sec{display:none}
-.sec.active{display:block;animation:fi .18s ease}
-@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-
-/* PAGE TITLE */
-.pg-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.pg-title{font-size:17px;font-weight:600;color:var(--text)}
-.pg-sub{font-size:12px;color:var(--text3);margin-top:2px}
-
-/* KPI */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
-.kpi{background:white;border:1px solid var(--border);border-radius:var(--rl);padding:18px 20px;position:relative;overflow:hidden;transition:box-shadow .2s}
-.kpi:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
-.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.kpi.b::before{background:var(--blue)}
-.kpi.g::before{background:var(--green)}
-.kpi.a::before{background:var(--amber)}
-.kpi.r::before{background:var(--red)}
-.kpi-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px}
-.kpi-val{font-size:28px;font-weight:300;line-height:1;color:var(--text)}
-.kpi-val.b{color:var(--blue)}
-.kpi-val.g{color:var(--green)}
-.kpi-val.a{color:var(--amber)}
-.kpi-val.r{color:var(--red)}
-.kpi-sub{font-size:11px;color:var(--text3);margin-top:5px}
-
-/* GRID */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
-
-/* CARD */
-.card{background:white;border:1px solid var(--border);border-radius:var(--rl);padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.c-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.c-title{font-size:13px;font-weight:600;color:var(--text)}
-
-/* BADGE */
-.b{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
-.bg{background:var(--green-bg);color:#15803D}
-.ba{background:var(--amber-bg);color:#B45309}
-.br{background:var(--red-bg);color:#B91C1C}
-.bb{background:var(--blue3);color:var(--blue)}
-.bx{background:var(--bg2);color:var(--text2)}
-
-/* TABLE */
-.tw{overflow-x:auto;overflow-y:auto;max-height:60vh}
-table{width:100%;border-collapse:collapse;font-size:12px}
-thead th{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:2px solid var(--border);white-space:nowrap;text-align:left;background:#F8FAFC;position:sticky;top:0;z-index:2}
-tbody td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
-tbody tr:last-child td{border-bottom:none}
-tbody tr:hover td{background:var(--bg2)}
-.mono{font-family:var(--mono);font-size:11px;color:var(--text2)}
-.td-r{color:var(--red);font-weight:600}
-.td-g{color:var(--green)}
-
-/* BARS */
-.bw{margin-bottom:10px}
-.bl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
-.bl span{color:var(--text3);font-size:11px}
-.bg-bar{background:var(--bg2);border-radius:4px;height:6px;overflow:hidden}
-.bar{height:100%;border-radius:4px;transition:width .5s}
-
-/* FILTERS */
-.frow{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
-.flbl{font-size:11px;color:var(--text3)}
-select{padding:6px 12px;background:white;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;cursor:pointer}
-select:focus{outline:none;border-color:var(--blue)}
-
-/* ALERTS */
-.al{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
-.al:last-child{border-bottom:none}
-.al-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
-.al-body{flex:1}
-.al-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:1px}
-.al-sub{font-size:11px;color:var(--text3)}
-
-/* DEPOT */
-.dep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.dep{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px}
-.dep-name{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
-.dep-cnt{font-size:22px;font-weight:300;color:var(--blue)}
-.dep-sub{font-size:10px;color:var(--text3);margin-top:2px}
-
-/* MISC */
-.spn{display:flex;align-items:center;justify-content:center;gap:8px;padding:30px;color:var(--text3);font-size:13px}
-.spin{width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:rot .7s linear infinite}
-@keyframes rot{to{transform:rotate(360deg)}}
-.empty{text-align:center;padding:30px;color:var(--text3);font-size:12px}
-.ms{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
-.ms:last-child{border-bottom:none}
-.ms-l{font-size:12px;color:var(--text2)}
-.ms-v{font-size:13px;font-weight:500;color:var(--text)}
-input[type=text]{width:100%;padding:9px 12px;background:white;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;transition:border-color .15s;margin-top:4px}
-input[type=text]:focus{outline:none;border-color:var(--blue)}
-.tl{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
-.tl:last-child{border-bottom:none}
-.tl-t{font-family:var(--mono);font-size:11px;color:var(--text3);width:40px;flex-shrink:0;padding-top:1px}
-.tl-b{flex:1}
-.tl-ttl{font-size:12px;font-weight:500;color:var(--text)}
-.tl-s{font-size:11px;color:var(--text3)}
-@media(max-width:900px){
-  aside{display:none} main{margin-left:0}
-  .kpi-grid,.g2,.g3{grid-template-columns:1fr 1fr}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f0f2f8;color:#1a1a2e;height:100vh;overflow:hidden}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:210px;min-width:210px;background:#1a3a8f;color:#fff;display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-logo{padding:16px;border-bottom:1px solid rgba(255,255,255,0.15)}
+.sidebar-logo .title{font-size:14px;font-weight:600;color:#fff}
+.sidebar-logo .sub{font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px}
+.sidebar-section{padding:8px 12px 4px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:13px;color:rgba(255,255,255,0.8);cursor:pointer;transition:background .15s}
+.sidebar-item:hover{background:rgba(255,255,255,0.1);color:#fff}
+.sidebar-item.active{background:rgba(255,255,255,0.18);color:#fff;font-weight:500}
+.sidebar-item.sub-item{padding-left:28px;font-size:12px}
+.sidebar-item .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.5);flex-shrink:0}
+.sidebar-item.active .dot{background:#60c8ff}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:#2247b8;color:#fff;padding:0 20px;height:48px;display:flex;align-items:center;gap:0;border-bottom:1px solid rgba(0,0,0,0.1);flex-shrink:0}
+.topbar-logo{font-size:13px;font-weight:600;margin-right:24px;white-space:nowrap}
+.topbar-logo span{font-size:11px;font-weight:400;opacity:.75;display:block}
+.nav-tabs{display:flex;height:100%;gap:2px;overflow-x:auto}
+.nav-tab{padding:0 14px;font-size:13px;color:rgba(255,255,255,0.75);cursor:pointer;border-bottom:2px solid transparent;height:100%;display:flex;align-items:center;transition:all .15s;white-space:nowrap}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.nav-tab.active{color:#fff;border-bottom-color:#60c8ff;background:rgba(255,255,255,0.1)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.topbar-time{font-size:12px;opacity:.75;white-space:nowrap}
+.btn-update{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.content{flex:1;overflow-y:auto;padding:20px;background:#f0f2f8}
+.page{display:none}
+.page.active{display:block}
+.page-header{margin-bottom:18px}
+.page-header h2{font-size:18px;font-weight:600;color:#1a1a2e}
+.page-header p{font-size:13px;color:#666;margin-top:3px}
+.tabs-row{display:flex;gap:0;border-bottom:1.5px solid #e0e0e0;margin-bottom:18px}
+.tab-btn{padding:8px 16px;font-size:13px;color:#666;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1.5px;background:none;border-top:none;border-left:none;border-right:none}
+.tab-btn.active{color:#1a3a8f;border-bottom-color:#1a3a8f;font-weight:500}
+.card{background:#fff;border:1px solid #e8eaf0;border-radius:10px;padding:16px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-size:14px;font-weight:600;color:#1a1a2e}
+.badge{background:#e8f0fe;color:#1a3a8f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.badge.warn{background:#fff3cd;color:#856404}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;padding:7px 8px;color:#888;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #eee}
+td{padding:8px 8px;border-bottom:1px solid #f5f5f5;color:#1a1a2e}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbff}
+.gps-pill{background:#fff3cd;color:#856404;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;white-space:nowrap;display:inline-block}
+.gps-pill.ok{background:#d1fae5;color:#065f46}
+.action-btn{background:#fff;border:1px solid #d0d5e8;color:#444;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .15s}
+.action-btn:hover{background:#f0f2f8}
+.action-btn.primary{background:#1a3a8f;border-color:#1a3a8f;color:#fff}
+.action-btn.primary:hover{background:#15317a}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:12px;color:#555;font-weight:500}
+.form-group input,.form-group select{padding:7px 10px;border:1px solid #d0d5e8;border-radius:6px;font-size:13px;background:#fff;color:#1a1a2e;outline:none}
+.form-group input:focus,.form-group select:focus{border-color:#1a3a8f;box-shadow:0 0 0 2px rgba(26,58,143,0.1)}
+.form-group.full{grid-column:1/-1}
+.form-footer{margin-top:14px;display:flex;gap:10px;justify-content:flex-end}
+.qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:4px}
+.qr-card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.qr-card h3{font-size:15px;font-weight:600;color:#1a1a2e;text-align:center}
+.qr-card p{font-size:12px;color:#666;text-align:center;line-height:1.5}
+.qr-wrap{background:#fff;padding:12px;border-radius:10px;border:2px solid #e8eaf0}
+.qr-label{font-size:11px;color:#888;text-align:center;font-family:monospace;word-break:break-all}
+.qr-download{background:#1a3a8f;color:#fff;border:none;padding:8px 20px;border-radius:6px;font-size:12px;cursor:pointer;margin-top:4px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.stat-card{background:#fff;border-radius:8px;padding:14px;border:1px solid #e8eaf0}
+.stat-card .label{font-size:12px;color:#888;margin-bottom:4px}
+.stat-card .value{font-size:22px;font-weight:600;color:#1a1a2e}
+.stat-card .sub{font-size:11px;color:#aaa;margin-top:2px}
+.filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.filter-row select,.filter-row input{padding:5px 9px;border:1px solid #d0d5e8;border-radius:6px;font-size:12px;background:#fff;color:#1a1a2e}
+.empty-state{text-align:center;padding:40px;color:#aaa;font-size:13px}
+.section-divider{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
+.btn-row{display:flex;gap:10px;margin-bottom:16px}
+@media(max-width:700px){
+  .sidebar{display:none}
+  .form-grid{grid-template-columns:1fr}
+  .qr-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
-
-<nav>
-  <div class="n-brand">
-    <div class="n-logo"><svg viewBox="0 0 16 16"><path d="M2 4h12v1H2zm0 3.5h12v1H2zm0 3.5h8v1H2z"/></svg></div>
-    <div><div class="n-title">CD Lo Espejo</div><div class="n-sub">Área de Transporte</div></div>
-  </div>
-  <div class="n-tabs">
-    <button class="n-tab active" onclick="showTab('dashboard',this)">Dashboard</button>
-    <button class="n-tab" onclick="showTab('programacion',this)">Programación RM</button>
-    <button class="n-tab" onclick="showTab('transito',this)">Programa Puerto</button>
-    <button class="n-tab" onclick="showTab('asignaciones',this)">Asignaciones</button>
-    <button class="n-tab" onclick="showTab('metricas',this)">Métricas</button>
-    <button class="n-tab" onclick="showTab('config',this)">Configuración</button>
-  </div>
-  <div class="n-right">
-    <div class="dot" id="dot"></div>
-    <span class="n-date" id="ndate">—</span>
-    <button class="btn-act" onclick="refreshData()" id="btn-act">
-      <svg viewBox="0 0 12 12"><path d="M10.5 6A4.5 4.5 0 1 1 6 1.5a4.47 4.47 0 0 1 3.18 1.32M9 1h2.5v2.5" stroke="white" stroke-width="1.2" fill="none"/></svg>
-      Actualizar
-    </button>
-  </div>
-</nav>
-
-<aside>
-  <div class="s-sec">Principal</div>
-  <button class="s-btn active" onclick="showTab('dashboard',null);setActive(this)">
-    <svg viewBox="0 0 16 16"><path d="M1 1h6v6H1zm8 0h6v6H9zM1 9h6v6H1zm8 0h6v6H9z"/></svg>
-    Dashboard
-  </button>
-
-  <div class="s-sec">Módulos</div>
-  <button class="s-btn" onclick="showTab('programacion',null);setActive(this)" style="opacity:.5;cursor:not-allowed">
-    <svg viewBox="0 0 16 16"><path d="M1 2h14v2H1zm1 3h12l-1 9H3L2 5zm4 2v5h1V7H6zm3 0v5h1V7H9z"/></svg>
-    Abastecimiento Tienda <small style="opacity:.6;margin-left:3px">AT</small>
-  </button>
-
-  <button class="s-btn active-parent" id="btn-ctn" onclick="showTab('dashboard',null);setActive(this)" style="border-left:3px solid var(--blue);background:var(--blue3);color:var(--blue);font-weight:600">
-    <svg viewBox="0 0 16 16"><path d="M1 5h10l3 3.5V12h-2a2 2 0 01-4 0H5a2 2 0 01-4 0H1V5z"/></svg>
-    Contenedores <small style="opacity:.6;margin-left:3px">CTN</small>
-  </button>
-
-  <div id="ctn-submenu">
-    <button class="s-sub" onclick="showTab('programacion',null);setActive(this)">Programación RM</button>
-    <button class="s-sub" onclick="showTab('transito',null);setActive(this)">Programa Puerto</button>
-    <button class="s-sub" onclick="showTab('asignaciones',null);setActive(this)">Asignaciones</button>
-    <button class="s-sub" onclick="showTab('metricas',null);setActive(this)">Métricas</button>
-  </div>
-
-  <button class="s-btn" style="opacity:.5;cursor:not-allowed">
-    <svg viewBox="0 0 16 16"><path d="M2 13h2V6H2zm3 0h2V3H5zm3 0h2V8H8zm3 0h2V1h-2z"/></svg>
-    Despacho a Domicilio <small style="opacity:.6;margin-left:3px">DAD</small>
-  </button>
-
-  <div class="s-sec">Sistema</div>
-  <button class="s-btn" onclick="showTab('config',null);setActive(this)">
-    <svg viewBox="0 0 16 16"><path d="M8 5a3 3 0 100 6A3 3 0 008 5zm5.5 2l-.8-.2-.3-.6.4-.8-.9-.9-.8.4-.6-.3-.2-.8H9l-.2.8-.6.3-.8-.4-.9.9.4.8-.3.6-.8.2v1.4l.8.2.3.6-.4.8.9.9.8-.4.6.3.2.8h1.4l.2-.8.6-.3.8.4.9-.9-.4-.8.3-.6.8-.2V7z"/></svg>
-    Configuración
-  </button>
-</aside>
-
-<main>
-
-<!-- DASHBOARD -->
-<div id="sec-dashboard" class="sec active">
-  <div class="pg-hdr">
-    <div><div class="pg-title">Dashboard de Transporte</div><div class="pg-sub">Resumen del programa activo</div></div>
-    <span class="b bb" id="prog-fecha-badge">—</span>
-  </div>
-  <div class="kpi-grid">
-    <div class="kpi b"><div class="kpi-lbl">Total programado</div><div class="kpi-val b" id="k-total">—</div><div class="kpi-sub">contenedores</div></div>
-    <div class="kpi g"><div class="kpi-lbl">Entregados / OK</div><div class="kpi-val g" id="k-ok">—</div><div class="kpi-sub">confirmados</div></div>
-    <div class="kpi a"><div class="kpi-lbl">Pendientes</div><div class="kpi-val a" id="k-pend">—</div><div class="kpi-sub">sin confirmar arribo</div></div>
-    <div class="kpi r"><div class="kpi-lbl">Demurrage crítico</div><div class="kpi-val r" id="k-dem">—</div><div class="kpi-sub">con &lt;10 días libres</div></div>
-  </div>
-  <div class="g2">
-    <div class="card">
-      <div class="c-hdr"><span class="c-title">Próximos arribar</span><span class="b bb" id="tl-badge">—</span></div>
-      <div id="tl-list"><div class="spn"><div class="spin"></div>Cargando...</div></div>
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:32px;height:32px;background:#60c8ff;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 3h18v4H3zM3 10h12v4H3zM3 17h8v4H3z" fill="#1a3a8f"/></svg>
+      </div>
+      <div class="title">CD Lo Espejo</div>
+      <div class="sub">Área de Transporte</div>
     </div>
-    <div class="card">
-      <div class="c-hdr"><span class="c-title">Alertas activas</span><span class="b br" id="al-badge">—</span></div>
-      <div id="al-list"><div class="spn"><div class="spin"></div>Calculando...</div></div>
+    <div class="sidebar-section">Principal</div>
+    <div class="sidebar-item active" id="sb-dashboard" onclick="showPage('dashboard')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg> Dashboard
+    </div>
+    <div class="sidebar-section">Módulos</div>
+    <div class="sidebar-item" id="sb-abastecimiento" onclick="showPage('abastecimiento')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 7h-4V5a2 2 0 00-4 0v2H8L6 21h12L20 7z"/></svg> Abastecimiento Tienda
+    </div>
+    <div class="sidebar-item" id="sb-despacho" onclick="showPage('despacho')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M1 3h15v13H1zm15 4l5 3v6h-5z"/></svg> Despacho a Domicilio
+    </div>
+    <div class="sidebar-item" id="sb-contenedores" onclick="showPage('contenedores')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M7 7V5a2 2 0 014 0v2"/></svg> Contenedores
+    </div>
+    <div class="sidebar-item sub-item active" id="sb-retiro" onclick="showPage('retiro')">
+      <span class="dot"></span> Retiro Puerto
+    </div>
+    <div class="sidebar-item sub-item" id="sb-devolucion" onclick="showPage('devolucion')">
+      <span class="dot"></span> Devolución Vacíos
+    </div>
+    <div class="sidebar-section">Sistema</div>
+    <div class="sidebar-item" id="sb-qr" onclick="showPage('qr')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h7v7H3zm11 0h7v7h-7zm-11 11h7v7H3zm11 2h2v-2h2v2h2v2h-2v2h-2v-2h-2zm0 4h2v2h-2zm4 0h2v2h-2z"/></svg> Códigos QR
+    </div>
+    <div class="sidebar-item" id="sb-config" onclick="showPage('config')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0-6l1.5 3h-3zm0 18l-1.5-3h3zm6-6l3 1.5v-3zm-18 0l-3-1.5v3zm15.5-9L19 8l-2-2zm-11 11L5 17l2-2zm11 0l-2 2-2-2zm-11-11l2-2 2 2z"/></svg> Configuración
     </div>
   </div>
-  <div class="g2">
-    <div class="card">
-      <div class="c-hdr"><span class="c-title">Depósitos activos</span></div>
-      <div class="dep-grid" id="dep-grid">
-        <div class="dep"><div class="dep-name">Sitrans SAI</div><div class="dep-cnt" id="d-sits">—</div><div class="dep-sub">contenedores</div></div>
-        <div class="dep"><div class="dep-name">Medlog Valp</div><div class="dep-cnt" id="d-med">—</div><div class="dep-sub">contenedores</div></div>
-        <div class="dep"><div class="dep-name">CIS SAI</div><div class="dep-cnt" id="d-cis">—</div><div class="dep-sub">contenedores</div></div>
-        <div class="dep"><div class="dep-name">HGT SAI</div><div class="dep-cnt" id="d-hgt">—</div><div class="dep-sub">contenedores</div></div>
-        <div class="dep"><div class="dep-name">Deposito CD</div><div class="dep-cnt" style="color:var(--green)">DESTINO</div><div class="dep-sub">principal</div></div>
-        <div class="dep"><div class="dep-name">Dep. Tercop</div><div class="dep-cnt" id="d-terc">—</div><div class="dep-sub">destino alt.</div></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-logo">CD Lo Espejo <span>Área de Transporte</span></div>
+      <div class="nav-tabs">
+        <div class="nav-tab active" id="nt-dashboard" onclick="showPage('dashboard')">Dashboard</div>
+        <div class="nav-tab" id="nt-progRM" onclick="showPage('progRM')">Programación RM</div>
+        <div class="nav-tab" id="nt-progPuerto" onclick="showPage('progPuerto')">Programa Puerto</div>
+        <div class="nav-tab" id="nt-asignaciones" onclick="showPage('asignaciones')">Asignaciones</div>
+        <div class="nav-tab" id="nt-metricas" onclick="showPage('metricas')">Métricas</div>
+        <div class="nav-tab" id="nt-config" onclick="showPage('config')">Configuración</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-time" id="clock">—</div>
+        <button class="btn-update" onclick="updateClock()">↻ Actualizar</button>
       </div>
     </div>
-    <div class="card">
-      <div class="c-hdr"><span class="c-title">Cumplimiento del programa</span></div>
-      <div id="cumpl-bars"><div class="spn"><div class="spin"></div>Calculando...</div></div>
-    </div>
-  </div>
-</div>
 
-<!-- PROGRAMACION -->
-<div id="sec-programacion" class="sec">
-  <div class="pg-hdr">
-    <div><div class="pg-title">Programación RM</div><div class="pg-sub">Contenedores programados Región Metropolitana</div></div>
-  </div>
-  <div class="frow">
-    <span class="flbl">Fecha:</span>
-    <select id="f-fecha" onchange="filtrarProg()">
-      <option value="">Todas las fechas</option>
-    </select>
-    <span class="flbl">Tipo:</span>
-    <select id="f-tipo" onchange="filtrarProg()">
-      <option value="">Todos</option>
-      <option>HC</option><option>STD</option><option>DRY</option>
-    </select>
-    <span class="flbl">Estado:</span>
-    <select id="f-estado" onchange="filtrarProg()">
-      <option value="">Todos</option>
-      <option>PENDIENTE</option><option>ENTREGADO</option>
-      <option>TRASVASIJE</option><option>REPROGRAMADO</option><option>CANCELADO</option>
-    </select>
-    <span class="flbl" id="prog-cnt" style="margin-left:8px;color:var(--blue);font-weight:500">— registros</span>
-  </div>
-  <div class="card">
-    <div class="tw">
-      <table>
-        <thead><tr><th>#</th><th>Fecha</th><th>Hora</th><th>Depósito</th><th>Tipo</th><th>Cap</th><th>Contenedor</th><th>Peso</th><th>Demurrage</th><th>BL</th><th>SKU</th><th>Descripción</th><th>Transporte</th><th>Bodega</th><th>Servicio</th><th>Estado</th></tr></thead>
-        <tbody id="prog-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+    <div class="content">
 
-<!-- TRANSITO -->
-<div id="sec-transito" class="sec">
-  <div class="pg-hdr">
-    <div><div class="pg-title">Programa de Puerto</div><div class="pg-sub">Contenedores sin despacho por depósito de origen</div></div>
-  </div>
-  <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
-    <div class="kpi b"><div class="kpi-lbl">Total sin despacho</div><div class="kpi-val b" id="t-total">—</div><div class="kpi-sub">contenedores</div></div>
-    <div class="kpi r"><div class="kpi-lbl">Demurrage crítico</div><div class="kpi-val r" id="t-dem">—</div><div class="kpi-sub">&lt;10 días libres</div></div>
-    <div class="kpi a"><div class="kpi-lbl">Depósitos activos</div><div class="kpi-val a" id="t-deps">—</div><div class="kpi-sub">con contenedores</div></div>
-  </div>
-  <div class="card">
-    <div class="c-hdr"><span class="c-title">Detalle por depósito</span><span class="b bb" id="t-badge">—</span></div>
-    <div class="tw">
-      <table>
-        <thead><tr><th>#</th><th>Depósito</th><th>Contenedor</th><th>Tipo</th><th>CC</th><th>Demurrage</th><th>Destino</th><th>Transportista</th><th>Status</th></tr></thead>
-        <tbody id="trans-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ASIGNACIONES -->
-<div id="sec-asignaciones" class="sec">
-  <div class="pg-hdr">
-    <div><div class="pg-title">Asignaciones transportistas</div><div class="pg-sub">Registros ingresados por empresas de transporte</div></div>
-  </div>
-  <div style="display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0">
-    <button class="asig-tab" id="at-reg" onclick="showAsigTab('reg')" style="padding:8px 16px;border:none;background:transparent;border-bottom:2px solid var(--blue);color:var(--blue);font-size:13px;font-weight:600;cursor:pointer">Registros en tiempo real</button>
-    <button class="asig-tab" id="at-form" onclick="showAsigTab('form')" style="padding:8px 16px;border:none;background:transparent;border-bottom:2px solid transparent;color:var(--text2);font-size:13px;cursor:pointer">Ingresar asignación</button>
-  </div>
-  <div id="asig-reg">
-    <div class="card">
-      <div class="c-hdr"><span class="c-title">Asignaciones Retiro Puerto</span><span class="b bb" id="ar-badge">Sin datos</span></div>
-      <div class="tw"><table>
-        <thead><tr><th>Fecha</th><th>Tipo</th><th>Depósito</th><th>Transportista</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th></tr></thead>
-        <tbody id="ar-tbody"><tr><td colspan="9"><div class="spn"><div class="spin"></div>Configura el Apps Script para ver registros en vivo</div></td></tr></tbody>
-      </table></div>
-    </div>
-  </div>
-  <div id="asig-form" style="display:none">
-    <div style="background:var(--blue3);border:1px solid #93C5FD;border-radius:var(--rl);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
-      <div><div style="font-size:13px;font-weight:500">Panel de ingreso — transportistas</div><div style="font-size:12px;color:var(--text2);margin-top:3px">Los transportistas completan este formulario. Los datos se guardan automáticamente en Google Sheets.</div></div>
-      <a href="https://sodimac-cd.github.io/transporte/" target="_blank" style="padding:7px 14px;background:var(--blue);color:white;border-radius:8px;font-size:12px;font-weight:500;text-decoration:none;white-space:nowrap;margin-left:16px">Pantalla completa ↗</a>
-    </div>
-    <div style="border-radius:var(--rl);overflow:hidden;border:1px solid var(--border)">
-      <iframe src="https://sodimac-cd.github.io/transporte/" style="width:100%;height:700px;border:none" loading="lazy"></iframe>
-    </div>
-  </div>
-</div>
-
-<!-- METRICAS -->
-<div id="sec-metricas" class="sec">
-  <div class="pg-hdr"><div><div class="pg-title">Métricas de cumplimiento</div><div class="pg-sub">Análisis del programa activo</div></div></div>
-  <div class="kpi-grid">
-    <div class="kpi g"><div class="kpi-lbl">Cumplimiento</div><div class="kpi-val g" id="m-cumpl">—</div><div class="kpi-sub">% entregado vs programado</div></div>
-    <div class="kpi b"><div class="kpi-lbl">Total programa</div><div class="kpi-val b" id="m-total">—</div><div class="kpi-sub">contenedores</div></div>
-    <div class="kpi r"><div class="kpi-lbl">Demurrage crítico</div><div class="kpi-val r" id="m-dem">—</div><div class="kpi-sub">&lt;10 días libres</div></div>
-    <div class="kpi a"><div class="kpi-lbl">Sin asignar</div><div class="kpi-val a" id="m-sin">—</div><div class="kpi-sub">sin transportista</div></div>
-  </div>
-  <div class="g2">
-    <div class="card">
-      <div class="c-hdr"><span class="c-title">Por bodega destino</span></div>
-      <div id="bodega-bars"></div>
-    </div>
-    <div class="card">
-      <div class="c-hdr"><span class="c-title">Por tipo de contenedor</span></div>
-      <div id="tipo-bars"></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="c-hdr"><span class="c-title">Historial de programas</span></div>
-    <div class="tw"><table>
-      <thead><tr><th>Fecha</th><th>Total</th><th>Entregados</th><th>Pendientes</th><th>Cumplimiento</th></tr></thead>
-      <tbody id="hist-tbody"></tbody>
-    </table></div>
-  </div>
-</div>
-
-<!-- CONFIG -->
-<div id="sec-config" class="sec">
-  <div class="pg-hdr"><div><div class="pg-title">Configuración</div><div class="pg-sub">Conexión con Google Sheets</div></div></div>
-  <div class="card" style="border:1.5px solid #93C5FD;background:#EFF6FF;margin-bottom:16px">
-    <div class="c-hdr"><span class="c-title" style="color:var(--blue)">⚡ Apps Script — Conexión directa (recomendado)</span><span class="b bb">Método principal</span></div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.6">Una vez desplegado el Apps Script en tu Sheet, pega aquí la URL. El dashboard leerá todas las hojas sin problemas.</div>
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--text3);margin-bottom:4px">URL del Web App</div>
-    <input type="text" id="url-script" placeholder="https://script.google.com/macros/s/XXXXXX/exec">
-  </div>
-  <div style="display:flex;gap:10px;margin-bottom:16px">
-    <button onclick="guardarConfig()" style="padding:9px 20px;background:var(--blue);border:none;border-radius:8px;color:white;font-size:13px;font-weight:500;cursor:pointer">Guardar y cargar datos</button>
-    <button onclick="loadDemo()" style="padding:9px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:13px;cursor:pointer">Ver datos demo</button>
-  </div>
-  <div class="card" id="cfg-status" style="display:none"><div id="cfg-msg"></div></div>
-</div>
-
-</main>
-
-<script>
-// ── DATOS REALES DE TUS ARCHIVOS ─────────────────────────
-const PROG_DATA     = [{"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "HLBU1465901", "TRASVASIJE": "", "OTROS": "", "PESO": -32, "DEMURRAGE": 2618, "BL": "HLCUBO12601BECN3", "SKU": "3377776", "DESC_SKU": "COJIN BERGEN BLANCO 45X45", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "BSIU9021790", "TRASVASIJE": "", "OTROS": "", "PESO": -35, "DEMURRAGE": 11749, "BL": "264489634", "SKU": "9166076", "DESC_SKU": "SILLA SALON EVENTO PU NEGRO", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "CMAU5641064", "TRASVASIJE": "", "OTROS": "", "PESO": -32, "DEMURRAGE": 8471, "BL": "QGD2686345", "SKU": "9044086", "DESC_SKU": "PAPEL HIGIENICO 50M PACK 24U", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "CMAU7334236", "TRASVASIJE": "", "OTROS": "", "PESO": -32, "DEMURRAGE": 17801, "BL": "QGD2684296", "SKU": "8814961", "DESC_SKU": "JUEGO VAJILLA 16PZS MARMOL NG", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "FFAU2866949", "TRASVASIJE": "", "OTROS": "", "PESO": -40, "DEMURRAGE": 6278, "BL": "HLCUNG12511RPYY6", "SKU": "8718237", "DESC_SKU": "WOK 30CM MARBEL INDUCCION", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "FSCU8258069", "TRASVASIJE": "", "OTROS": "", "PESO": -40, "DEMURRAGE": 8310, "BL": "HLCUSHA2602GLCE0", "SKU": "905684X", "DESC_SKU": "SILLA PC MALLA BOSTON GR", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "GCXU2443783", "TRASVASIJE": "", "OTROS": "", "PESO": -40, "DEMURRAGE": 4707, "BL": "HLCUSHA2602GKWM3", "SKU": "9126694", "DESC_SKU": "CONECTOR RAPID SALIDA B1B2B3B4", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "FBIU0084247", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 22464, "DEMURRAGE": -32, "BL": "HLCUSGN260183963", "SKU": "8987858", "DESC_SKU": "SPC XL PELICAN 5,0/1 IX 1,74M2", "TRANSPORTE": "BYD", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "HASU4849100", "TRASVASIJE": "", "OTROS": "", "PESO": 23869, "DEMURRAGE": -36, "BL": "268676420", "SKU": "9198415", "DESC_SKU": "BARRA ISLA VIMO POSITANO", "TRANSPORTE": "FR RENTAL", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "BSIU2748508", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 22464, "DEMURRAGE": -32, "BL": "HLCUSGN260183963", "SKU": "8987858", "DESC_SKU": "SPC XL PELICAN 5,0/1 IX 1,74M2", "TRANSPORTE": "FR RENTAL", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "TRHU5670030", "TRASVASIJE": "", "OTROS": "", "PESO": 23971, "DEMURRAGE": -36, "BL": "268676420", "SKU": "9198423", "DESC_SKU": "MUEBLE MICROONDAS COC VIMO POS", "TRANSPORTE": "FR RENTAL", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "HCIU2090284", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 22150, "DEMURRAGE": -41, "BL": "FOC0343996", "SKU": "2311127", "DESC_SKU": "CERAMICA 30X60 WALL TILE  1,62", "TRANSPORTE": "JUC CHILE", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "CMAU0510457", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 25038, "DEMURRAGE": -41, "BL": "GGZ2903101", "SKU": "9088652", "DESC_SKU": "PORCELANATO MAR GR 60X60 1,44M", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "CMAU3187800", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 22737, "DEMURRAGE": -41, "BL": "GGZ2903101", "SKU": "9088652", "DESC_SKU": "PORCELANATO MAR GR 60X60 1,44M", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "DFSU2267480", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 24000, "DEMURRAGE": -41, "BL": "FOC0343997", "SKU": "2311127", "DESC_SKU": "CERAMICA 30X60 WALL TILE  1,62", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "TEMU4487166", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 18942, "DEMURRAGE": -32, "BL": "HLCUSGN260183963", "SKU": "898784X", "DESC_SKU": "SPC LUCILE XL 4,0/1 IX 2,43M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-02", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "TEMU5815043", "TRASVASIJE": "", "OTROS": "", "PESO": 23250, "DEMURRAGE": -41, "BL": "FOC0344379", "SKU": "8919402", "DESC_SKU": "GR RST GREIGE MT 60X60 1,44M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "CAIU8897118", "TRASVASIJE": "", "OTROS": "", "PESO": 14700, "DEMURRAGE": -32, "BL": "QGD2662446", "SKU": "5460158", "DESC_SKU": "ONE PIECE VINCINY", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "MRKU9229373", "TRASVASIJE": "", "OTROS": "", "PESO": 1968, "DEMURRAGE": -35, "BL": "264489636", "SKU": "9156585", "DESC_SKU": "SILLA PC ZURICH GRIS", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "CMAU0725624", "TRASVASIJE": "", "OTROS": "", "PESO": 18942, "DEMURRAGE": -32, "BL": "SGN3033643", "SKU": "8987866", "DESC_SKU": "SPC EVIAN XL 4,0/1 IX 2,43M2", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "08:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "HLXU1367380", "TRASVASIJE": "", "OTROS": "", "PESO": 23681, "DEMURRAGE": -31, "BL": "HLCUXM1251232231", "SKU": "9179658", "DESC_SKU": "GRES AERO BEIGE 20X120 1,44M2", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "09:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "MRKU8142330", "TRASVASIJE": "", "OTROS": "", "PESO": 21900, "DEMURRAGE": -35, "BL": "264489635", "SKU": "3678881", "DESC_SKU": "PIEDRA 60X15 MOSA MULT OXI 0,6", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "09:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "HLXU3497253", "TRASVASIJE": "", "OTROS": "", "PESO": 23619, "DEMURRAGE": -31, "BL": "HLCUXM1251232231", "SKU": "9179631", "DESC_SKU": "GRES AERO BROWN 20X120 1,44M2", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "10:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "TGBU4171389", "TRASVASIJE": "", "OTROS": "", "PESO": 19757, "DEMURRAGE": -22, "BL": "SNG0495197", "SKU": "877532X", "DESC_SKU": "PLAM 8MM OAK NAT MIX 1,99 M2", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "10:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "CMAU1979583", "TRASVASIJE": "", "OTROS": "", "PESO": 23077, "DEMURRAGE": -32, "BL": "SGN3033643", "SKU": "8987823", "DESC_SKU": "SPC MINN OAK 4,0/1,0 IX 2,5M2", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "11:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "ECMU1549184", "TRASVASIJE": "", "OTROS": "", "PESO": 24544, "DEMURRAGE": -40, "BL": "FOC0343997", "SKU": "2835118", "DESC_SKU": "CERAMICA 25X40 CUADR C/ENG 1.5", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "11:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "TXGU8852803", "TRASVASIJE": "", "OTROS": "", "PESO": 19757, "DEMURRAGE": -30, "BL": "SNG0495196", "SKU": "877532X", "DESC_SKU": "PLAM 8MM OAK NAT MIX 1,99 M2", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "12:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "CMAU2231488", "TRASVASIJE": "", "OTROS": "", "PESO": 23239, "DEMURRAGE": -40, "BL": "GGZ2900389", "SKU": "9088636", "DESC_SKU": "POR MARM GRIS 60X120 2,16M2", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "12:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "GAOU2554450", "TRASVASIJE": "", "OTROS": "", "PESO": 23328, "DEMURRAGE": -21, "BL": "264211961", "SKU": "8708983", "DESC_SKU": "PORCELANATO 60X60 SS BG 1,44M2", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "13:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "MAXU1371756", "TRASVASIJE": "", "OTROS": "", "PESO": 23328, "DEMURRAGE": -18, "BL": "GGZ2875825", "SKU": "8708983", "DESC_SKU": "PORCELANATO 60X60 SS BG 1,44M2", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "13:30", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "FCIU6603038", "TRASVASIJE": "", "OTROS": "", "PESO": 22800, "DEMURRAGE": -31, "BL": "HLCUXM1251232231", "SKU": "9179682", "DESC_SKU": "PORCELANATO MT BOR 20X120 1,20", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "DEPOSITO CD 512", "SERVICIOS": "TRASVASIJE", "CONFIRMACION": "ok", "ESTADO": "TRASVASIJE"}, {"FECHA": "2026-05-04", "HORARIO": "09:00", "DEPOSITO": "SITRANS SANTIAGO", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "TEMU6829885", "TRASVASIJE": "", "OTROS": "", "PESO": 28641, "DEMURRAGE": -34, "BL": "QGD2663783", "SKU": "52760", "DESC_SKU": "OSB ESTRUCTURAL 9,5MM 122X244", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA RENGO 381", "SERVICIOS": "DESCONSOLIDADO", "CONFIRMACION": "ok", "ESTADO": "REPROGRAMADO"}, {"FECHA": "2026-05-04", "HORARIO": "09:30", "DEPOSITO": "SITRANS SANTIAGO", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "UETU6477836", "TRASVASIJE": "", "OTROS": "", "PESO": 22294, "DEMURRAGE": -33, "BL": "QGD2664288", "SKU": "246824", "DESC_SKU": "OSB ESTRUCTURAL 15MM 1,22X2,44", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA RENGO 381", "SERVICIOS": "DESCONSOLIDADO", "CONFIRMACION": "ok", "ESTADO": "REPROGRAMADO"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO TERCOP", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "CMAU9859178", "TRASVASIJE": "", "OTROS": "", "PESO": 5478, "DEMURRAGE": -25, "BL": "TJN0873692", "SKU": "2795639", "DESC_SKU": "CIERRE DE CANA 2 X 5 M PDQ", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "CANCELADO"}, {"FECHA": "2026-05-04", "HORARIO": "09:00", "DEPOSITO": "DEPOSITO TERCOP", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "FFAU7697482", "TRASVASIJE": "", "OTROS": "", "PESO": 6941, "DEMURRAGE": -35, "BL": "264489638", "SKU": "9157239", "DESC_SKU": "JGO COMEDOR EAMES 1+4 BCO/GR", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "CANCELADO"}, {"FECHA": "2026-05-04", "HORARIO": "13:00", "DEPOSITO": "DEPOSITO TERCOP", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "SCLU5001769", "TRASVASIJE": "SCLU5001769", "OTROS": "", "PESO": 4838, "DEMURRAGE": -3660, "BL": "", "SKU": "1292595", "DESC_SKU": "SILLA NEGRO-NGR RATAN PE", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "CANCELADO"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "UACU8494437", "TRASVASIJE": "", "OTROS": "", "PESO": 4215, "DEMURRAGE": -40, "BL": "HLCUSHA2602GKHY2", "SKU": "9036369", "DESC_SKU": "MANGO RATCHET 0,25IN 3/8IN", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "BMOU3071062", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 4139, "DEMURRAGE": -41, "BL": "HLCUSHA2602GHKI4", "SKU": "594595X", "DESC_SKU": "MALETA PLAST. PROTECCION IP L", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "CAAU6717662", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 6884, "DEMURRAGE": -41, "BL": "HLCUDE1260155138", "SKU": "9099905", "DESC_SKU": "LIMP BANO ALG CLAIR 40X60 VDE", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "CAIU4986428", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 6803, "DEMURRAGE": -41, "BL": "HLCUSZX2602BGNN8", "SKU": "9170391", "DESC_SKU": "CAMPANA 60CM SS CONVENCIONAL", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "HLBU1809381", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 5689, "DEMURRAGE": -41, "BL": "HLCUSHA2602GHKI4", "SKU": "8791058", "DESC_SKU": "DISCO MADERA ESMERIL 41/2", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "HLBU2885278", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 6975, "DEMURRAGE": -41, "BL": "HLCUSZX2602BGNN8", "SKU": "9170456", "DESC_SKU": "CAMPANA 60CM RETRACTIL ACERO", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "HLBU3969898", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 6601, "DEMURRAGE": -41, "BL": "HLCUNG12511RQBN1", "SKU": "374907X", "DESC_SKU": "ESPEJO SENSI BISEL 1CM 60X90", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "KKFU1811320", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 4008, "DEMURRAGE": -41, "BL": "HLCUSHA2602GHKJ5", "SKU": "3440699", "DESC_SKU": "CARRO PROFESIONAL 3 EN 1", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "12:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "TEMU1392832", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 21157, "DEMURRAGE": -41, "BL": "HLCUJK1260208373", "SKU": "1202480", "DESC_SKU": "BLOQUE VID TRANS TERM. CURVO", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "12:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "TEMU7499710", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 6423, "DEMURRAGE": -41, "BL": "HLCUSZX2602BGNN8", "SKU": "9170669", "DESC_SKU": "CAMPANA 60CM DECO SS TOUCH", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "12:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "TXGU7097879", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 7675, "DEMURRAGE": -41, "BL": "HLCUSZX2602BGNN8", "SKU": "9170618", "DESC_SKU": "CAMPANA 60CM NEGRA CONVENCION", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "14:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "UACU8365419", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 5205, "DEMURRAGE": -41, "BL": "HLCUSHA2602GHKJ5", "SKU": "8791163", "DESC_SKU": "BASE DELTA VELCRO 92MM", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "14:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "UACU8373538", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 5190, "DEMURRAGE": -41, "BL": "HLCUSHA2602GHKJ5", "SKU": "5945933", "DESC_SKU": "MALETA PLAST PROTECCION IP65", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "14:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "UACU8431613", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 7162, "DEMURRAGE": -41, "BL": "HLCUNG12511RPXZ1", "SKU": "1131028", "DESC_SKU": "TEFLON 3/4X10M PREMIUM", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "14:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "UACU8516351", "TRASVASIJE": "", "OTROS": "RETIRO 30-04", "PESO": 5956, "DEMURRAGE": -41, "BL": "HLCUSHA2602GHKI4", "SKU": "4222253", "DESC_SKU": "MOCHILA CON RUEDAS", "TRANSPORTE": "DEPOSITO CD", "BODEGA": "BODEGA CD LO ESPEJO", "SERVICIOS": "DESPACHO", "CONFIRMACION": "ok", "ESTADO": "ENTREGADO"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "TLLU2308869", "TRASVASIJE": "SDLU0003457", "OTROS": "", "PESO": 18612, "DEMURRAGE": -3660, "BL": "", "SKU": "302489X", "DESC_SKU": "PISO LAMINA 7MM WINTER 2,390M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA CD CORONEL", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "TCKU7389826", "TRASVASIJE": "", "OTROS": "", "PESO": 24784, "DEMURRAGE": -36, "BL": "268676420", "SKU": "919830X", "DESC_SKU": "MUEBLE MICROONDAS COCINA SICILI", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "13:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "BEAU4669666", "TRASVASIJE": "SCLU4006555", "OTROS": "", "PESO": 8488, "DEMURRAGE": -3660, "BL": "", "SKU": "9157441", "DESC_SKU": "ARRIMO NOIR 2CJ OAK 100X35X80", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "16:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "ECMU9767990", "TRASVASIJE": "SCLU4007470", "OTROS": "", "PESO": 8613, "DEMURRAGE": -3660, "BL": "", "SKU": "9127569", "DESC_SKU": "SILLA PLEGABLE BLANCA", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "16:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "CAXU9602893", "TRASVASIJE": "CAXU9602893", "OTROS": "", "PESO": 0, "DEMURRAGE": -3660, "BL": "", "SKU": "1488791", "DESC_SKU": "ESPEJO CUERPO ENT 30X120CM PDQ", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "TEMU8694670", "TRASVASIJE": "", "OTROS": "GRANEL", "PESO": 8589, "DEMURRAGE": -32, "BL": "TJN0891539", "SKU": "9163743", "DESC_SKU": "LANA VIDRIO 40MM R113 1,2X24M", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "TGHU5159121", "TRASVASIJE": "", "OTROS": "GRANEL", "PESO": 7586, "DEMURRAGE": -23, "BL": "HLCUTS12601BRMD6", "SKU": "9011242", "DESC_SKU": "ESCALERA TIJ 3P 1,26M AL 90K", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "DFSU3110279", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 23400, "DEMURRAGE": -40, "BL": "GGZ2903101", "SKU": "9004122", "DESC_SKU": "PORCELANATO VET GR 60X60 1,44M", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "ECMU7020388", "TRASVASIJE": "", "OTROS": "", "PESO": 18720, "DEMURRAGE": -22, "BL": "SNG0495197", "SKU": "8775222", "DESC_SKU": "PLAM 8MM OAK BRWN 1,99M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "08:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "APZU2111194", "TRASVASIJE": "", "OTROS": "", "PESO": 22932, "DEMURRAGE": -37, "BL": "IBC1462362", "SKU": "8714746", "DESC_SKU": "CERAMICA 34X50 HM MUSGO 1,7M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "08:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "UETU7444605", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 18720, "DEMURRAGE": -30, "BL": "SNG0495196", "SKU": "8775222", "DESC_SKU": "PLAM 8MM OAK BRWN 1,99M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "09:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "CAIU2417649", "TRASVASIJE": "", "OTROS": "", "PESO": 24375, "DEMURRAGE": -40, "BL": "GGZ2903101", "SKU": "9088652", "DESC_SKU": "PORCELANATO MAR GR 60X60 1,44M", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "CMAU7947346", "TRASVASIJE": "", "OTROS": "", "PESO": 14700, "DEMURRAGE": -32, "BL": "QGD2662446", "SKU": "5460158", "DESC_SKU": "ONE PIECE VINCINY", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "CMAU7168114", "TRASVASIJE": "", "OTROS": "", "PESO": 14700, "DEMURRAGE": -32, "BL": "QGD2662446", "SKU": "5460158", "DESC_SKU": "ONE PIECE VINCINY", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "SCLU4000602", "TRASVASIJE": "SCLU4000602", "OTROS": "", "PESO": 20986, "DEMURRAGE": -3660, "BL": "", "SKU": "9088717", "DESC_SKU": "POR TRRZO DARK MT 60X60 1,44M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "SEGU2023262", "TRASVASIJE": "", "OTROS": "", "PESO": 23250, "DEMURRAGE": -40, "BL": "FOC0344379", "SKU": "8919402", "DESC_SKU": "GR RST GREIGE MT 60X60 1,44M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "MRKU6751105", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 23250, "DEMURRAGE": -21, "BL": "265605732", "SKU": "8919372", "DESC_SKU": "GR WOOD STICK MT 60X60 1,44M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "11:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "UACU3775719", "TRASVASIJE": "", "OTROS": "", "PESO": 23425, "DEMURRAGE": -40, "BL": "HLCUFOC260224743", "SKU": "9086463", "DESC_SKU": "CER CALACAT WH 30X60 1,8M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "11:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "ECMU5029107 1", "TRASVASIJE": "SCLU4000789", "OTROS": "", "PESO": 5100, "DEMURRAGE": -3660, "BL": "", "SKU": "5647363", "DESC_SKU": "SANITARIO TWO PIECES GIRONA BL", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "11:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "CMAU2330407", "TRASVASIJE": "", "OTROS": "", "PESO": 23328, "DEMURRAGE": -18, "BL": "GGZ2865546", "SKU": "8708983", "DESC_SKU": "PORCELANATO 60X60 SS BG 1,44M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "11:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "MRKU9237018", "TRASVASIJE": "", "OTROS": "", "PESO": 23113, "DEMURRAGE": -21, "BL": "265680091", "SKU": "261961X", "DESC_SKU": "GRES PORCELA 60X60 RUST NG1,44", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "12:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "ECMU5029107", "TRASVASIJE": "SCLU4003535", "OTROS": "", "PESO": 5100, "DEMURRAGE": -3660, "BL": "", "SKU": "5647363", "DESC_SKU": "SANITARIO TWO PIECES GIRONA BL", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "12:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "CMAU3159238", "TRASVASIJE": "", "OTROS": "", "PESO": 23328, "DEMURRAGE": -18, "BL": "GGZ2875825", "SKU": "8708983", "DESC_SKU": "PORCELANATO 60X60 SS BG 1,44M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "12:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "CMAU4913358", "TRASVASIJE": "", "OTROS": "", "PESO": 20220, "DEMURRAGE": -22, "BL": "SNG0495639", "SKU": "9065911", "DESC_SKU": "PISO LAM 6MM ESSEN AC3 2,96M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "13:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "CAIU7069166", "TRASVASIJE": "SCLU4004892", "OTROS": "CYBER", "PESO": 4320, "DEMURRAGE": -3660, "BL": "", "SKU": "9134069", "DESC_SKU": "ONE PIECE RIVA BL 30,5 DUA", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "13:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "ECMU7053695", "TRASVASIJE": "", "OTROS": "", "PESO": 21082, "DEMURRAGE": -38, "BL": "SNG0495613", "SKU": "8775311", "DESC_SKU": "PLAM 8MM OAK BRWN GR 1,99 M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "13:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "FCIU9167410", "TRASVASIJE": "", "OTROS": "", "PESO": 20220, "DEMURRAGE": -22, "BL": "SNG0495639", "SKU": "9065911", "DESC_SKU": "PISO LAM 6MM ESSEN AC3 2,96M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "14:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "DRY", "CAPACIDAD": "40", "CONTENEDOR": "HLXU1302326", "TRASVASIJE": "MSKU0226170", "OTROS": "CYBER", "PESO": 5700, "DEMURRAGE": -3660, "BL": "", "SKU": "5460190", "DESC_SKU": "ONE PIECE GRANADA", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "14:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "ECMU7571668", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 18720, "DEMURRAGE": -30, "BL": "SNG0495196", "SKU": "8775222", "DESC_SKU": "PLAM 8MM OAK BRWN 1,99M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "09:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "TCLU7460562", "TRASVASIJE": "", "OTROS": "CYBER", "PESO": 23328, "DEMURRAGE": -25, "BL": "GGZ2884974", "SKU": "8708983", "DESC_SKU": "PORCELANATO 60X60 SS BG 1,44M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LO RUIZ 209", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "CAIU2718391", "TRASVASIJE": "", "OTROS": "", "PESO": 21614, "DEMURRAGE": -33, "BL": "FOC0343529", "SKU": "1791893", "DESC_SKU": "CERAMICA 20X30 BLANCA EN M 1.5", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LO RUIZ 209", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "11:00", "DEPOSITO": "DEPOSITO CD", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "CAIU3792330", "TRASVASIJE": "", "OTROS": "", "PESO": 21614, "DEMURRAGE": -33, "BL": "FOC0343534", "SKU": "1791893", "DESC_SKU": "CERAMICA 20X30 BLANCA EN M 1.5", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LO RUIZ 209", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO TERCOP", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "CAIU9517444", "TRASVASIJE": "", "OTROS": "", "PESO": 7070, "DEMURRAGE": -33, "BL": "HLCUSHA2602GKEO6", "SKU": "3338797", "DESC_SKU": "SOFA 2 CUERPO TELA 77X145X71", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "07:00", "DEPOSITO": "DEPOSITO TERCOP", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "CMAU1185177", "TRASVASIJE": "", "OTROS": "", "PESO": 1196, "DEMURRAGE": -32, "BL": "YGG0147647", "SKU": "9070184", "DESC_SKU": "SOFA CAMA GIRODANO BCO", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "09:00", "DEPOSITO": "DEPOSITO TERCOP", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "FANU1173970", "TRASVASIJE": "", "OTROS": "", "PESO": 3634, "DEMURRAGE": -33, "BL": "HLCUSHA2602GKEI0", "SKU": "9157611", "DESC_SKU": "FUTON BENTO 190X93X84", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "09:00", "DEPOSITO": "DEPOSITO TERCOP", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "FDCU0142598", "TRASVASIJE": "", "OTROS": "", "PESO": 5376, "DEMURRAGE": -40, "BL": "HLCUNG12511RPYO6", "SKU": "9056955", "DESC_SKU": "FUTON CAMA TEKI GRAFITO", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "11:00", "DEPOSITO": "DEPOSITO TERCOP", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "HAMU1336057", "TRASVASIJE": "", "OTROS": "", "PESO": 4497, "DEMURRAGE": -40, "BL": "HLCUNG12511RPYO6", "SKU": "9157123", "DESC_SKU": "POLTRONA INUYE VERDE 1C", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "11:00", "DEPOSITO": "DEPOSITO TERCOP", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "HAMU4007461", "TRASVASIJE": "", "OTROS": "", "PESO": 5376, "DEMURRAGE": -40, "BL": "HLCUNG12511RPYO6", "SKU": "9056955", "DESC_SKU": "FUTON CAMA TEKI GRAFITO", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "09:00", "DEPOSITO": "MEDLOG VALPARAISO", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "MRKU8538423", "TRASVASIJE": "", "OTROS": "", "PESO": 26568, "DEMURRAGE": -6, "BL": "266576420", "SKU": "9136177", "DESC_SKU": "CERAMICA MYKONOS 53X53 2,81M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESCONSOLIDADO", "CONFIRMACION": "ok", "ESTADO": "REPROGRAMADO"}, {"FECHA": "2026-05-04", "HORARIO": "11:00", "DEPOSITO": "DEPOSITO TERCOP", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "HLBU1417734", "TRASVASIJE": "", "OTROS": "", "PESO": 12714, "DEMURRAGE": -33, "BL": "HLCUTS12602ATMK3", "SKU": "3099415", "DESC_SKU": "SILLA SALON BURDEO 48X57X90", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "13:00", "DEPOSITO": "DEPOSITO TERCOP", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "HLBU3977682", "TRASVASIJE": "", "OTROS": "", "PESO": 4289, "DEMURRAGE": -40, "BL": "HLCUNG12511RPYN5", "SKU": "2736268", "DESC_SKU": "LAVADERO LOZA CON MBLE Y CAJON", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 214", "SERVICIOS": "DESPACHO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "09:00", "DEPOSITO": "MEDLOG VALPARAISO", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "SUDU7904950", "TRASVASIJE": "", "OTROS": "", "PESO": 26568, "DEMURRAGE": -6, "BL": "266576420", "SKU": "9136177", "DESC_SKU": "CERAMICA MYKONOS 53X53 2,81M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESCONSOLIDADO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "MEDLOG VALPARAISO", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "TGBU2172494", "TRASVASIJE": "", "OTROS": "", "PESO": 26588, "DEMURRAGE": -6, "BL": "HLCUIT1260216382", "SKU": "9042695", "DESC_SKU": "CERAMICA MYK GREY 53X53 2,81M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESCONSOLIDADO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "10:00", "DEPOSITO": "SITRANS SANTIAGO", "TIPO": "HC", "CAPACIDAD": "40", "CONTENEDOR": "CMAU4692468", "TRASVASIJE": "", "OTROS": "", "PESO": 27348, "DEMURRAGE": -32, "BL": "QGD2664288", "SKU": "199877", "DESC_SKU": "OSB ESTRUCTURAL 11MM 1,22X2,44", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA RENGO 381", "SERVICIOS": "DESCONSOLIDADO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "10:30", "DEPOSITO": "SITRANS SANTIAGO", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "FCIU4277708", "TRASVASIJE": "", "OTROS": "", "PESO": 26400, "DEMURRAGE": -14, "BL": "265407580", "SKU": "9086463", "DESC_SKU": "CER CALACAT WH 30X60 1,8M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESCONSOLIDADO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}, {"FECHA": "2026-05-04", "HORARIO": "11:00", "DEPOSITO": "SITRANS SANTIAGO", "TIPO": "STD", "CAPACIDAD": "20", "CONTENEDOR": "HASU1235900", "TRASVASIJE": "", "OTROS": "", "PESO": 26400, "DEMURRAGE": -14, "BL": "265407580", "SKU": "9086463", "DESC_SKU": "CER CALACAT WH 30X60 1,8M2", "TRANSPORTE": "SODIMAC", "BODEGA": "BODEGA LA FARFANA 257", "SERVICIOS": "DESCONSOLIDADO", "CONFIRMACION": "", "ESTADO": "PENDIENTE"}];
-const TRANSITO_DATA = [{"DEPOSITO": "HGT SAN ANTONIO", "CONTENEDOR": "TCNU4058813", "TIPO": "40.0", "CC": "221", "DEMURRAGE": "-40", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "JUC CHILE", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS VALPARAISO", "CONTENEDOR": "HAMU1105227", "TIPO": "20", "CC": "257", "DEMURRAGE": "-40", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "BYD", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS VALPARAISO", "CONTENEDOR": "UACU3956002", "TIPO": "20", "CC": "257", "DEMURRAGE": "-40", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "FR RENTAL", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS VALPARAISO", "CONTENEDOR": "HLXU1262408", "TIPO": "20", "CC": "257", "DEMURRAGE": "-40", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "ECMU4739887", "TIPO": "40", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "ECMU5534496", "TIPO": "40", "CC": "257", "DEMURRAGE": "-36", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "FFAU5966469", "TIPO": "40", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "TCLU6461775", "TIPO": "40", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "APHU6516881", "TIPO": "40", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "CMAU0623216", "TIPO": "20", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "CMAU6623661", "TIPO": "40", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "CMAU6982743", "TIPO": "40", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "CMAU8961673", "TIPO": "40", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "FCIU7348359", "TIPO": "40", "CC": "257", "DEMURRAGE": "-36", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "FFAU4447387", "TIPO": "40", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "TCNU3810891", "TIPO": "40", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "TGBU4318079", "TIPO": "40", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "TRHU8916180", "TIPO": "40", "CC": "510", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "UETU5630724", "TIPO": "40", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "GCXU2480684", "TIPO": "20", "CC": "257", "DEMURRAGE": "-41", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "TEMU0799016", "TIPO": "20", "CC": "257", "DEMURRAGE": "-37", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "SITRANS SAN ANTONIO", "CONTENEDOR": "TEMU0029294", "TIPO": "20", "CC": "257", "DEMURRAGE": "-40", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "CIS SAN ANTONIO", "CONTENEDOR": "TCNU7689875", "TIPO": "40", "CC": "221", "DEMURRAGE": "-40", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "CIS SAN ANTONIO", "CONTENEDOR": "BMOU4359201", "TIPO": "40", "CC": "221", "DEMURRAGE": "-40", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "CIS SAN ANTONIO", "CONTENEDOR": "CMAU3752860", "TIPO": "40", "CC": "221", "DEMURRAGE": "-40", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "CIS SAN ANTONIO", "CONTENEDOR": "CMAU8358968", "TIPO": "40", "CC": "221", "DEMURRAGE": "-40", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "CIS SAN ANTONIO", "CONTENEDOR": "TEMU7744714", "TIPO": "40", "CC": "221", "DEMURRAGE": "-40", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}, {"DEPOSITO": "CIS SAN ANTONIO", "CONTENEDOR": "LATU3002254", "TIPO": "20", "CC": "221", "DEMURRAGE": "-40", "DESTINO": "DEPOSITO CD", "TRANSPORTE": "", "STATUS": "SIN DESPACHO"}];
-
-const ID   = "1cZmrivsLcxUVcb9b8Q_2RyIsyKNQO9tl7t5URmVOsVw";
-const BASE = "https://docs.google.com/spreadsheets/d/" + ID + "/gviz/tq?tqx=out:csv&sheet=";
-
-// ── STATE ────────────────────────────────────────────────
-let STATE = { prog:[], transito:[], asignaciones:[] };
-
-// ── DATE ─────────────────────────────────────────────────
-function updateDate() {
-  const n = new Date();
-  const d = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  const m = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  document.getElementById('ndate').textContent =
-    d[n.getDay()] + ' ' + n.getDate() + ' ' + m[n.getMonth()] + ' ' + n.getFullYear() +
-    ' · ' + n.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
-}
-updateDate(); setInterval(updateDate, 60000);
-
-// ── TABS ─────────────────────────────────────────────────
-function showTab(name, btn) {
-  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.n-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('sec-' + name).classList.add('active');
-  if (btn) btn.classList.add('active');
-  if (name === 'asignaciones') loadAsigData();
-}
-function toggleCtn() {
-  const sub = document.getElementById('ctn-submenu');
-  sub.style.display = sub.style.display === 'none' ? 'block' : 'block';
-}
-function setActive(btn) {
-  document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-}
-function showAsigTab(tab) {
-  document.getElementById('asig-reg').style.display  = tab==='reg'  ? 'block' : 'none';
-  document.getElementById('asig-form').style.display = tab==='form' ? 'block' : 'none';
-  document.getElementById('at-reg').style.borderBottomColor  = tab==='reg'  ? 'var(--blue)' : 'transparent';
-  document.getElementById('at-form').style.borderBottomColor = tab==='form' ? 'var(--blue)' : 'transparent';
-  document.getElementById('at-reg').style.color  = tab==='reg'  ? 'var(--blue)' : 'var(--text2)';
-  document.getElementById('at-form').style.color = tab==='form' ? 'var(--blue)' : 'var(--text2)';
-}
-
-// ── BADGES ───────────────────────────────────────────────
-// Normaliza cualquier formato de fecha a YYYY-MM-DD
-function normFecha(val) {
-  if (!val) return '';
-  const s = String(val).trim();
-  // Ya está en formato correcto
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-  // Intentar parsear
-  try {
-    const d = new Date(s);
-    if (!isNaN(d.getTime())) {
-      const y = d.getFullYear();
-      const m = String(d.getMonth()+1).padStart(2,'0');
-      const dd = String(d.getDate()).padStart(2,'0');
-      return y + '-' + m + '-' + dd;
-    }
-  } catch(e) {}
-  return s.substring(0,10);
-}
-
-// Formatea fecha para mostrar: DD-MM-YYYY
-function fmtFecha(val) {
-  const f = normFecha(val);
-  if (!f) return '—';
-  const p = f.split('-');
-  return p.length === 3 ? p[2]+'-'+p[1]+'-'+p[0] : f;
-}
-
-function estadoBadge(e) {
-  const v = (e||'').toUpperCase().trim();
-  if (v==='ENTREGADO')                       return '<span class="b bg">Entregado</span>';
-  if (v==='TRASVASIJE')                      return '<span class="b bb">Trasvasije</span>';
-  if (v==='EN TRANSITO'||v==='EN RUTA')      return '<span class="b bb">En ruta</span>';
-  if (v==='REPROGRAMADO'||v==='REPROGRAMAR') return '<span class="b ba">Reprogramado</span>';
-  if (v==='CANCELADO')                       return '<span class="b br">Cancelado</span>';
-  if (v==='PENDIENTE'||v==='')               return '<span class="b bx">Pendiente</span>';
-  return '<span class="b bx">'+e+'</span>';
-}
-function tipoBadge(t) {
-  return t==='HC' ? '<span class="b bb">HC</span>' :
-         t==='STD'? '<span class="b bx">STD</span>':
-                    '<span class="b bx">'+(t||'—')+'</span>';
-}
-
-// ── PARSE CSV ─────────────────────────────────────────────
-function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  if (lines.length < 2) return [];
-  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,'').toUpperCase());
-  return lines.slice(1).map(line => {
-    const vals=[]; let cur='',inQ=false;
-    for (let c of line) {
-      if (c==='"'){ inQ=!inQ; continue; }
-      if (c===','&&!inQ){ vals.push(cur.trim()); cur=''; } else cur+=c;
-    }
-    vals.push(cur.trim());
-    const obj={};
-    headers.forEach((h,i) => { obj[h]=(vals[i]||'').trim(); });
-    return obj;
-  }).filter(r => Object.values(r).some(v=>v));
-}
-
-// ── FETCH ─────────────────────────────────────────────────
-async function fetchSheet(url) {
-  if (!url) return [];
-  try {
-    const r = await fetch(url, {redirect:'follow'});
-    if (!r.ok) return [];
-    const t = await r.text();
-    if (!t || t.length < 10) return [];
-    if (t.trim().startsWith('{')) {
-      const j = JSON.parse(t);
-      if (j.ok && j.data) return j.data;
-    }
-    return parseCSV(t);
-  } catch(e) { return []; }
-}
-async function fetchScript(url, sheet) {
-  if (!url) return [];
-  try {
-    const fullUrl = url + '?sheet=' + encodeURIComponent(sheet);
-    const res = await fetch(fullUrl, { redirect: 'follow', method: 'GET' });
-    if (!res.ok) { console.warn('fetchScript HTTP', res.status); return []; }
-    const txt = await res.text();
-    const json = JSON.parse(txt);
-    if (json.ok && Array.isArray(json.data)) {
-      console.log('✓ ' + sheet + ': ' + json.data.length + ' filas');
-      return json.data;
-    }
-    return [];
-  } catch(e) {
-    console.warn('fetchScript error (' + sheet + '):', e.message);
-    return [];
-  }
-}
-
-// ── LOAD DEMO (datos reales de tus Excel) ─────────────────
-function loadDemo() {
-  STATE.prog     = PROG_DATA;
-  STATE.transito = TRANSITO_DATA;
-  document.getElementById('dot').style.background = '#f59e0b';
-  renderAll();
-}
-
-// ── LOAD FROM SHEETS ──────────────────────────────────────
-async function refreshData() {
-  const btn = document.getElementById('btn-act');
-  btn.classList.add('spin');
-  document.getElementById('dot').style.background = '#f59e0b';
-  const script = localStorage.getItem('cd_script_url') || APPS_SCRIPT_URL;
-  if (script) {
-    const [prog, trans, asig] = await Promise.all([
-      fetchScript(script,'PROGRAMACION RM'),
-      fetchScript(script,'PROGRAMA PUERTO'),
-      fetchScript(script,'ASIGNACIONES_RETIRO'),
-    ]);
-    if (prog.length)  STATE.prog     = prog;
-    if (trans.length) STATE.transito = trans;
-    if (asig.length)  STATE.asignaciones = asig;
-    document.getElementById('dot').style.background = '#4ade80';
-  }
-  renderAll();
-  btn.classList.remove('spin');
-}
-
-async function loadAsigData() {
-  const script = localStorage.getItem('cd_script_url') || APPS_SCRIPT_URL;
-  if (!script) return;
-  const data = await fetchScript(script, 'ASIGNACIONES_RETIRO');
-  if (data.length) {
-    STATE.asignaciones = data;
-    renderAsig();
-  }
-}
-
-// ── CONFIG ────────────────────────────────────────────────
-function guardarConfig() {
-  const url = document.getElementById('url-script').value.trim();
-  if (url) { localStorage.setItem('cd_script_url', url); }
-  const el = document.getElementById('cfg-status');
-  const msg = document.getElementById('cfg-msg');
-  el.style.display = 'block';
-  if (url) {
-    msg.innerHTML = '<span style="color:var(--green);font-weight:500">✓ URL guardada. Actualizando datos...</span>';
-    refreshData();
-  } else {
-    msg.innerHTML = '<span style="color:var(--amber)">Pega la URL del Apps Script para conectar con datos en vivo.</span>';
-  }
-}
-
-// ── RENDER ALL ────────────────────────────────────────────
-function renderAll() {
-  renderDashboard();
-  renderProg();
-  renderTransito();
-  renderMetricas();
-  renderAsig();
-}
-
-// ── RENDER DASHBOARD ──────────────────────────────────────────────────────────
-function renderDashboard() {
-  const p = STATE.prog;
-  if (!p.length) return;
-
-  // Separar por fecha — más reciente = programa activo
-  // Obtener fechas únicas y ordenar correctamente (más reciente = mayor)
-  const fechasSet = [...new Set(p.map(r => normFecha(r.FECHA||r.fecha||'')).filter(Boolean))];
-  // Ordenar por fecha real (mayor = más reciente = va primero como activo)
-  fechasSet.sort((a,b) => new Date(a+' 12:00:00') - new Date(b+' 12:00:00'));
-  const fechaActual   = fechasSet[fechasSet.length - 1] || '';  // más reciente
-  const fechaAnterior = fechasSet.length > 1 ? fechasSet[fechasSet.length - 2] : ''; // anterior
-
-  const progActual   = p.filter(r => normFecha(r.FECHA||r.fecha||'') === fechaActual);
-  const progAnterior = p.filter(r => normFecha(r.FECHA||r.fecha||'') === fechaAnterior);
-
-  // KPIs del programa ACTIVO (más reciente)
-  const total = progActual.length;
-  const ok    = progActual.filter(r => ['ENTREGADO','TRASVASIJE'].includes((r.ESTADO||'').toUpperCase())).length;
-  const pend  = progActual.filter(r => !['ENTREGADO','TRASVASIJE','CANCELADO'].includes((r.ESTADO||'').toUpperCase())).length;
-  const dem   = STATE.transito.filter(r => parseInt(r.DEMURRAGE||0) >= -10).length;
-
-  document.getElementById('prog-fecha-badge').textContent = fechaActual ? 'Programa activo: ' + fmtFecha(fechaActual) : '—';
-  document.getElementById('k-total').textContent = total || '—';
-  document.getElementById('k-ok').textContent    = ok    || '0';
-  document.getElementById('k-pend').textContent  = pend  || '0';
-  document.getElementById('k-dem').textContent   = dem   || '0';
-
-  // Timeline del programa activo por horario
-  const byH = {};
-  progActual.forEach(r => {
-    const h = (r.HORARIO||'').substring(0,5);
-    if (h) { if (!byH[h]) byH[h] = []; byH[h].push(r); }
-  });
-  const horas = Object.keys(byH).sort();
-  const tl = document.getElementById('tl-list');
-  document.getElementById('tl-badge').textContent = total + ' contenedores';
-  tl.innerHTML = horas.length ? horas.slice(0,8).map(h => {
-    const items = byH[h];
-    const tipos = [...new Set(items.map(r => r.TIPO))].join(', ');
-    const bodega = [...new Set(items.map(r => r.BODEGA||r.DEPOSITO||''))].slice(0,1).join('');
-    return `<div class="tl"><span class="tl-t">${h}</span><div class="tl-b"><div class="tl-ttl">${items.length} contenedor${items.length>1?'es':''} — ${tipos}</div><div class="tl-s">${bodega}</div></div><span class="b bb">${items.length}</span></div>`;
-  }).join('') : '<div class="empty">Sin horarios cargados</div>';
-
-  // Alertas
-  const alerts = [];
-  if (dem > 0) alerts.push({c:'#DC2626', t: dem+' contenedor'+(dem>1?'es':'')+' con demurrage crítico',    s:'Menos de 10 días libres — revisar urgente', badge:'<span class="b br">Urgente</span>'});
-  const sinD = STATE.transito.filter(r => (r.STATUS||'').toUpperCase() === 'SIN DESPACHO').length;
-  if (sinD > 0) alerts.push({c:'#D97706', t: sinD+' contenedor'+(sinD>1?'es':'')+' sin despacho',          s:'En depósito de origen sin transportista', badge:'<span class="b ba">Pendiente</span>'});
-  if (pend > 0) alerts.push({c:'#D97706', t: pend+' contenedor'+(pend>1?'es':'')+' pendientes de arribar', s:'Programa '+fmtFecha(fechaActual)+' sin confirmar', badge:'<span class="b ba">Pendiente</span>'});
-  if (ok === total && total > 0) alerts.push({c:'#16A34A', t:'Programa completado al 100%', s:total+'/'+total+' entregas confirmadas', badge:'<span class="b bg">OK</span>'});
-
-  const alEl = document.getElementById('al-list');
-  document.getElementById('al-badge').textContent = alerts.length;
-  alEl.innerHTML = alerts.length
-    ? alerts.map(a => `<div class="al"><div class="al-dot" style="background:${a.c}"></div><div class="al-body"><div class="al-title">${a.t}</div><div class="al-sub">${a.s}</div></div>${a.badge}</div>`).join('')
-    : '<div class="empty">Sin alertas activas</div>';
-
-  // Depósitos
-  const deps = {};
-  STATE.transito.forEach(r => { const d=(r.DEPOSITO||'').toUpperCase(); deps[d]=(deps[d]||0)+1; });
-  document.getElementById('d-sits').textContent = deps['SITRANS SAN ANTONIO'] || '0';
-  document.getElementById('d-med').textContent  = deps['MEDLOG VALPARAISO']   || '0';
-  document.getElementById('d-cis').textContent  = deps['CIS SAN ANTONIO']     || '0';
-  document.getElementById('d-hgt').textContent  = deps['HGT SAN ANTONIO']     || '0';
-  document.getElementById('d-terc').textContent = progActual.filter(r => (r.BODEGA||'').toUpperCase().includes('TERCOP')).length || '0';
-
-  // Cumplimiento programa activo
-  const pct = total ? Math.round(ok/total*100) : 0;
-  const col = pct>=90?'var(--green)':pct>=60?'var(--amber)':'var(--red)';
-  const hc  = progActual.filter(r => r.TIPO==='HC').length;
-  const std = progActual.filter(r => r.TIPO==='STD').length;
-
-  let cumplHtml = `
-    <div class="bw"><div class="bl">Entregas confirmadas <span>${ok}/${total}</span></div><div class="bg-bar"><div class="bar" style="width:${pct}%;background:${col}"></div></div></div>
-    <div class="bw"><div class="bl">HC 40ft <span>${hc}</span></div><div class="bg-bar"><div class="bar" style="width:${total?Math.round(hc/total*100):0}%;background:var(--blue)"></div></div></div>
-    <div class="bw"><div class="bl">STD 20ft <span>${std}</span></div><div class="bg-bar"><div class="bar" style="width:${total?Math.round(std/total*100):0}%;background:var(--text3)"></div></div></div>`;
-
-  // Resumen programa ANTERIOR si existe
-  if (progAnterior.length > 0) {
-    const pOk   = progAnterior.filter(r => ['ENTREGADO','TRASVASIJE'].includes((r.ESTADO||'').toUpperCase())).length;
-    const pPend = progAnterior.filter(r => !['ENTREGADO','TRASVASIJE','CANCELADO'].includes((r.ESTADO||'').toUpperCase())).length;
-    const pCanc = progAnterior.filter(r => (r.ESTADO||'').toUpperCase() === 'CANCELADO').length;
-    const pPct  = progAnterior.length ? Math.round(pOk/progAnterior.length*100) : 0;
-    const pCol  = pPct>=90?'var(--green)':pPct>=60?'var(--amber)':'var(--red)';
-    cumplHtml += `
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px">Programa anterior — ${fmtFecha(fechaAnterior)}</div>
-        <div class="ms"><span class="ms-l">Total programado</span><span class="ms-v">${progAnterior.length}</span></div>
-        <div class="ms"><span class="ms-l">Entregados / Trasvasije</span><span class="ms-v" style="color:var(--green)">${pOk}</span></div>
-        <div class="ms"><span class="ms-l">Pendientes de arribo</span><span class="ms-v" style="color:${pPend>0?'var(--amber)':'var(--text)'};">${pPend}</span></div>
-        <div class="ms"><span class="ms-l">Cancelados</span><span class="ms-v" style="color:${pCanc>0?'var(--red)':'var(--text)'};">${pCanc}</span></div>
-        <div class="ms"><span class="ms-l">Cumplimiento final</span><span class="ms-v" style="color:${pCol};font-weight:600">${pPct}%</span></div>
-      </div>`;
-  }
-  document.getElementById('cumpl-bars').innerHTML = cumplHtml;
-}
-
-// ── RENDER PROGRAMACION ───────────────────────────────────
-let filteredProg = [];
-function renderProg() {
-  // Poblar filtro de fechas dinámicamente
-  const sel = document.getElementById('f-fecha');
-  const currentVal = sel.value;
-  const fechas = [...new Set(STATE.prog.map(r => normFecha(r.FECHA||r.fecha||'')).filter(Boolean))].sort();
-  sel.innerHTML = '<option value="">Todas las fechas (' + STATE.prog.length + ')</option>';
-  fechas.forEach(f => {
-    const parts = f.split('-');
-    const label = (parts[2]||'') + '-' + (parts[1]||'') + '-' + (parts[0]||'');
-    const opt = document.createElement('option');
-    opt.value = f;
-    opt.textContent = label;
-    if (f === currentVal) opt.selected = true;
-    sel.appendChild(opt);
-  });
-  filteredProg = [...STATE.prog];
-  filtrarProg();
-}
-function filtrarProg() {
-  const fecha  = document.getElementById('f-fecha').value;
-  const tipo   = document.getElementById('f-tipo').value;
-  const estado = document.getElementById('f-estado').value;
-  let data = STATE.prog.filter(r => {
-    if (fecha  && normFecha(r.FECHA||r.fecha||'') !== fecha) return false;
-    if (tipo   && (r.TIPO||'')    !== tipo)   return false;
-    if (estado && (r.ESTADO||'') !== estado) return false;
-    return true;
-  });
-  document.getElementById('prog-cnt').textContent = data.length + ' registros';
-  const tbody = document.getElementById('prog-tbody');
-  if (!data.length) { tbody.innerHTML=`<tr><td colspan="16"><div class="empty">Sin datos con estos filtros</div></td></tr>`; return; }
-  tbody.innerHTML = data.map((r,i) => {
-    const dem = parseInt(r.PESO||0);
-    const demCl = dem>=-10?'td-r':dem>=-20?'td-a':'';
-    return `<tr>
-      <td class="mono">${i+1}</td>
-      <td class="mono">${fmtFecha(r.FECHA)}</td>
-      <td class="mono" style="font-weight:500">${(r.HORARIO||'').substring(0,5)}</td>
-      <td style="font-size:11px">${r.DEPOSITO||'—'}</td>
-      <td>${tipoBadge(r.TIPO)}</td>
-      <td class="mono">${r.CAPACIDAD||'—'}</td>
-      <td class="mono">${r.CONTENEDOR||'—'}</td>
-      <td class="mono">${r.DEMURRAGE||'—'}</td>
-      <td class="mono ${demCl}">${r.PESO||'—'}</td>
-      <td class="mono" style="font-size:10px">${(r.BL||'—').substring(0,14)}</td>
-      <td class="mono">${r.SKU||'—'}</td>
-      <td style="font-size:11px;max-width:160px">${r.DESC_SKU||'—'}</td>
-      <td style="font-size:11px">${r.TRANSPORTE||'—'}</td>
-      <td style="font-size:11px">${r.BODEGA||'—'}</td>
-      <td><span class="b bx">${r.SERVICIOS||'—'}</span></td>
-      <td>${estadoBadge(r.ESTADO)}</td>
-    </tr>`;
-  }).join('');
-}
-
-// ── RENDER TRANSITO ───────────────────────────────────────────────────────────
-function renderTransito() {
-  const data = STATE.transito;
-  document.getElementById('t-total').textContent = data.length || '0';
-  document.getElementById('t-dem').textContent   = data.filter(r => parseInt(r.DEMURRAGE||0) >= -10).length || '0';
-  document.getElementById('t-deps').textContent  = new Set(data.map(r => r.DEPOSITO).filter(Boolean)).size || '0';
-  document.getElementById('t-badge').textContent = data.length + ' contenedores';
-
-  const tbody = document.getElementById('trans-tbody');
-  if (!data.length) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty">Sin datos de tránsito</div></td></tr>`;
-    return;
-  }
-
-  // Agrupar por FECHA_PROG
-  const byFecha = {};
-  data.forEach(r => {
-    const f = normFecha(r.FECHA_PROG || r.FECHA || '') || 'Sin fecha';
-    if (!byFecha[f]) byFecha[f] = [];
-    byFecha[f].push(r);
-  });
-
-  // Ordenar fechas — más reciente primero
-  const fechasOrdenadas = Object.keys(byFecha).sort((a,b) => {
-    if (a === 'Sin fecha') return 1;
-    if (b === 'Sin fecha') return -1;
-    return new Date(b+' 12:00:00') - new Date(a+' 12:00:00');
-  });
-
-  let html = '';
-  fechasOrdenadas.forEach(f => {
-    const rows = byFecha[f];
-    const label = f === 'Sin fecha' ? 'Sin fecha asignada' : 'Programa ' + fmtFecha(f);
-    const sinDesp  = rows.filter(r => (r.STATUS||'').toUpperCase().includes('SIN DESPACHO')).length;
-    const retirado = rows.filter(r => (r.STATUS||'').toUpperCase().includes('RETIRADO') || (r.STATUS||'').toUpperCase().includes('ENTREGADO')).length;
-
-    // Fila de separador de fecha
-    html += `<tr>
-      <td colspan="9" style="background:#EFF6FF;padding:8px 12px;border-bottom:2px solid var(--blue)">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <span style="font-size:12px;font-weight:600;color:var(--blue)">${label}</span>
-          <div style="display:flex;gap:8px">
-            <span class="b bb">${rows.length} total</span>
-            ${sinDesp  > 0 ? `<span class="b ba">${sinDesp} sin despacho</span>` : ''}
-            ${retirado > 0 ? `<span class="b bg">${retirado} retirados</span>`   : ''}
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page active">
+        <div class="page-header"><h2>Dashboard de Transporte</h2><p>Resumen general de todos los módulos</p></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="label">Total registros</div><div class="value">1</div><div class="sub">Activos hoy</div></div>
+          <div class="stat-card"><div class="label">Contenedores</div><div class="value">1</div><div class="sub">1 retiro · 0 devolución</div></div>
+          <div class="stat-card"><div class="label">Abastecimiento Tienda</div><div class="value" style="font-size:13px;padding-top:4px">Próximo</div><div class="sub">Módulo en desarrollo</div></div>
+          <div class="stat-card"><div class="label">Despacho a Domicilio</div><div class="value" style="font-size:13px;padding-top:4px">Próximo</div><div class="sub">Módulo en desarrollo</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Asignaciones Retiro Puerto</span><span class="badge">1</span></div>
+          <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Creado</th></tr></thead>
+            <tbody>
+              <tr><td>02-05-2026</td><td>SITRANS SAN ANTONIO</td><td>—</td><td>H. BUSTOS</td><td>1</td><td>1</td><td>1</td><td>1</td><td><span class="gps-pill">RAMPLA-TRACTO</span></td><td style="font-size:11px;color:#999">02-05-2026, 4:28 p.m.</td></tr>
+            </tbody>
+          </table>
           </div>
         </div>
-      </td>
-    </tr>`;
+        <div class="card">
+          <div class="card-header"><span class="card-title">Devoluciones Vacíos Navieros</span><span class="badge">0</span></div>
+          <div class="empty-state">Sin registros de devolución</div>
+        </div>
+      </div>
 
-    // Filas de contenedores
-    rows.forEach((r, i) => {
-      const dem = parseInt(r.DEMURRAGE || 0);
-      const demCl = dem >= -10 ? 'td-r' : dem >= -20 ? 'td-a' : '';
-      html += `<tr>
-        <td class="mono">${i+1}</td>
-        <td style="font-size:11px">${r.DEPOSITO||'—'}</td>
-        <td class="mono">${r.CONTENEDOR||'—'}</td>
-        <td><span class="b bx">${r.TIPO||'—'}ft</span></td>
-        <td class="mono">${r.CC||'—'}</td>
-        <td class="mono ${demCl}">${r.DEMURRAGE||'—'}</td>
-        <td style="font-size:11px">${r.DESTINO||'—'}</td>
-        <td style="font-weight:500;font-size:12px">${r.TRANSPORTE||'—'}</td>
-        <td>${estadoBadge(r.STATUS)}</td>
-      </tr>`;
-    });
-  });
+      <!-- RETIRO PUERTO -->
+      <div id="page-retiro" class="page">
+        <div class="page-header"><h2>Área de Transporte</h2><p>Retiro Puerto</p></div>
+        <div class="btn-row">
+          <button class="action-btn primary" id="btn-retiro-reg" onclick="switchTab('retiro','registros')">≡ Registros</button>
+          <button class="action-btn" id="btn-retiro-new" onclick="switchTab('retiro','nueva')">+ Nueva Asignación</button>
+        </div>
+        <div id="retiro-registros">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Asignaciones Retiro Puerto</span><span class="badge">1</span></div>
+            <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Creado</th></tr></thead>
+              <tbody>
+                <tr><td>02-05-2026</td><td>SITRANS SAN ANTONIO</td><td>—</td><td>H. BUSTOS</td><td>1</td><td>1</td><td>1</td><td>1</td><td><span class="gps-pill">RAMPLA-TRACTO</span></td><td style="font-size:11px;color:#999">02-05-2026, 4:28 p.m.</td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+        <div id="retiro-nueva" style="display:none">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px">Nueva Asignación — Retiro Puerto</div>
+            <div class="section-divider">Datos Generales</div>
+            <div class="form-grid">
+              <div class="form-group"><label>Fecha *</label><input type="date"/></div>
+              <div class="form-group"><label>Tipo de registro *</label><select><option value="">Seleccionar...</option><option>Ingreso</option><option>Salida</option></select></div>
+              <div class="form-group full"><label>Depósito de retiro *</label>
+                <select><option value="">Seleccionar depósito...</option><option>SITRANS SAN ANTONIO</option><option>CIS SAN ANTONIO</option><option>HGT SAN ANTONIO</option><option>MEDLOG VALPARAISO</option><option>MEDLOG SAN ANTONIO</option><option>SITRANS VALPARAISO</option><option>HGT VALPARAISO</option><option>SITRANS SANTIAGO</option><option>HGT SANTIAGO</option><option>DEPOSITO CD</option><option>TERCOP</option></select>
+              </div>
+            </div>
+            <div class="section-divider">Empresa de Transporte</div>
+            <div class="form-grid">
+              <div class="form-group full"><label>Transportista *</label>
+                <select><option value="">Seleccionar transporte...</option><option>85.131.900-K CASABLANCA</option><option>76.651.987-3 FR RENTAL</option><option>76107615-9 BYD</option><option>76.840.809-2 JUC CHILE</option><option>76.421.758-6 SERMOV</option><option>96.979.980-4 SAN FABIAN</option><option>76.501.883-8 CASTELLINI</option><option>77.082.997-6 CF</option><option>77.248.307-4 GLOBAL LOGISTIC</option><option>77.079.719-5 H. BUSTOS</option><option>77.304.186-5 CELMAR</option><option>96.500.950-7 SITRANS</option><option>77.090.481-1 PRECAM</option><option>76.228.166-K TRANVIAL</option><option>76.388.144-K MOVEONTRUCK</option><option>76.172.595-5 MEDLOG</option><option>76.381.392-4 JULIO HIDALGO</option></select>
+              </div>
+            </div>
+            <div class="section-divider">Datos del Conductor</div>
+            <div class="form-grid">
+              <div class="form-group"><label>Nombre chofer *</label><input type="text" placeholder="Nombre completo"/></div>
+              <div class="form-group"><label>RUT chofer *</label><input type="text" placeholder="12.345.678-9"/></div>
+              <div class="form-group"><label>Teléfono *</label><input type="tel" placeholder="+56 9 xxxx xxxx"/></div>
+              <div class="form-group"><label>Patente tracto *</label><input type="text" placeholder="XXXX-XX"/></div>
+              <div class="form-group"><label>Patente rampla *</label><input type="text" placeholder="XXXX-XX"/></div>
+              <div class="form-group"><label>Chofer a reemplazar</label><input type="text" placeholder="Opcional"/></div>
+              <div class="form-group full"><label>Ubicación GPS *</label>
+                <select><option>Rampla + Tracto</option><option>Solo Tracto</option><option>Solo Rampla</option><option>Sin GPS</option></select>
+              </div>
+            </div>
+            <div class="form-footer">
+              <button class="action-btn" onclick="limpiarForm('retiro')">Limpiar</button>
+              <button class="action-btn primary">Guardar en Google Sheets</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  tbody.innerHTML = html;
+      <!-- DEVOLUCIÓN VACÍOS -->
+      <div id="page-devolucion" class="page">
+        <div class="page-header"><h2>Área de Transporte</h2><p>Devolución Vacíos</p></div>
+        <div class="btn-row">
+          <button class="action-btn primary" id="btn-dev-reg" onclick="switchTab('dev','registros')">≡ Registros</button>
+          <button class="action-btn" id="btn-dev-new" onclick="switchTab('dev','nueva')">+ Nueva Devolución</button>
+        </div>
+        <div id="dev-registros">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Devoluciones Vacíos Navieros</span><span class="badge">0</span></div>
+            <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Fecha</th><th>Depósito</th><th>Transporte</th><th>Contenedor</th><th>EIR</th><th>Creado</th></tr></thead>
+              <tbody><tr><td colspan="6" class="empty-state">Sin registros de devolución</td></tr></tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+        <div id="dev-nueva" style="display:none">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px">Nueva Devolución de Vacío Naviero</div>
+            <div class="form-grid">
+              <div class="form-group"><label>Fecha *</label><input type="date"/></div>
+              <div class="form-group"><label>Depósito *</label>
+                <select><option value="">Seleccionar depósito...</option><option>SITRANS SAN ANTONIO</option><option>CIS SAN ANTONIO</option><option>HGT SAN ANTONIO</option><option>MEDLOG VALPARAISO</option><option>MEDLOG SAN ANTONIO</option><option>SITRANS VALPARAISO</option><option>DEPOSITO CD</option><option>TERCOP</option></select>
+              </div>
+              <div class="form-group full"><label>Transportista *</label>
+                <select><option value="">Seleccionar transporte...</option><option>85.131.900-K CASABLANCA</option><option>76.651.987-3 FR RENTAL</option><option>76107615-9 BYD</option><option>76.840.809-2 JUC CHILE</option><option>76.421.758-6 SERMOV</option><option>96.979.980-4 SAN FABIAN</option><option>76.501.883-8 CASTELLINI</option><option>77.082.997-6 CF</option><option>77.248.307-4 GLOBAL LOGISTIC</option><option>77.079.719-5 H. BUSTOS</option><option>77.304.186-5 CELMAR</option><option>96.500.950-7 SITRANS</option><option>77.090.481-1 PRECAM</option><option>76.228.166-K TRANVIAL</option><option>76.388.144-K MOVEONTRUCK</option><option>76.172.595-5 MEDLOG</option><option>76.381.392-4 JULIO HIDALGO</option></select>
+              </div>
+              <div class="form-group"><label>Número contenedor *</label><input type="text" placeholder="XXXX0000000"/></div>
+              <div class="form-group"><label>EIR *</label><input type="text" placeholder="Número EIR"/></div>
+            </div>
+            <div class="form-footer">
+              <button class="action-btn" onclick="limpiarForm('dev')">Limpiar</button>
+              <button class="action-btn primary">Guardar en Google Sheets</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASIGNACIONES (vista transportistas) -->
+      <div id="page-asignaciones" class="page">
+        <div class="page-header"><h2>Asignaciones transportistas</h2><p>Registros ingresados por empresas de transporte</p></div>
+        <div class="tabs-row">
+          <button class="tab-btn active" id="dbt-real" onclick="switchDashTab('real')">Registros en tiempo real</button>
+          <button class="tab-btn" id="dbt-ingresar" onclick="switchDashTab('ingresar')">Ingresar asignación</button>
+        </div>
+        <div id="dt-real">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Asignaciones Retiro Puerto</span><span class="badge">1 registros</span></div>
+            <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Fecha</th><th>Tipo</th><th>Depósito</th><th>Transportista</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th></tr></thead>
+              <tbody>
+                <tr><td>02-05-2026</td><td>—</td><td>SITRANS SAN ANTONIO</td><td>H. BUSTOS</td><td>1</td><td>1</td><td>1</td><td>1</td><td><span class="gps-pill">RAMPLA-TRACTO</span></td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+        <div id="dt-ingresar" style="display:none">
+          <div class="card">
+            <p style="font-size:13px;color:#666;margin-bottom:12px">Los transportistas completan este formulario. Los datos se guardan automáticamente en Google Sheets.</p>
+            <a href="https://sodimac-cd.github.io/transporte/" target="_blank" style="color:#1a3a8f;font-size:13px;display:inline-block;margin-bottom:16px">Pantalla completa ↗</a>
+            <div style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden">
+              <iframe src="https://sodimac-cd.github.io/transporte/" style="width:100%;height:520px;border:none" title="Panel de ingreso transportistas"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROGRAMACIÓN RM -->
+      <div id="page-progRM" class="page">
+        <div class="page-header"><h2>Programación RM</h2><p>Contenedores programados Región Metropolitana</p></div>
+        <div class="filter-row">
+          <select><option>Fecha: Todas las fechas</option></select>
+          <select><option>Tipo: Todos</option><option>HC</option><option>STD</option><option>DRY</option></select>
+          <select><option>Estado: Todos</option><option>PENDIENTE</option><option>ENTREGADO</option><option>TRASVASIJE</option><option>REPROGRAMADO</option><option>CANCELADO</option></select>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Contenedores programados</span><span class="badge">— registros</span></div>
+          <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>#</th><th>Fecha</th><th>Hora</th><th>Depósito</th><th>Tipo</th><th>Cap</th><th>Contenedor</th><th>Peso</th><th>Demurrage</th><th>BL</th><th>SKU</th><th>Descripción</th><th>Transporte</th><th>Bodega</th><th>Servicio</th><th>Estado</th></tr></thead>
+            <tbody><tr><td colspan="16" class="empty-state">Sin registros programados — conecta Google Sheets</td></tr></tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROGRAMA PUERTO -->
+      <div id="page-progPuerto" class="page">
+        <div class="page-header"><h2>Programa de Puerto</h2><p>Contenedores sin despacho por depósito de origen</p></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="label">Total sin despacho</div><div class="value">—</div><div class="sub">contenedores</div></div>
+          <div class="stat-card"><div class="label">Demurrage crítico</div><div class="value">—</div><div class="sub">&lt;10 días libres</div></div>
+          <div class="stat-card"><div class="label">Depósitos activos</div><div class="value">—</div><div class="sub">con contenedores</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Detalle por depósito</span></div>
+          <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>#</th><th>Depósito</th><th>Contenedor</th><th>Tipo</th><th>CC</th><th>Demurrage</th><th>Destino</th><th>Transportista</th><th>Status</th></tr></thead>
+            <tbody><tr><td colspan="9" class="empty-state">Sin datos de programa de puerto</td></tr></tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MÉTRICAS -->
+      <div id="page-metricas" class="page">
+        <div class="page-header"><h2>Métricas de cumplimiento</h2><p>Análisis del programa activo</p></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="label">Cumplimiento</div><div class="value">—</div><div class="sub">% entregado vs programado</div></div>
+          <div class="stat-card"><div class="label">Total programa</div><div class="value">—</div><div class="sub">contenedores</div></div>
+          <div class="stat-card"><div class="label">Demurrage crítico</div><div class="value">—</div><div class="sub">&lt;10 días libres</div></div>
+          <div class="stat-card"><div class="label">Sin asignar</div><div class="value">—</div><div class="sub">sin transportista</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Historial de programas</span></div>
+          <table>
+            <thead><tr><th>Fecha</th><th>Total</th><th>Entregados</th><th>Pendientes</th><th>Cumplimiento</th></tr></thead>
+            <tbody><tr><td colspan="5" class="empty-state">Sin historial disponible</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CONFIGURACIÓN -->
+      <div id="page-config" class="page">
+        <div class="page-header"><h2>Configuración</h2><p>Conexión con Google Sheets</p></div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:4px">⚡ Apps Script — Conexión directa (recomendado)</div>
+          <p style="font-size:12px;color:#888;margin-bottom:14px">Una vez desplegado el Apps Script en tu Sheet, pega aquí la URL. El dashboard leerá todas las hojas sin problemas.</p>
+          <div class="form-group" style="margin-bottom:14px"><label>URL del Web App</label><input type="text" id="appsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%"/></div>
+          <div style="display:flex;gap:10px">
+            <button class="action-btn primary" onclick="guardarUrl()">Guardar y cargar datos</button>
+            <button class="action-btn" onclick="verDemo()">Ver datos demo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QR CÓDIGOS -->
+      <div id="page-qr" class="page">
+        <div class="page-header"><h2>Códigos QR — Acceso transportistas</h2><p>Escanea para ingresar directamente al panel correspondiente sin ver el dashboard completo</p></div>
+        <div class="qr-grid">
+          <div class="qr-card">
+            <div style="width:40px;height:40px;background:#e8f0fe;border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#1a3a8f"><path d="M1 3h15v13H1zm15 4l5 3v6h-5z"/></svg>
+            </div>
+            <h3>Retiro Puerto</h3>
+            <p>Acceso directo al formulario de retiro de contenedores en puerto. Solo visible este módulo.</p>
+            <div class="qr-wrap"><canvas id="qr1" width="200" height="200"></canvas></div>
+            <div class="qr-label">sodimac-cd.github.io/transporte/</div>
+            <button class="qr-download" onclick="descargarQR('qr1','QR-Retiro-Puerto')">Descargar QR</button>
+          </div>
+          <div class="qr-card">
+            <div style="width:40px;height:40px;background:#e8f0fe;border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#1a3a8f"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M7 7V5a2 2 0 014 0v2"/></svg>
+            </div>
+            <h3>Devolución Vacíos</h3>
+            <p>Acceso directo al formulario de devolución de contenedores vacíos navieros. Solo visible este módulo.</p>
+            <div class="qr-wrap"><canvas id="qr2" width="200" height="200"></canvas></div>
+            <div class="qr-label">sodimac-cd.github.io/transporte/#devolucion</div>
+            <button class="qr-download" onclick="descargarQR('qr2','QR-Devolucion-Vacios')">Descargar QR</button>
+          </div>
+        </div>
+        <div class="card" style="margin-top:20px">
+          <div class="card-title" style="margin-bottom:8px">¿Cómo funcionan estos QR?</div>
+          <p style="font-size:13px;color:#666;line-height:1.7">Cada código QR lleva al transportista directamente al formulario de su módulo (Retiro Puerto o Devolución Vacíos) en <strong>sodimac-cd.github.io/transporte/</strong>. El transportista solo ve y puede ingresar datos de ese módulo específico, sin acceso al dashboard general ni a otros módulos.</p>
+        </div>
+      </div>
+
+      <!-- ABASTECIMIENTO -->
+      <div id="page-abastecimiento" class="page">
+        <div class="page-header"><h2>Abastecimiento Tienda</h2></div>
+        <div class="card"><div class="empty-state">🏗️ Módulo próximamente disponible</div></div>
+      </div>
+
+      <!-- DESPACHO -->
+      <div id="page-despacho" class="page">
+        <div class="page-header"><h2>Despacho a Domicilio</h2></div>
+        <div class="card"><div class="empty-state">🚚 Módulo próximamente disponible</div></div>
+      </div>
+
+      <!-- CONTENEDORES -->
+      <div id="page-contenedores" class="page">
+        <div class="page-header"><h2>Contenedores</h2><p>Resumen por módulo</p></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="label">Retiro Puerto</div><div class="value">1</div><div class="sub">registro activo</div></div>
+          <div class="stat-card"><div class="label">Devolución Naviera</div><div class="value">0</div><div class="sub">sin registros</div></div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:4px">
+          <button class="action-btn primary" onclick="showPage('retiro')">Ver Retiro Puerto →</button>
+          <button class="action-btn" onclick="showPage('devolucion')">Ver Devolución Vacíos →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script>
+function updateClock(){
+  const now=new Date();
+  const opts={weekday:'short',day:'numeric',month:'short',year:'numeric'};
+  const d=now.toLocaleDateString('es-CL',opts);
+  const t=now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('clock').textContent=d+' · '+t;
+}
+updateClock();
+setInterval(updateClock,30000);
+
+const pageNavMap={
+  dashboard:'nt-dashboard',progRM:'nt-progRM',progPuerto:'nt-progPuerto',
+  asignaciones:'nt-asignaciones',metricas:'nt-metricas',config:'nt-config'
+};
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('page-'+id);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  if(pageNavMap[id]) document.getElementById(pageNavMap[id]).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  const sb=document.getElementById('sb-'+id);
+  if(sb) sb.classList.add('active');
+  if(id==='qr') generateQRs();
 }
 
-// ── RENDER METRICAS ───────────────────────────────────────
-function renderMetricas() {
-  const p = STATE.prog;
-  const total = p.length;
-  const ok    = p.filter(r=>['ENTREGADO','TRASVASIJE'].includes(r.ESTADO)).length;
-  const pct   = total ? Math.round(ok/total*100) : 0;
-  const dem   = STATE.transito.filter(r=>parseInt(r.DEMURRAGE||0)>=-10).length;
-  const sinT  = p.filter(r=>!(r.TRANSPORTE||'').trim()).length;
-  document.getElementById('m-cumpl').textContent = total ? pct+'%' : '—';
-  document.getElementById('m-total').textContent = total||'—';
-  document.getElementById('m-dem').textContent   = dem||'0';
-  document.getElementById('m-sin').textContent   = sinT||'0';
-
-  // Bodega bars
-  const bodegas = {};
-  p.forEach(r=>{ const b=r.BODEGA||'Sin asignar'; bodegas[b]=(bodegas[b]||0)+1; });
-  const col = ['var(--blue)','var(--green)','var(--amber)','var(--red)','var(--text3)'];
-  document.getElementById('bodega-bars').innerHTML = Object.entries(bodegas)
-    .sort((a,b)=>b[1]-a[1]).slice(0,5)
-    .map(([b,n],i)=>`<div class="bw"><div class="bl">${b.replace('BODEGA ','')} <span>${n}</span></div><div class="bg-bar"><div class="bar" style="width:${total?Math.round(n/total*100):0}%;background:${col[i]}"></div></div></div>`)
-    .join('');
-
-  // Tipo bars
-  const tipos = {'HC':0,'STD':0,'DRY':0};
-  p.forEach(r=>{ if(r.TIPO in tipos) tipos[r.TIPO]++; });
-  document.getElementById('tipo-bars').innerHTML = Object.entries(tipos)
-    .map(([t,n])=>`<div class="bw"><div class="bl">${t} <span>${n}</span></div><div class="bg-bar"><div class="bar" style="width:${total?Math.round(n/total*100):0}%;background:var(--blue)"></div></div></div>`)
-    .join('');
-
-  // Historial
-  const fechas = [...new Set(p.map(r=>r.FECHA).filter(Boolean))].sort();
-  document.getElementById('hist-tbody').innerHTML = fechas.map(f=>{
-    const fp = p.filter(r=>r.FECHA===f);
-    const fok = fp.filter(r=>['ENTREGADO','TRASVASIJE'].includes(r.ESTADO)).length;
-    const fpct = fp.length ? Math.round(fok/fp.length*100) : 0;
-    const c = fpct>=90?'var(--green)':fpct>=60?'var(--amber)':'var(--red)';
-    return `<tr><td class="mono">${fmtFecha(f)}</td><td class="mono">${fp.length}</td><td class="mono td-g">${fok}</td><td class="mono">${fp.length-fok}</td><td style="color:${c};font-weight:500">${fpct}%</td></tr>`;
-  }).join('');
-}
-
-// ── RENDER ASIGNACIONES ───────────────────────────────────
-function renderAsig() {
-  const data = STATE.asignaciones;
-  const badge = document.getElementById('ar-badge');
-  const tbody = document.getElementById('ar-tbody');
-  if (!data || !data.length) {
-    badge.textContent = 'Sin datos';
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty">Configura el Apps Script para ver registros en vivo</div></td></tr>`;
-    return;
+function switchTab(mod,tab){
+  if(mod==='retiro'){
+    document.getElementById('retiro-registros').style.display=tab==='registros'?'block':'none';
+    document.getElementById('retiro-nueva').style.display=tab==='nueva'?'block':'none';
+    document.getElementById('btn-retiro-reg').className='action-btn'+(tab==='registros'?' primary':'');
+    document.getElementById('btn-retiro-new').className='action-btn'+(tab==='nueva'?' primary':'');
+  } else {
+    document.getElementById('dev-registros').style.display=tab==='registros'?'block':'none';
+    document.getElementById('dev-nueva').style.display=tab==='nueva'?'block':'none';
+    document.getElementById('btn-dev-reg').className='action-btn'+(tab==='registros'?' primary':'');
+    document.getElementById('btn-dev-new').className='action-btn'+(tab==='nueva'?' primary':'');
   }
-  badge.textContent = data.length+' registros';
-  tbody.innerHTML = [...data].reverse().slice(0,50).map(r => {
-    const tte = (r.TRANSPORTISTA||r.TRANSPORTE||'—').replace(/^\d[\d.\-]+\s*/,'');
-    const gps = (r.GPS||r['UBICACIÓN GPS']||'').toUpperCase();
-    const gpsBadge = gps.includes('TRACTO')&&gps.includes('RAMPLA')?'<span class="b bg">T+R</span>':
-                     gps.includes('TRACTO')?'<span class="b bb">Tracto</span>':
-                     gps.includes('RAMPLA')?'<span class="b bb">Rampla</span>':
-                     '<span class="b bx">Sin GPS</span>';
-    return `<tr>
-      <td class="mono">${(r.FECHA||'—').substring(0,10)}</td>
-      <td><span class="b bx">${r.TIPO||r['TIPO DE REGISTRO']||'—'}</span></td>
-      <td style="font-size:11px">${r.DEPOSITO||'—'}</td>
-      <td style="font-weight:500">${tte}</td>
-      <td style="font-size:11px">${r.CHOFER||r['NOMBRE CHOFER']||'—'}</td>
-      <td class="mono">${r.RUT||r['RUT CHOFER']||'—'}</td>
-      <td class="mono">${r.TRACTO||r['PATENTE TRACTO']||'—'}</td>
-      <td class="mono">${r.RAMPLA||r['PATENTE RAMPLA']||'—'}</td>
-      <td>${gpsBadge}</td>
-    </tr>`;
-  }).join('');
 }
 
-// ── INIT ──────────────────────────────────────────────────
-// URL Apps Script configurada automáticamente
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVuxQ9EWwyqa9jClhAGEPfXPwCzli2dOa553wJ_l13hkgbx1lLyVsw8Q6bimarqopAog/exec';
-if (!localStorage.getItem('cd_script_url')) {
-  localStorage.setItem('cd_script_url', APPS_SCRIPT_URL);
+function switchDashTab(tab){
+  document.getElementById('dbt-real').className='tab-btn'+(tab==='real'?' active':'');
+  document.getElementById('dbt-ingresar').className='tab-btn'+(tab==='ingresar'?' active':'');
+  document.getElementById('dt-real').style.display=tab==='real'?'block':'none';
+  document.getElementById('dt-ingresar').style.display=tab==='ingresar'?'block':'none';
 }
-const savedScript = localStorage.getItem('cd_script_url');
-if (savedScript) document.getElementById('url-script').value = savedScript;
-// Cargar datos de los Excel inmediatamente
-loadDemo();
-// Intentar datos en vivo en background
-setTimeout(async () => {
-  const s = localStorage.getItem('cd_script_url');
-  if (s) await refreshData();
-}, 1000);
+
+function limpiarForm(mod){
+  const prefix=mod==='retiro'?'retiro-nueva':'dev-nueva';
+  document.querySelectorAll('#'+prefix+' input,#'+prefix+' select').forEach(el=>{
+    if(el.tagName==='SELECT') el.selectedIndex=0;
+    else el.value='';
+  });
+}
+
+function guardarUrl(){
+  const url=document.getElementById('appsScriptUrl').value.trim();
+  if(url) localStorage.setItem('appsScriptUrl',url);
+  alert('URL guardada. Recarga para aplicar.');
+}
+
+function verDemo(){alert('Modo demo: los datos se cargarán desde el Apps Script configurado.');}
+
+let qrGenerated=false;
+function generateQRs(){
+  if(qrGenerated||typeof QRCode==='undefined') return;
+  QRCode.toCanvas(document.getElementById('qr1'),'https://sodimac-cd.github.io/transporte/',
+    {width:200,margin:1,color:{dark:'#1a3a8f',light:'#ffffff'}},function(){});
+  QRCode.toCanvas(document.getElementById('qr2'),'https://sodimac-cd.github.io/transporte/#devolucion',
+    {width:200,margin:1,color:{dark:'#1a3a8f',light:'#ffffff'}},function(){});
+  qrGenerated=true;
+}
+
+function descargarQR(canvasId,nombre){
+  const canvas=document.getElementById(canvasId);
+  const link=document.createElement('a');
+  link.download=nombre+'.png';
+  link.href=canvas.toDataURL();
+  link.click();
+}
+
+const saved=localStorage.getItem('appsScriptUrl');
+if(saved) document.getElementById('appsScriptUrl').value=saved;
 </script>
 </body>
 </html>
