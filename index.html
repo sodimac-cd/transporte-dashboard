@@ -409,123 +409,197 @@ tr:hover td{background:#fafbff}
   </div>
 </div>
 
-    ipt>
-// CLOCK
-function tick(){
-  var n=new Date();
-  document.getElementById('clock').textContent=n.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+' · '+n.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
-}
+<script>
+var URL_AS='https://script.google.com/macros/s/AKfycbykZe2S_KzXGD1qdYZMGtgK_HpBNIa218kXvPczwvBa-_l8mYy1waPC9Bc1TQblELclFQ/exec';
+var store={retiro:[],devolucion:[],programacion:[]};
+var pgData=[];
+var kpiCharts={};
+
+function tick(){var n=new Date();document.getElementById('clk').textContent=n.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+' · '+n.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});}
 tick();setInterval(tick,30000);
 
-// NAV map for topbar
-var NM={dashboard:'nt-dashboard',progRM:'nt-progRM',progPuerto:'nt-progPuerto',asignaciones:'nt-asignaciones',metricas:'nt-metricas',config:'nt-config'};
-function SP(id){
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
-  var pg=document.getElementById('page-'+id);if(pg)pg.classList.add('active');
-  document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active')});
-  if(NM[id])document.getElementById(NM[id]).classList.add('active');
-  document.querySelectorAll('.sb-item').forEach(function(i){i.classList.remove('active')});
-  var sb=document.getElementById('sb-'+id);if(sb)sb.classList.add('active');
-  if(id==='qr')genQR();
-  if(id==='contenedores'&&store.programacion&&store.programacion.length)renderKPI(store.programacion);
-}
+(function(){var u=localStorage.getItem('asUrl')||URL_AS;localStorage.setItem('asUrl',u);var el=document.getElementById('cfgUrl');if(el)el.value=u;})();
 
-function ST(mod,tab){
-  if(mod==='retiro'){
-    document.getElementById('retiro-reg').style.display=tab==='reg'?'block':'none';
-    document.getElementById('retiro-new').style.display=tab==='new'?'block':'none';
-    document.getElementById('brr').className='abtn'+(tab==='reg'?' p':'');
-    document.getElementById('brn').className='abtn'+(tab==='new'?' p':'');
+var NM={metricas:'nt-metricas',config:'nt-config'};
+function go(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  var pg=document.getElementById('p-'+id);if(pg)pg.classList.add('on');
+  document.querySelectorAll('.nt').forEach(function(t){t.classList.remove('on');});
+  if(NM[id])document.getElementById(NM[id]).classList.add('on');
+  document.querySelectorAll('.si').forEach(function(i){i.classList.remove('on');});
+  var sb=document.getElementById('sb-'+id);if(sb)sb.classList.add('on');
+  if(id==='qr')genQR();
+  if(id==='contenedores'&&store.programacion.length)renderKPI(store.programacion);
+}
+function tab(m,t){
+  if(m==='retiro'){
+    document.getElementById('retiro-reg').style.display=t==='reg'?'block':'none';
+    document.getElementById('retiro-new').style.display=t==='new'?'block':'none';
+    document.getElementById('brr').className='btn'+(t==='reg'?' blue':'');
+    document.getElementById('brn').className='btn'+(t==='new'?' blue':'');
   }else{
-    document.getElementById('dev-reg').style.display=tab==='reg'?'block':'none';
-    document.getElementById('dev-new').style.display=tab==='new'?'block':'none';
-    document.getElementById('bdr').className='abtn'+(tab==='reg'?' p':'');
-    document.getElementById('bdn').className='abtn'+(tab==='new'?' p':'');
+    document.getElementById('dev-reg').style.display=t==='reg'?'block':'none';
+    document.getElementById('dev-new').style.display=t==='new'?'block':'none';
+    document.getElementById('bdr').className='btn'+(t==='reg'?' blue':'');
+    document.getElementById('bdn').className='btn'+(t==='new'?' blue':'');
   }
 }
-function SDT(t){
-  document.getElementById('dbt-r').className='tb'+(t==='r'?' active':'');
-  document.getElementById('dbt-i').className='tb'+(t==='i'?' active':'');
+function sdt(t){
+  document.getElementById('dbt-r').className='tabb'+(t==='r'?' on':'');
+  document.getElementById('dbt-i').className='tabb'+(t==='i'?' on':'');
   document.getElementById('dt-r').style.display=t==='r'?'block':'none';
   document.getElementById('dt-i').style.display=t==='i'?'block':'none';
 }
+function saveUrl(){var u=document.getElementById('cfgUrl').value.trim();if(u){localStorage.setItem('asUrl',u);URL_AS=u;load();}}
 
-// CONFIG
-function guardarUrl(){var u=document.getElementById('asUrl').value.trim();if(u){localStorage.setItem('asUrl',u);cargarDatos();}}
-var su=localStorage.getItem('asUrl');if(su)document.getElementById('asUrl').value=su;
+function load(){
+  var url=localStorage.getItem('asUrl')||URL_AS;
+  var cb='_cb'+Date.now();
+  window[cb]=function(d){
+    try{delete window[cb];}catch(e){}
+    var s=document.getElementById('_jscript');if(s)s.remove();
+    if(d.debug){var box=document.getElementById('dbg-box'),txt=document.getElementById('dbg-txt');if(box&&txt){box.style.display='block';txt.textContent=JSON.stringify(d.debug,null,2);}}
+    if(d.retiro&&d.retiro.length)renderR(d.retiro);
+    if(d.devolucion&&d.devolucion.length)renderD(d.devolucion);
+    if(d.programacion&&d.programacion.length)renderP(d.programacion);
+  };
+  var s=document.createElement('script');
+  s.id='_jscript';
+  s.src=url+'?callback='+cb+'&t='+Date.now();
+  s.onerror=function(){console.warn('Error cargando datos');};
+  document.head.appendChild(s);
+}
 
-// QR — usa API de Google Charts (no requiere librería)
+function pill(e){var s=String(e||'').toUpperCase();var m={ENTREGADO:'pe',PENDIENTE:'pp',REPROGRAMADO:'pr',CANCELADO:'pc',DESCONSOLIDADO:'pd'};return '<span class="'+(m[s]||'pp')+'">'+e+'</span>';}
+
+function renderR(rows){
+  store.retiro=rows;
+  var h1=rows.map(function(r){return '<tr><td>'+r.fecha+'</td><td>'+r.deposito+'</td><td>'+(r.tipo||'—')+'</td><td>'+(r.transportista||r.transporte||'—')+'</td><td>'+r.chofer+'</td><td>'+r.rut+'</td><td>'+r.tracto+'</td><td>'+r.rampla+'</td><td><span class="gps">'+(r.gps||'—')+'</span></td><td style="font-size:11px;color:#999">'+r.creado+'</td></tr>';}).join('');
+  var h2=rows.map(function(r){return '<tr><td>'+r.fecha+'</td><td>'+(r.tipo||'—')+'</td><td>'+r.deposito+'</td><td>'+(r.transportista||r.transporte||'—')+'</td><td>'+r.chofer+'</td><td>'+r.rut+'</td><td>'+r.tracto+'</td><td>'+r.rampla+'</td><td><span class="gps">'+(r.gps||'—')+'</span></td></tr>';}).join('');
+  ['r-tb','d-rtb'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h1||'<tr><td colspan="10" class="es">Sin registros</td></tr>';});
+  var at=document.getElementById('as-tb');if(at)at.innerHTML=h2||'<tr><td colspan="9" class="es">Sin registros</td></tr>';
+  ['r-cnt','d-rcnt','as-cnt','c-r'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=rows.length;});
+}
+
+function renderD(rows){
+  store.devolucion=rows;
+  var h=rows.map(function(r){return '<tr><td>'+r.fecha+'</td><td>'+r.deposito+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+r.contenedor+'</td><td>'+r.eir+'</td><td style="font-size:11px;color:#999">'+r.creado+'</td></tr>';}).join('');
+  ['dv-tb','d-dtb'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h||'<tr><td colspan="6" class="es">Sin registros</td></tr>';});
+  ['dv-cnt','d-dcnt'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=rows.length;});
+}
+
+function renderP(rows){
+  store.programacion=rows;pgData=rows;
+  renderKPI(rows);
+  filtrarPG();filtrarRM();
+  var t=rows.length,e=rows.filter(function(r){return String(r.estado).toUpperCase()==='ENTREGADO';}).length;
+  var p=rows.filter(function(r){return String(r.estado).toUpperCase()==='PENDIENTE';}).length;
+  var dem=rows.filter(function(r){var n=parseInt(r.demurrage);return !isNaN(n)&&n<10&&n>-9999;}).length;
+  var sin=rows.filter(function(r){return !r.transporte&&!r.transportista;}).length;
+  var pct=t>0?Math.round(e/t*100):0;
+  [['pg-t',t],['pg-e',e],['pg-p',p],['pg-d',dem],['d-tot',t],['d-ent',e],['d-pen',p],['d-dem',dem],['c-p',t],['rm-cnt',t],['m-c',pct+'%'],['m-t',t],['m-d',dem],['m-s',sin]].forEach(function(x){var el=document.getElementById(x[0]);if(el)el.textContent=x[1];});
+  var es={};rows.forEach(function(r){var s=r.estado||'SIN ESTADO';es[s]=(es[s]||0)+1;});
+  var mt=document.getElementById('m-tb');if(mt)mt.innerHTML=Object.keys(es).map(function(s){return '<tr><td>'+pill(s)+'</td><td>'+es[s]+'</td><td>'+(t>0?Math.round(es[s]/t*100):0)+'%</td></tr>';}).join('');
+}
+
+function renderKPI(rows){
+  if(!rows||!rows.length)return;
+  var t=rows.length;
+  var e=rows.filter(function(r){return String(r.estado).toUpperCase()==='ENTREGADO';}).length;
+  var dem=rows.filter(function(r){var n=parseInt(r.demurrage);return !isNaN(n)&&n<10&&n>-9999;}).length;
+  var pct=t>0?Math.round(e/t*100):0;
+  var cp=document.getElementById('c-p');if(cp)cp.textContent=t;
+  var cc=document.getElementById('c-cumpl');if(cc)cc.textContent=pct+'%';
+  var cd=document.getElementById('c-dem');if(cd)cd.textContent=dem;
+  var es={};rows.forEach(function(r){var s=r.estado||'SIN ESTADO';es[s]=(es[s]||0)+1;});
+  var tp={};rows.forEach(function(r){var s=r.tipo||'—';tp[s]=(tp[s]||0)+1;});
+  var dp={};rows.forEach(function(r){var s=r.deposito||'—';dp[s]=(dp[s]||0)+1;});
+  var dKeys=Object.keys(dp).sort(function(a,b){return dp[b]-dp[a];}).slice(0,6);
+  var eK=Object.keys(es),tK=Object.keys(tp);
+  var eC=['#059669','#6366f1','#f59e0b','#dc2626','#64748b','#3266ad'];
+  var tC=['#3266ad','#64748b','#94a3b8','#1d6f42'];
+  var le=document.getElementById('c-legend-estado');
+  if(le)le.innerHTML=eK.map(function(k,i){return '<span style="display:flex;align-items:center;gap:3px"><span style="width:9px;height:9px;border-radius:2px;background:'+eC[i%eC.length]+';display:inline-block"></span>'+k+' '+es[k]+'</span>';}).join('');
+  var lt=document.getElementById('c-legend-tipo');
+  if(lt)lt.innerHTML=tK.map(function(k,i){return '<span style="display:flex;align-items:center;gap:3px"><span style="width:9px;height:9px;border-radius:2px;background:'+tC[i%tC.length]+';display:inline-block"></span>'+k+' '+tp[k]+'</span>';}).join('');
+  if(typeof Chart==='undefined')return;
+  if(kpiCharts.e)kpiCharts.e.destroy();
+  if(kpiCharts.t)kpiCharts.t.destroy();
+  if(kpiCharts.d)kpiCharts.d.destroy();
+  var dO={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'68%'};
+  var c1=document.getElementById('c-chart-estado');
+  if(c1)kpiCharts.e=new Chart(c1,{type:'doughnut',data:{labels:eK,datasets:[{data:eK.map(function(k){return es[k];}),backgroundColor:eC.slice(0,eK.length),borderWidth:0}]},options:dO});
+  var c2=document.getElementById('c-chart-tipo');
+  if(c2)kpiCharts.t=new Chart(c2,{type:'doughnut',data:{labels:tK,datasets:[{data:tK.map(function(k){return tp[k];}),backgroundColor:tC.slice(0,tK.length),borderWidth:0}]},options:dO});
+  var c3=document.getElementById('c-chart-dep');
+  if(c3)kpiCharts.d=new Chart(c3,{type:'bar',data:{labels:dKeys,datasets:[{data:dKeys.map(function(k){return dp[k];}),backgroundColor:'#3266ad',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},stepSize:1}}}}});
+  var alertRows=rows.filter(function(r){var n=parseInt(r.demurrage);return !isNaN(n)&&n<10&&n>-9999;}).sort(function(a,b){return parseInt(a.demurrage)-parseInt(b.demurrage);}).slice(0,5);
+  var ac=document.getElementById('c-alerts-card'),al=document.getElementById('c-alerts');
+  if(ac&&al&&alertRows.length){
+    ac.style.display='block';
+    al.innerHTML=alertRows.map(function(r){var n=parseInt(r.demurrage);var col=n<5?'background:#fee2e2;color:#991b1b':n<8?'background:#fef3c7;color:#92400e':'background:#dbeafe;color:#1e40af';return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:12px"><div><div style="font-weight:500;font-family:monospace;font-size:11px">'+r.contenedor+'</div><div style="color:var(--color-text-secondary);font-size:11px">'+r.deposito+'</div></div><span style="font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;'+col+'">'+r.demurrage+' días</span></div>';}).join('');
+  }
+}
+
+function filtrarPG(){
+  var ft=document.getElementById('pg-ft')&&document.getElementById('pg-ft').value;
+  var fe=document.getElementById('pg-fe')&&document.getElementById('pg-fe').value;
+  var rows=pgData.filter(function(r){return(!ft||r.tipo===ft)&&(!fe||String(r.estado).toUpperCase()===fe.toUpperCase());});
+  var cnt=document.getElementById('pg-cnt');if(cnt)cnt.textContent=rows.length;
+  var html=rows.length?rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td>'+r.fecha+'</td><td>'+(r.hora||'—')+'</td><td>'+r.deposito+'</td><td>'+r.tipo+'</td><td>'+(r.capacidad||'—')+'</td><td>'+r.contenedor+'</td><td>'+(r.peso||'—')+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.bl||'—')+'</td><td>'+(r.sku||'—')+'</td><td>'+(r.descripcion||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+(r.bodega||'—')+'</td><td>'+(r.servicio||'—')+'</td><td>'+pill(r.estado)+'</td></tr>';}).join(''):'<tr><td colspan="16" class="es">Sin registros</td></tr>';
+  var tb=document.getElementById('pg-tb');if(tb)tb.innerHTML=html;
+}
+function filtrarRM(){
+  var fe=document.getElementById('rm-fe')&&document.getElementById('rm-fe').value;
+  var rows=pgData.filter(function(r){return !fe||String(r.estado).toUpperCase()===fe.toUpperCase();});
+  var cnt=document.getElementById('rm-cnt');if(cnt)cnt.textContent=rows.length;
+  var html=rows.length?rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td>'+r.fecha+'</td><td>'+(r.hora||'—')+'</td><td>'+r.deposito+'</td><td>'+r.tipo+'</td><td>'+(r.capacidad||'—')+'</td><td>'+r.contenedor+'</td><td>'+(r.peso||'—')+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.bl||'—')+'</td><td>'+(r.sku||'—')+'</td><td>'+(r.descripcion||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+(r.bodega||'—')+'</td><td>'+(r.servicio||'—')+'</td><td>'+pill(r.estado)+'</td></tr>';}).join(''):'<tr><td colspan="16" class="es">Sin registros</td></tr>';
+  var tb=document.getElementById('rm-tb');if(tb)tb.innerHTML=html;
+}
+
+function xls(mod,nom){
+  var rows=store[mod];if(!rows||!rows.length){alert('Sin datos.');return;}
+  var hd,cl;
+  if(mod==='retiro'){hd=['Fecha','Deposito','Tipo','Transporte','Chofer','RUT','Tracto','Rampla','GPS','Creado'];cl=['fecha','deposito','tipo','transportista','chofer','rut','tracto','rampla','gps','creado'];}
+  else if(mod==='devolucion'){hd=['Fecha','Deposito','Transporte','Contenedor','EIR','Creado'];cl=['fecha','deposito','transporte','contenedor','eir','creado'];}
+  else{hd=['Fecha','Hora','Deposito','Tipo','Cap','Contenedor','Peso','Demurrage','BL','SKU','Descripcion','Transporte','Bodega','Servicio','Estado'];cl=['fecha','hora','deposito','tipo','capacidad','contenedor','peso','demurrage','bl','sku','descripcion','transporte','bodega','servicio','estado'];}
+  var csv='\uFEFF'+hd.join(';')+'\n';
+  rows.forEach(function(r){csv+=cl.map(function(k){return '"'+String(r[k]||'').replace(/"/g,'""')+'"';}).join(';')+'\n';});
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=nom+'_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+
+function saveRetiro(){
+  var url=localStorage.getItem('asUrl')||URL_AS;
+  var d={fecha:document.getElementById('rf-f').value,tipo:document.getElementById('rf-t').value,deposito:document.getElementById('rf-d').value,transportista:document.getElementById('rf-tr').value,chofer:document.getElementById('rf-ch').value,rut:document.getElementById('rf-ru').value,tel:document.getElementById('rf-te').value,tracto:document.getElementById('rf-tc').value,rampla:document.getElementById('rf-ra').value,reemplazo:document.getElementById('rf-re').value,gps:document.getElementById('rf-gp').value};
+  if(!d.fecha||!d.deposito||!d.transportista||!d.chofer||!d.rut){alert('Completa los campos obligatorios (*).');return;}
+  fetch(url,{method:'POST',body:JSON.stringify({modulo:'retiro',datos:d})}).then(function(){alert('Guardado.');tab('retiro','reg');load();}).catch(function(){alert('Error al guardar.');});
+}
+function saveDev(){
+  var url=localStorage.getItem('asUrl')||URL_AS;
+  var d={fecha:document.getElementById('dv-f').value,deposito:document.getElementById('dv-d').value,transportista:document.getElementById('dv-tr').value,contenedor:document.getElementById('dv-co').value,eir:document.getElementById('dv-ei').value};
+  if(!d.fecha||!d.deposito||!d.transportista||!d.contenedor||!d.eir){alert('Completa los campos obligatorios (*).');return;}
+  fetch(url,{method:'POST',body:JSON.stringify({modulo:'devolucion',datos:d})}).then(function(){alert('Guardado.');tab('dev','reg');load();}).catch(function(){alert('Error al guardar.');});
+}
+function demo(){
+  renderR([{fecha:'02-05-2026',deposito:'SITRANS SAN ANTONIO',tipo:'Ingreso',transportista:'H. BUSTOS',transporte:'H. BUSTOS',chofer:'Juan Perez',rut:'12.345.678-9',tracto:'ABCD-12',rampla:'EFGH-34',gps:'RAMPLA-TRACTO',creado:'02-05-2026 16:28'}]);
+  renderP([{fecha:'05-05-2026',hora:'08:30',deposito:'SITRANS SAN ANTONIO',tipo:'HC',capacidad:'40',contenedor:'TCKU1234567',peso:'24500',demurrage:'5',bl:'BL123456',sku:'7891234',descripcion:'Herramientas',transporte:'H. BUSTOS',bodega:'CD LO ESPEJO',servicio:'DESPACHO',estado:'PENDIENTE'},{fecha:'05-05-2026',hora:'10:00',deposito:'MEDLOG VALPARAISO',tipo:'STD',capacidad:'20',contenedor:'MSCU7654321',peso:'18000',demurrage:'15',bl:'BL654321',sku:'1234567',descripcion:'Linea blanca',transporte:'SITRANS',bodega:'CD LO ESPEJO',servicio:'DESPACHO',estado:'ENTREGADO'}]);
+}
 var qrDone=false;
 function genQR(){
   if(qrDone)return;
-  var u1='https://sodimac-cd.github.io/transporte/retiro-movil.html';
-  var u2='https://sodimac-cd.github.io/transporte/devolucion-movil.html';
-  var base='https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=1a237e&bgcolor=ffffff&data=';
-  
-  // Genera las imágenes
-  document.getElementById('qr1-img').src=base+encodeURIComponent(u1);
-  document.getElementById('qr2-img').src=base+encodeURIComponent(u2);
-  
-  // OPCIONAL: Hacer que hacer clic en la imagen abra la URL (envuelve la imagen en un enlace dinámicamente o abre en nueva pestaña)
-  document.getElementById('qr1-img').style.cursor = 'pointer';
-  document.getElementById('qr1-img').onclick = function() { window.open(u1, '_blank'); };
-  
-  document.getElementById('qr2-img').style.cursor = 'pointer';
-  document.getElementById('qr2-img').onclick = function() { window.open(u2, '_blank'); };
-  
+  var b='https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=1a237e&bgcolor=ffffff&data=';
+  document.getElementById('qr1').src=b+encodeURIComponent('https://sodimac-cd.github.io/transporte/retiro-movil.html');
+  document.getElementById('qr2').src=b+encodeURIComponent('https://sodimac-cd.github.io/transporte/devolucion-movil.html');
   qrDone=true;
 }
-
-function imprimirQR(imgId,titulo){
-  var img=document.getElementById(imgId);
-  var w=window.open('','_blank','width=420,height=520');
-  w.document.write('<!DOCTYPE html><html><head><title>QR '+titulo+'</title><style>body{font-family:sans-serif;text-align:center;padding:32px;background:#fff}h2{color:#1a237e;font-size:18px;margin-bottom:4px}p{color:#666;font-size:13px;margin-bottom:20px}img{border:2px solid #e0e0e0;border-radius:8px;padding:12px}@media print{button{display:none}}</style></head><body>');
-  w.document.write('<h2>CD Lo Espejo — Área de Transporte</h2><p>'+titulo+'</p><img src="'+img.src+'" width="220"/><br><br><button onclick="window.print()" style="background:#1a237e;color:#fff;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;margin-top:12px">🖨️ Imprimir</button></body></html>');
+function printQR(id,tit){
+  var img=document.getElementById(id);
+  var w=window.open('','_blank','width=420,height=500');
+  w.document.write('<!DOCTYPE html><html><head><title>QR '+tit+'</title><style>body{font-family:sans-serif;text-align:center;padding:32px}h2{color:#1a237e}p{color:#666;font-size:13px;margin:6px 0 20px}img{border:2px solid #e0e0e0;border-radius:8px;padding:12px}@media print{button{display:none}}</style></head><body><h2>CD Lo Espejo</h2><p>'+tit+'</p><img src="'+img.src+'" width="220"/><br><br><button onclick="window.print()" style="background:#1a237e;color:#fff;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;margin-top:16px">Imprimir</button></body></html>');
   w.document.close();
 }
-
-// DATA
-function pill(e){var m={PENDIENTE:'background:#fff3cd;color:#856404',ENTREGADO:'background:#d1fae5;color:#065f46',CANCELADO:'background:#fee2e2;color:#991b1b',REPROGRAMADO:'background:#e0e7ff;color:#3730a3'};return '<span style="'+(m[e]||'background:#f3f4f6;color:#374151')+';font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block">'+e+'</span>';}
-
-function renderRetiro(rows){
-  var h1=rows.length?rows.map(function(r){return '<tr><td>'+r.fecha+'</td><td>'+r.deposito+'</td><td>'+(r.tipo||'—')+'</td><td>'+r.transportista+'</td><td>'+r.chofer+'</td><td>'+r.rut+'</td><td>'+r.tracto+'</td><td>'+r.rampla+'</td><td><span class="gps">'+r.gps+'</span></td><td style="font-size:11px;color:#999">'+r.creado+'</td></tr>';}).join(''):'<tr><td colspan="10" class="es">Sin registros</td></tr>';
-  var h2=rows.length?rows.map(function(r){return '<tr><td>'+r.fecha+'</td><td>'+(r.tipo||'—')+'</td><td>'+r.deposito+'</td><td>'+r.transportista+'</td><td>'+r.chofer+'</td><td>'+r.rut+'</td><td>'+r.tracto+'</td><td>'+r.rampla+'</td><td><span class="gps">'+r.gps+'</span></td></tr>';}).join(''):'<tr><td colspan="9" class="es">Sin registros</td></tr>';
-  ['r-tb','d-rtb'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h1;});
-  document.getElementById('as-tb').innerHTML=h2;
-  ['r-cnt','d-rcnt','as-cnt','c-ret'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=rows.length;});
-}
-function renderDevolucion(rows){
-  var h=rows.length?rows.map(function(r){return '<tr><td>'+r.fecha+'</td><td>'+r.deposito+'</td><td>'+r.transportista+'</td><td>'+r.contenedor+'</td><td>'+r.eir+'</td><td style="font-size:11px;color:#999">'+r.creado+'</td></tr>';}).join(''):'<tr><td colspan="6" class="es">Sin registros</td></tr>';
-  ['dv-tb','d-dtb'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h;});
-  ['dv-cnt','d-dcnt','c-dev'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=rows.length;});
-}
-var pgData=[];
-function renderProgramacion(rows){
-  pgData=rows||[];filtrarPG();
-  var t=rows.length,e=rows.filter(function(r){return r.estado==='ENTREGADO';}).length,p=rows.filter(function(r){return r.estado==='PENDIENTE';}).length,d=rows.filter(function(r){return parseInt(r.demurrage)<10;}).length;
-  [['pg-t',t],['pg-e',e],['pg-p',p],['pg-d',d],['d-total',t],['d-ent',e],['d-pend',p],['d-dem',d],['c-prog',t]].forEach(function(x){var el=document.getElementById(x[0]);if(el)el.textContent=x[1];});
-}
-function filtrarPG(){
-  var ft=document.getElementById('pg-ft').value,fe=document.getElementById('pg-fe').value;
-  var rows=pgData.filter(function(r){return(!ft||r.tipo===ft)&&(!fe||r.estado===fe);});
-  var el=document.getElementById('pg-cnt');if(el)el.textContent=rows.length;
-  var tb=document.getElementById('pg-tb');if(!tb)return;
-  tb.innerHTML=rows.length?rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td>'+r.fecha+'</td><td>'+(r.hora||'—')+'</td><td>'+r.deposito+'</td><td>'+r.tipo+'</td><td>'+(r.capacidad||'—')+'</td><td>'+r.contenedor+'</td><td>'+(r.peso||'—')+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.bl||'—')+'</td><td>'+(r.sku||'—')+'</td><td>'+(r.descripcion||'—')+'</td><td>'+(r.transporte||'—')+'</td><td>'+(r.bodega||'—')+'</td><td>'+pill(r.estado)+'</td></tr>';}).join(''):'<tr><td colspan="15" class="es">Sin registros con estos filtros</td></tr>';
-}
-function cargarDatos(){
-  var url=localStorage.getItem('asUrl');if(!url)return;
-  fetch(url+'?action=getDatos').then(function(r){return r.json();}).then(function(d){
-    if(d.retiro)renderRetiro(d.retiro);
-    if(d.devolucion)renderDevolucion(d.devolucion);
-    if(d.programacion)renderProgramacion(d.programacion);
-  }).catch(function(e){console.warn('Error:',e);});
-}
-function cargarDemo(){
-  renderRetiro([{fecha:'02-05-2026',deposito:'SITRANS SAN ANTONIO',tipo:'Ingreso',transportista:'H. BUSTOS',chofer:'Juan Pérez',rut:'12.345.678-9',tracto:'ABCD-12',rampla:'EFGH-34',gps:'RAMPLA-TRACTO',creado:'02-05-2026, 4:28 p.m.'}]);
-  renderProgramacion([{fecha:'05-05-2026',hora:'08:30',deposito:'SITRANS SAN ANTONIO',tipo:'HC',capacidad:'40',contenedor:'TCKU1234567',peso:'24500',demurrage:'5',bl:'BL123456',sku:'7891234',descripcion:'Herramientas eléctricas',transporte:'H. BUSTOS',bodega:'CD LO ESPEJO',estado:'PENDIENTE'},{fecha:'05-05-2026',hora:'10:00',deposito:'MEDLOG VALPARAISO',tipo:'STD',capacidad:'20',contenedor:'MSCU7654321',peso:'18000',demurrage:'15',bl:'BL654321',sku:'1234567',descripcion:'Línea blanca',transporte:'SITRANS',bodega:'CD LO ESPEJO',estado:'ENTREGADO'}]);
-  alert('Datos demo cargados.');
-}
-window.addEventListener('load',function(){if(localStorage.getItem('asUrl'))cargarDatos();});
+window.addEventListener('load',load);
 </script>
 </body>
 </html>
