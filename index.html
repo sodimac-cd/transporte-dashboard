@@ -80,6 +80,7 @@ tr:hover td{background:#fafbff}
 .qr-print{background:#1a3a8f;color:#fff;border:none;padding:11px 28px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%}
 .qr-print:hover{background:#15317a}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 </head>
 <body>
 <div class="app">
@@ -376,25 +377,39 @@ tr:hover td{background:#fafbff}
       <div id="page-abastecimiento" class="page"><div class="ph"><h2>Abastecimiento Tienda</h2></div><div class="card"><div class="es">🏗️ Módulo próximamente disponible</div></div></div>
       <div id="page-despacho" class="page"><div class="ph"><h2>Despacho a Domicilio</h2></div><div class="card"><div class="es">🚚 Módulo próximamente disponible</div></div></div>
       <div id="page-contenedores" class="page">
-        <div class="ph"><h2>Contenedores</h2><p>Resumen por módulo</p></div>
-        <div class="sg">
-          <div class="sc"><div class="lbl">Programados</div><div class="val" id="c-prog">—</div></div>
-          <div class="sc"><div class="lbl">Retiro Puerto</div><div class="val" id="c-ret">0</div></div>
-          <div class="sc"><div class="lbl">Devolución Naviera</div><div class="val" id="c-dev">0</div></div>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="abtn p" onclick="SP('programacion')">Programación →</button>
-          <button class="abtn" onclick="SP('retiro')">Retiro Puerto →</button>
-          <button class="abtn" onclick="SP('devolucion')">Devolución Vacíos →</button>
-          <button class="abtn" onclick="SP('qr')">Códigos QR →</button>
-        </div>
-      </div>
-
+  <div class="ph"><h2>Centro de Control — Contenedores</h2><p>KPIs en tiempo real del programa activo</p></div>
+  <div class="sg" style="grid-template-columns:repeat(4,1fr)">
+    <div class="sc"><div class="lbl">Total programado</div><div class="val" id="c-p">—</div><div class="sub">contenedores</div></div>
+    <div class="sc"><div class="lbl">Cumplimiento</div><div class="val" id="c-cumpl" style="color:#059669">—</div><div class="sub">% entregado</div></div>
+    <div class="sc"><div class="lbl">Demurrage crítico</div><div class="val" id="c-dem" style="color:#dc2626">—</div><div class="sub">&lt;10 días libres</div></div>
+    <div class="sc"><div class="lbl">Retiro Puerto</div><div class="val" id="c-r">0</div><div class="sub">asignaciones</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="card"><div class="ct" style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-secondary);margin-bottom:10px">Por estado</div>
+      <div id="c-legend-estado" style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--color-text-secondary);margin-bottom:8px"></div>
+      <div style="position:relative;height:160px"><canvas id="c-chart-estado" role="img" aria-label="Distribución por estado">Contenedores por estado.</canvas></div>
     </div>
+    <div class="card"><div class="ct" style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-secondary);margin-bottom:10px">Por tipo</div>
+      <div id="c-legend-tipo" style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--color-text-secondary);margin-bottom:8px"></div>
+      <div style="position:relative;height:160px"><canvas id="c-chart-tipo" role="img" aria-label="Distribución por tipo">Contenedores por tipo.</canvas></div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:12px"><div class="ct" style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-secondary);margin-bottom:10px">Por depósito de origen</div>
+    <div style="position:relative;height:120px"><canvas id="c-chart-dep" role="img" aria-label="Contenedores por depósito">Contenedores por depósito.</canvas></div>
+  </div>
+  <div class="card" id="c-alerts-card" style="display:none;margin-bottom:12px">
+    <div class="ct" style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#dc2626;margin-bottom:10px">Alertas demurrage — días libres restantes</div>
+    <div id="c-alerts" style="display:flex;flex-direction:column;gap:6px"></div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn blue" onclick="go('programacion')">Programación →</button>
+    <button class="btn" onclick="go('retiro')">Retiro Puerto →</button>
+    <button class="btn" onclick="go('devolucion')">Devolución Vacíos →</button>
+    <button class="btn" onclick="go('qr')">Códigos QR →</button>
   </div>
 </div>
 
-<script>
+    ipt>
 // CLOCK
 function tick(){
   var n=new Date();
@@ -412,6 +427,7 @@ function SP(id){
   document.querySelectorAll('.sb-item').forEach(function(i){i.classList.remove('active')});
   var sb=document.getElementById('sb-'+id);if(sb)sb.classList.add('active');
   if(id==='qr')genQR();
+  if(id==='contenedores'&&store.programacion&&store.programacion.length)renderKPI(store.programacion);
 }
 
 function ST(mod,tab){
