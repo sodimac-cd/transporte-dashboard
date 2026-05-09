@@ -31,7 +31,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f2f8;color:#1a1a2e;height:1
 .t-time{font-size:12px;opacity:.75;white-space:nowrap}
 .btn-upd{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer}
 .content{flex:1;overflow-y:auto;padding:20px;background:#f0f2f8}
-.page{display:none}.page.active{display:block}
+.page{display:none}
 .ph{margin-bottom:18px}
 .ph h2{font-size:18px;font-weight:600}
 .ph p{font-size:13px;color:#666;margin-top:3px}
@@ -422,10 +422,10 @@ tick();setInterval(tick,30000);
 
 var NM={metricas:'nt-metricas',config:'nt-config'};
 function go(id){
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
-  var pg=document.getElementById('p-'+id);if(pg)pg.classList.add('on');
+  document.querySelectorAll('[id^="page-"]').forEach(function(p){p.style.display='none';});
+  var pg=document.getElementById('page-'+id);if(pg)pg.style.display='block';
   document.querySelectorAll('.nt').forEach(function(t){t.classList.remove('on');});
-  if(NM[id])document.getElementById(NM[id]).classList.add('on');
+  if(NM[id]){var nte=document.getElementById(NM[id]);if(nte)nte.classList.add('on');}
   document.querySelectorAll('.si').forEach(function(i){i.classList.remove('on');});
   var sb=document.getElementById('sb-'+id);if(sb)sb.classList.add('on');
   if(id==='qr')genQR();
@@ -599,7 +599,14 @@ function printQR(id,tit){
   w.document.write('<!DOCTYPE html><html><head><title>QR '+tit+'</title><style>body{font-family:sans-serif;text-align:center;padding:32px}h2{color:#1a237e}p{color:#666;font-size:13px;margin:6px 0 20px}img{border:2px solid #e0e0e0;border-radius:8px;padding:12px}@media print{button{display:none}}</style></head><body><h2>CD Lo Espejo</h2><p>'+tit+'</p><img src="'+img.src+'" width="220"/><br><br><button onclick="window.print()" style="background:#1a237e;color:#fff;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;margin-top:16px">Imprimir</button></body></html>');
   w.document.close();
 }
-window.addEventListener('load',load);
+window.SP=go;
+window.addEventListener('load',function(){
+  // Show dashboard page initially
+  document.querySelectorAll('[id^="page-"]').forEach(function(p){p.style.display='none';});
+  var dash=document.getElementById('page-dashboard');if(dash)dash.style.display='block';
+  var sb=document.getElementById('sb-dashboard');if(sb)sb.classList.add('on');
+  load();
+});
 </script>
 </body>
 </html>
