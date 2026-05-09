@@ -103,6 +103,7 @@ tr:hover td{background:#fafbff}
   <div class="si sub" id="sb-programacion" onclick="SP('programacion')"><span class="dot"></span> Programación</div>
   <div class="si sub" id="sb-retiro" onclick="SP('retiro')"><span class="dot"></span> Retiro Puerto</div>
   <div class="si sub" id="sb-devolucion" onclick="SP('devolucion')"><span class="dot"></span> Devolución Vacíos</div>
+  <div class="si sub" id="sb-progpuerto" onclick="SP('progpuerto')"><span class="dot"></span> Programa Puerto</div>
   <div class="si sub" id="sb-qr" onclick="SP('qr')"><span class="dot"></span> Códigos QR</div>
   <div class="sb-sec">Sistema</div>
   <div class="si" id="sb-config" onclick="SP('config')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Configuración</div>
@@ -189,7 +190,7 @@ tr:hover td{background:#fafbff}
     </div>
 
     <div id="page-retiro" class="page">
-      <div class="ph"><h2>Área de Transporte</h2><p>Retiro Puerto</p></div>
+      <div class="ph"><h2>Asignaciones Retiro Puerto</h2><p>Registro de retiro de contenedores en puerto</p></div>
       <div class="brow">
         <button class="btn blue" id="brr" onclick="vtab('retiro','reg')">≡ Registros</button>
         <button class="btn" id="brn" onclick="vtab('retiro','new')">+ Nueva Asignación</button>
@@ -293,6 +294,27 @@ tr:hover td{background:#fafbff}
       </div>
     </div>
 
+    
+    <div id="page-progpuerto" class="page">
+      <div class="ph"><h2>Programa de Puerto</h2><p>Contenedores por retirar desde depósitos de origen</p></div>
+      <div class="sg" style="grid-template-columns:repeat(4,1fr)">
+        <div class="sc"><div class="lbl">Total</div><div class="val" id="pp-tot">—</div><div class="sub">contenedores</div></div>
+        <div class="sc"><div class="lbl">Entregados</div><div class="val" id="pp-ent">—</div></div>
+        <div class="sc"><div class="lbl">Pendientes</div><div class="val" id="pp-pen">—</div></div>
+        <div class="sc"><div class="lbl">Sin transporte</div><div class="val" id="pp-sin">—</div></div>
+      </div>
+      <div class="fr">
+        <select id="pp-fe" onchange="filterPP()"><option value="">Estado: Todos</option><option>PENDIENTE</option><option>ENTREGADO</option><option>DESCONSOLIDADO</option><option>REPROGRAMADO</option><option>CANCELADO</option></select>
+        <button class="btn green" onclick="xls('programapuerto','Programa_Puerto')" style="margin-left:auto;padding:5px 12px;font-size:12px">&#8595; Excel</button>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">Contenedores Programa Puerto</span><span class="badge" id="pp-cnt">0</span></div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Depósito</th><th>Contenedor</th><th>Peso (kg)</th><th>Demurrage</th><th>Transporte</th><th>Estado</th></tr></thead>
+          <tbody id="pp-tb"><tr><td colspan="6" class="es">Cargando...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
     <div id="page-abastecimiento" class="page"><div class="ph"><h2>Abastecimiento Tienda</h2></div><div class="card"><div class="es">🏗️ Próximamente</div></div></div>
     <div id="page-despacho" class="page"><div class="ph"><h2>Despacho a Domicilio</h2></div><div class="card"><div class="es">🚚 Próximamente</div></div></div>
 
@@ -301,8 +323,28 @@ tr:hover td{background:#fafbff}
 </div>
 <script>
 var APPS_URL='https://script.google.com/macros/s/AKfycbykZe2S_KzXGD1qdYZMGtgK_HpBNIa218kXvPczwvBa-_l8mYy1waPC9Bc1TQblELclFQ/exec';
-var store={retiro:[],devolucion:[],programacion:[]};
+var store={retiro:[],devolucion:[],programacion:[],programapuerto:[]};
 var pgData=[], kpiC={};
+var ppData=[];
+function renderPP(rows){
+  store.programapuerto=rows; ppData=rows;
+  filterPP();
+  var t=rows.length;
+  var e=rows.filter(function(r){return String(r.estado).toUpperCase()==='ENTREGADO';}).length;
+  var p=rows.filter(function(r){return String(r.estado).toUpperCase()==='PENDIENTE';}).length;
+  var sin=rows.filter(function(r){return !r.transporte&&!r.transportista;}).length;
+  [['pp-tot',t],['pp-ent',e],['pp-pen',p],['pp-sin',sin]].forEach(function(x){var el=document.getElementById(x[0]);if(el)el.textContent=x[1];});
+}
+function filterPP(){
+  var fe=document.getElementById('pp-fe')&&document.getElementById('pp-fe').value||'';
+  var rows=ppData.filter(function(r){return !fe||String(r.estado).toUpperCase()===fe.toUpperCase();});
+  var cnt=document.getElementById('pp-cnt');if(cnt)cnt.textContent=rows.length;
+  var html=rows.length?rows.map(function(r){
+    return '<tr><td>'+r.deposito+'</td><td style="font-family:monospace;font-weight:500">'+r.contenedor+'</td><td>'+r.peso+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+pill(r.estado)+'</td></tr>';
+  }).join(''):'<tr><td colspan="6" class="es">Sin registros</td></tr>';
+  var tb=document.getElementById('pp-tb');if(tb)tb.innerHTML=html;
+}
+
 
 function tick(){var n=new Date();var el=document.getElementById('clk');if(el)el.textContent=n.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+' · '+n.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});}
 tick();setInterval(tick,30000);
@@ -346,6 +388,7 @@ function cargar(){
       if(d.retiro&&d.retiro.length)renderR(d.retiro);
       if(d.devolucion&&d.devolucion.length)renderD(d.devolucion);
       if(d.programacion&&d.programacion.length)renderP(d.programacion);
+      if(d.programaPuerto&&d.programaPuerto.length)renderPP(d.programaPuerto);
     })
     .catch(function(e){console.warn('Error:',e.message);});
 }
@@ -434,6 +477,7 @@ function xls(mod,nom){
   var hd,cl;
   if(mod==='retiro'){hd=['Fecha','Deposito','Tipo','Transporte','Chofer','RUT','Tracto','Rampla','GPS','Creado'];cl=['fecha','deposito','tipo','transportista','chofer','rut','tracto','rampla','gps','creado'];}
   else if(mod==='devolucion'){hd=['Fecha','Deposito','Transporte','Contenedor','EIR','Creado'];cl=['fecha','deposito','transporte','contenedor','eir','creado'];}
+  else if(mod==='programapuerto'){hd=['Deposito','Contenedor','Peso','Demurrage','Transporte','Estado'];cl=['deposito','contenedor','peso','demurrage','transporte','estado'];}
   else{hd=['Fecha','Hora','Deposito','Tipo','Cap','Contenedor','Peso','Demurrage','BL','SKU','Descripcion','Transporte','Bodega','Servicio','Estado'];cl=['fecha','hora','deposito','tipo','capacidad','contenedor','peso','demurrage','bl','sku','descripcion','transporte','bodega','servicio','estado'];}
   var csv='\uFEFF'+hd.join(';')+'\n';
   rows.forEach(function(r){csv+=cl.map(function(k){return '"'+String(r[k]||'').replace(/"/g,'""')+'"';}).join(';')+'\n';});
