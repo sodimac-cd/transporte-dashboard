@@ -140,14 +140,14 @@ tr:hover td{background:#fafbff}
           <div class="sc"><div class="lbl">Demurrage crítico</div><div class="val" id="d-dem">—</div><div class="sub">&lt;10 días libres</div></div>
         </div>
         <div class="card">
-          <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><span class="badge" id="d-rcnt">0</span></div>
+          <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><span class="badge" id="d-rcnt">0</span> <button class="btn green" onclick="xls('retiro','Retiro_Puerto')" style="padding:4px 10px;font-size:11px">&#8595; Excel</button></div>
           <div style="overflow-x:auto"><table>
             <thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Creado</th></tr></thead>
             <tbody id="d-rtb"><tr><td colspan="10" class="es">Cargando datos...</td></tr></tbody>
           </table></div>
         </div>
         <div class="card">
-          <div class="ch"><span class="ct">Devoluciones Vacíos Navieros</span><span class="badge" id="d-dcnt">0</span></div>
+          <div class="ch"><span class="ct">Devoluciones Vacíos Navieros</span><span class="badge" id="d-dcnt">0</span> <button class="btn green" onclick="xls('devolucion','Devolucion_Vacios')" style="padding:4px 10px;font-size:11px">&#8595; Excel</button></div>
           <div style="overflow-x:auto"><table>
             <thead><tr><th>Fecha</th><th>Depósito</th><th>Transporte</th><th>Contenedor</th><th>EIR</th><th>Creado</th></tr></thead>
             <tbody id="d-dtb"><tr><td colspan="6" class="es">Sin registros</td></tr></tbody>
@@ -169,7 +169,7 @@ tr:hover td{background:#fafbff}
           <select id="pg-fe" onchange="filtrarPG()"><option value="">Estado: Todos</option><option value="PENDIENTE">PENDIENTE</option><option value="ENTREGADO">ENTREGADO</option><option value="REPROGRAMADO">REPROGRAMADO</option><option value="CANCELADO">CANCELADO</option></select>
         </div>
         <div class="card">
-          <div class="ch"><span class="ct">Contenedores programados</span><span class="badge" id="pg-cnt">0</span></div>
+          <div class="ch"><span class="ct">Contenedores programados</span><span class="badge" id="pg-cnt">0</span> <button class="btn green" onclick="xls('programacion','Programacion')" style="padding:4px 10px;font-size:11px">&#8595; Excel</button></div>
           <div style="overflow-x:auto"><table>
             <thead><tr><th>#</th><th>Fecha</th><th>Hora</th><th>Depósito</th><th>Tipo</th><th>Cap</th><th>Contenedor</th><th>Peso</th><th>Demurrage</th><th>BL</th><th>SKU</th><th>Descripción</th><th>Transporte</th><th>Bodega</th><th>Estado</th></tr></thead>
             <tbody id="pg-tb"><tr><td colspan="15" class="es">Cargando datos del programa...</td></tr></tbody>
@@ -186,7 +186,7 @@ tr:hover td{background:#fafbff}
         </div>
         <div id="retiro-reg">
           <div class="card">
-            <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><span class="badge" id="r-cnt">0</span></div>
+            <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><span class="badge" id="r-cnt">0</span> <button class="btn green" onclick="xls('retiro','Retiro_Puerto')" style="padding:4px 10px;font-size:11px">&#8595; Excel</button></div>
             <div style="overflow-x:auto"><table>
               <thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Creado</th></tr></thead>
               <tbody id="r-tb"><tr><td colspan="10" class="es">Cargando...</td></tr></tbody>
@@ -230,7 +230,7 @@ tr:hover td{background:#fafbff}
         </div>
         <div id="dev-reg">
           <div class="card">
-            <div class="ch"><span class="ct">Devoluciones Vacíos Navieros</span><span class="badge" id="dv-cnt">0</span></div>
+            <div class="ch"><span class="ct">Devoluciones Vacíos Navieros</span><span class="badge" id="dv-cnt">0</span> <button class="btn green" onclick="xls('devolucion','Devolucion_Vacios')" style="padding:4px 10px;font-size:11px">&#8595; Excel</button></div>
             <div style="overflow-x:auto"><table>
               <thead><tr><th>Fecha</th><th>Depósito</th><th>Transporte</th><th>Contenedor</th><th>EIR</th><th>Creado</th></tr></thead>
               <tbody id="dv-tb"><tr><td colspan="6" class="es">Sin registros</td></tr></tbody>
@@ -292,7 +292,7 @@ tr:hover td{background:#fafbff}
         </div>
         <div id="dt-r">
           <div class="card">
-            <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><span class="badge" id="as-cnt">0</span></div>
+            <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><span class="badge" id="as-cnt">0</span> <button class="btn green" onclick="xls('retiro','Retiro_Puerto')" style="padding:4px 10px;font-size:11px">&#8595; Excel</button></div>
             <div style="overflow-x:auto"><table>
               <thead><tr><th>Fecha</th><th>Tipo</th><th>Depósito</th><th>Transportista</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th></tr></thead>
               <tbody id="as-tb"><tr><td colspan="9" class="es">Cargando...</td></tr></tbody>
@@ -319,7 +319,7 @@ tr:hover td{background:#fafbff}
           <select><option>Estado: Todos</option><option>PENDIENTE</option><option>ENTREGADO</option><option>TRASVASIJE</option><option>REPROGRAMADO</option><option>CANCELADO</option></select>
         </div>
         <div class="card">
-          <div class="ch"><span class="ct">Contenedores programados</span><span class="badge" id="rm-cnt">0</span></div>
+          <div class="ch"><span class="ct">Contenedores programados</span><span class="badge" id="rm-cnt">0</span> <button class="btn green" onclick="xls('programacion','Programacion_RM')" style="padding:4px 10px;font-size:11px">&#8595; Excel</button></div>
           <div style="overflow-x:auto"><table>
             <thead><tr><th>#</th><th>Fecha</th><th>Hora</th><th>Depósito</th><th>Tipo</th><th>Cap</th><th>Contenedor</th><th>Peso</th><th>Demurrage</th><th>BL</th><th>SKU</th><th>Descripción</th><th>Transporte</th><th>Bodega</th><th>Servicio</th><th>Estado</th></tr></thead>
             <tbody id="rm-tb"><tr><td colspan="16" class="es">Conecta Google Sheets en Configuración</td></tr></tbody>
