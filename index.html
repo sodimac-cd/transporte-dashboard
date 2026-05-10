@@ -476,6 +476,15 @@ function renderKPI(rows){
   if(al&&arows.length)al.innerHTML=arows.map(function(r){var n=parseInt(r.demurrage);var col=n<=3?'background:#fee2e2;color:#991b1b':n<=7?'background:#fef3c7;color:#92400e':'background:#dbeafe;color:#1e40af';return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f8f9ff;border-radius:6px;font-size:12px"><div><div style="font-weight:500;font-family:monospace;font-size:11px">'+r.contenedor+'</div><div style="color:#666;font-size:11px">'+r.deposito+'</div></div><span style="font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;'+col+'">'+n+' días</span></div>';}).join('');
 }
 
+function getEC(e){var m={'PENDIENTE':'pendiente','ENTREGADO':'entregado','DESCONSOLIDADO':'retirado','REPROGRAMADO':'en-ruta','CANCELADO':'cancelado'};return m[String(e).toUpperCase()]||'';}
+function mkOpts(cur){return ['','PENDIENTE','ENTREGADO','DESCONSOLIDADO','REPROGRAMADO','CANCELADO'].map(function(s){return '<option value="'+s+'"'+(s===cur?' selected':'')+'>'+( s||'— Estado')+'</option>';}).join('');}
+function filtrarPP(){
+  var fe=(document.getElementById('pp-fe')&&document.getElementById('pp-fe').value)||'';
+  var rows=ppData.filter(function(r){return !fe||String(r.estado).toUpperCase()===fe.toUpperCase();});
+  var cnt=document.getElementById('pp-cnt');if(cnt)cnt.textContent=rows.length;
+  var html=rows.length?rows.map(function(r){var ec=getEC(r.estado);return '<tr><td>'+r.deposito+'</td><td style="font-family:monospace;font-weight:500">'+r.contenedor+'</td><td>'+r.peso+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td><select class="sel-e '+ec+'" data-cont="'+r.contenedor+'" data-sheet="PROGRAMACION PUERTO" onchange="cambiarEstado(this)">'+mkOpts(r.estado||'')+'</select></td></tr>';}).join(''):'<tr><td colspan="6" class="es">Sin registros</td></tr>';
+  var tb=document.getElementById('pp-tb');if(tb)tb.innerHTML=html;
+}
 function filterPG(){
   var ft=document.getElementById('pg-ft')&&document.getElementById('pg-ft').value;
   var fe=document.getElementById('pg-fe')&&document.getElementById('pg-fe').value;
@@ -501,17 +510,14 @@ function cambiarEstadoProg(sel){
 }
 function cambiarEstado(sel){
   var url=localStorage.getItem('asUrl')||APPS_URL;
-  var rut=sel.getAttribute('data-rut');
-  var tracto=sel.getAttribute('data-tracto');
+  var cont=sel.getAttribute('data-cont');
+  var sheet=sel.getAttribute('data-sheet');
   var estado=sel.value;
-  var cls=getEstadoClass(estado);
-  sel.className='sel-estado '+(cls||'');
-  fetch(url,{method:'POST',body:JSON.stringify({modulo:'updateEstado',rut:rut,tracto:tracto,estado:estado})})
+  sel.className='sel-e '+(getEC(estado)||'');
+  fetch(url,{method:'POST',body:JSON.stringify({modulo:'updateEstado',contenedor:cont,sheet:sheet,estado:estado})})
     .then(function(r){return r.json();})
-    .then(function(d){
-      if(d.ok){sel.style.boxShadow='0 0 0 2px #34d399';setTimeout(function(){sel.style.boxShadow='';},1500);}
-      else{alert('Error al guardar: '+(d.error||'desconocido'));}
-    }).catch(function(){alert('Error de conexión');});
+    .then(function(d){if(d.ok){sel.style.boxShadow='0 0 0 2px #34d399';setTimeout(function(){sel.style.boxShadow='';},1500);}else{alert('Error: '+(d.error||'?'));
+    }}).catch(function(){alert('Error de conexión');});
 }
 function xls(mod,nom){
   var rows=store[mod];if(!rows||!rows.length){alert('Sin datos para exportar.');return;}
