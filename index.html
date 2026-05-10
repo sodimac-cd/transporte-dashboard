@@ -346,7 +346,7 @@ function filterPP(){
   var rows=ppData.filter(function(r){return !fe||String(r.estado).toUpperCase()===fe.toUpperCase();});
   var cnt=document.getElementById('pp-cnt');if(cnt)cnt.textContent=rows.length;
   var html=rows.length?rows.map(function(r){
-    return '<tr><td>'+r.deposito+'</td><td style="font-family:monospace;font-weight:500">'+r.contenedor+'</td><td>'+r.peso+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+pill(r.estado)+'</td></tr>';
+    var estPP=r.estado||'';var clsPP=getEstadoClass(estPP);var optsPP=ESTADOS_RETIRO.map(function(s){return '<option value="'+s+'"'+(s===estPP?' selected':'')+'>'+( s||'— Sin estado')+'</option>';}).join('');return '<tr><td>'+r.deposito+'</td><td style="font-family:monospace;font-weight:500">'+r.contenedor+'</td><td>'+r.peso+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td><select class="sel-estado '+clsPP+'" data-hoja="PROGRAMACION PUERTO" data-cont="'+r.contenedor+'" onchange="cambiarEstadoProg(this)">'+optsPP+'</select></td></tr>';
   }).join(''):'<tr><td colspan="6" class="es">Sin registros</td></tr>';
   var tb=document.getElementById('pp-tb');if(tb)tb.innerHTML=html;
 }
@@ -481,10 +481,24 @@ function filterPG(){
   var fe=document.getElementById('pg-fe')&&document.getElementById('pg-fe').value;
   var rows=pgData.filter(function(r){return(!ft||r.tipo===ft)&&(!fe||String(r.estado).toUpperCase()===fe.toUpperCase());});
   var cnt=document.getElementById('pg-cnt');if(cnt)cnt.textContent=rows.length;
-  var html=rows.length?rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td>'+r.fecha+'</td><td>'+(r.hora||'—')+'</td><td>'+r.deposito+'</td><td>'+r.tipo+'</td><td>'+(r.capacidad||'—')+'</td><td>'+r.contenedor+'</td><td>'+(r.peso||'—')+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.bl||'—')+'</td><td>'+(r.sku||'—')+'</td><td>'+(r.descripcion||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+(r.bodega||'—')+'</td><td>'+(r.servicio||'—')+'</td><td>'+pill(r.estado)+'</td></tr>';}).join(''):'<tr><td colspan="16" class="es">Sin registros</td></tr>';
+  var html=rows.length?rows.map(function(r,i){var estPG=r.estado||'';var clsPG=getEstadoClass(estPG);var optsPG=ESTADOS_RETIRO.map(function(s){return '<option value="'+s+'"'+(s===estPG?' selected':'')+'>'+( s||'— Sin estado')+'</option>';}).join('');return '<tr><td>'+(i+1)+'</td><td>'+r.fecha+'</td><td>'+(r.hora||'—')+'</td><td>'+r.deposito+'</td><td>'+r.tipo+'</td><td>'+(r.capacidad||'—')+'</td><td>'+r.contenedor+'</td><td>'+(r.peso||'—')+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.bl||'—')+'</td><td>'+(r.sku||'—')+'</td><td>'+(r.descripcion||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+(r.bodega||'—')+'</td><td>'+(r.servicio||'—')+'</td><td><select class="sel-estado '+clsPG+'" data-hoja="PROGRAMACION ACTUAL" data-cont="'+r.contenedor+'" onchange="cambiarEstadoProg(this)">'+optsPG+'</select></td></tr>';}).join(''):'<tr><td colspan="16" class="es">Sin registros</td></tr>';
   var tb=document.getElementById('pg-tb');if(tb)tb.innerHTML=html;
 }
 
+function cambiarEstadoProg(sel){
+  var url=localStorage.getItem('asUrl')||APPS_URL;
+  var hoja=sel.getAttribute('data-hoja');
+  var cont=sel.getAttribute('data-cont');
+  var estado=sel.value;
+  var cls=getEstadoClass(estado);
+  sel.className='sel-estado '+(cls||'');
+  fetch(url,{method:'POST',body:JSON.stringify({modulo:'updateEstadoProg',hoja:hoja,contenedor:cont,estado:estado})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.ok){sel.style.boxShadow='0 0 0 2px #34d399';setTimeout(function(){sel.style.boxShadow='';},1500);}
+      else{alert('Error: '+(d.error||'desconocido'));}
+    }).catch(function(){alert('Error de conexión');});
+}
 function cambiarEstado(sel){
   var url=localStorage.getItem('asUrl')||APPS_URL;
   var rut=sel.getAttribute('data-rut');
