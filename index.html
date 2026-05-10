@@ -58,6 +58,12 @@ tr:hover td{background:#fafbff}
 .btn.blue:hover{background:#15317a}
 .btn.green{background:#1d6f42;border-color:#1d6f42;color:#fff}
 .btn.green:hover{background:#155233}
+.sel-estado{border:1px solid #d0d5e8;border-radius:6px;padding:3px 6px;font-size:11px;font-weight:500;cursor:pointer;outline:none;background:#fff}
+.sel-estado.retirado{background:#d1fae5;color:#065f46;border-color:#6ee7b7}
+.sel-estado.en-ruta{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
+.sel-estado.cancelado{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.sel-estado.entregado{background:#ecfdf5;color:#047857;border-color:#34d399}
+.sel-estado.no-disponible{background:#f3f4f6;color:#6b7280;border-color:#d1d5db}
 .tabrow{display:flex;border-bottom:1.5px solid #e0e0e0;margin-bottom:18px}
 .tabb{padding:8px 16px;font-size:13px;color:#666;cursor:pointer;border:none;border-bottom:2px solid transparent;margin-bottom:-1.5px;background:none}
 .tabb.on{color:#1a3a8f;border-bottom-color:#1a3a8f;font-weight:500}
@@ -129,7 +135,7 @@ tr:hover td{background:#fafbff}
       </div>
       <div class="card">
         <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><div class="chr"><span class="badge" id="d-rcnt">0</span><button class="btn green" onclick="xls('retiro','Retiro_Puerto')" style="padding:4px 10px;font-size:11px">↓ Excel</button></div></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Creado</th></tr></thead><tbody id="d-rtb"><tr><td colspan="10" class="es">Cargando datos...</td></tr></tbody></table></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Estado</th><th>Creado</th></tr></thead><tbody id="d-rtb"><tr><td colspan="10" class="es">Cargando datos...</td></tr></tbody></table></div>
       </div>
       <div class="card">
         <div class="ch"><span class="ct">Devoluciones Vacíos Navieros</span><div class="chr"><span class="badge" id="d-dcnt">0</span><button class="btn green" onclick="xls('devolucion','Devolucion_Vacios')" style="padding:4px 10px;font-size:11px">↓ Excel</button></div></div>
@@ -198,7 +204,7 @@ tr:hover td{background:#fafbff}
       </div>
       <div id="retiro-reg">
         <div class="card"><div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><span class="badge" id="r-cnt">0</span></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Creado</th></tr></thead><tbody id="r-tb"><tr><td colspan="10" class="es">Cargando...</td></tr></tbody></table></div></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Estado</th><th>Creado</th></tr></thead><tbody id="r-tb"><tr><td colspan="10" class="es">Cargando...</td></tr></tbody></table></div></div>
       </div>
       <div id="retiro-new" style="display:none">
         <div class="card"><div class="ct" style="margin-bottom:14px">Nueva Asignación — Retiro Puerto</div>
@@ -395,9 +401,16 @@ function cargar(){
 
 function pill(e){var s=String(e||'').toUpperCase();var m={ENTREGADO:'pe',PENDIENTE:'pp',REPROGRAMADO:'pr',CANCELADO:'pc',DESCONSOLIDADO:'pd'};return '<span class="'+(m[s]||'pp')+'">'+e+'</span>';}
 
+var ESTADOS_RETIRO=['','RETIRADO','EN RUTA','ENTREGADO','CANCELADO','NO DISPONIBLE'];
+function getEstadoClass(e){var m={'RETIRADO':'retirado','EN RUTA':'en-ruta','ENTREGADO':'entregado','CANCELADO':'cancelado','NO DISPONIBLE':'no-disponible'};return m[String(e).toUpperCase()]||'';}
 function renderR(rows){
   store.retiro=rows;
-  var h1=rows.map(function(r){return '<tr><td>'+r.fecha+'</td><td>'+r.deposito+'</td><td>'+(r.tipo||'—')+'</td><td>'+(r.transportista||r.transporte||'—')+'</td><td>'+r.chofer+'</td><td>'+r.rut+'</td><td>'+r.tracto+'</td><td>'+r.rampla+'</td><td><span class="gps">'+(r.gps||'—')+'</span></td><td style="font-size:11px;color:#999">'+r.creado+'</td></tr>';}).join('');
+  var h1=rows.map(function(r,i){
+    var est=r.estado||'';
+    var cls=getEstadoClass(est);
+    var opts=ESTADOS_RETIRO.map(function(s){return '<option value="'+s+'"'+(s===est?' selected':'')+'>'+( s||'— Sin estado')+'</option>';}).join('');
+    return '<tr><td>'+r.fecha+'</td><td>'+r.deposito+'</td><td>'+(r.tipo||'—')+'</td><td>'+(r.transportista||r.transporte||'—')+'</td><td>'+r.chofer+'</td><td>'+r.rut+'</td><td>'+r.tracto+'</td><td>'+r.rampla+'</td><td><span class="gps">'+(r.gps||'—')+'</span></td><td><select class="sel-estado '+cls+'" data-rut="'+r.rut+'" data-tracto="'+r.tracto+'" onchange="cambiarEstado(this)">'+opts+'</select></td><td style="font-size:11px;color:#999">'+r.creado+'</td></tr>';
+  }).join('');
   ['r-tb','d-rtb'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h1||'<tr><td colspan="10" class="es">Sin registros</td></tr>';});
   ['r-cnt','d-rcnt','c-r'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=rows.length;});
 }
@@ -472,6 +485,20 @@ function filterPG(){
   var tb=document.getElementById('pg-tb');if(tb)tb.innerHTML=html;
 }
 
+function cambiarEstado(sel){
+  var url=localStorage.getItem('asUrl')||APPS_URL;
+  var rut=sel.getAttribute('data-rut');
+  var tracto=sel.getAttribute('data-tracto');
+  var estado=sel.value;
+  var cls=getEstadoClass(estado);
+  sel.className='sel-estado '+(cls||'');
+  fetch(url,{method:'POST',body:JSON.stringify({modulo:'updateEstado',rut:rut,tracto:tracto,estado:estado})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.ok){sel.style.boxShadow='0 0 0 2px #34d399';setTimeout(function(){sel.style.boxShadow='';},1500);}
+      else{alert('Error al guardar: '+(d.error||'desconocido'));}
+    }).catch(function(){alert('Error de conexión');});
+}
 function xls(mod,nom){
   var rows=store[mod];if(!rows||!rows.length){alert('Sin datos para exportar.');return;}
   var hd,cl;
