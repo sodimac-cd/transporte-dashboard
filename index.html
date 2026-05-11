@@ -559,58 +559,7 @@ function genQR(){
 function pQR(id,tit){
   var img=document.getElementById(id);
   var w=window.open('','_blank','width=420,height=500');
-  w.document.write('<!DOCTYPE html><html><head><title>QR</title><style>body{font-family:sans-serif;text-align:center;padding:32px}h2{color:#1a237e}p{color:#666;font-size:13px;margin:6px 0 20px}@media print{button{display:none}}</style></head><body><h2>CD Lo Espejo</h2><p>'+tit+'</p><img src="'+img.src+'" width="220" style="border:2px solid #e0e0e0;border-radius:8px;padding:12px"/><br><br><button onclick="window.print()" style="background:#1a237e;color:#fff;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;margin-top:16px">Imprimir</button>
-<script>
-(function(){
-  function init(){
-    var idx={};
-    if(window.pgData)window.pgData.forEach(function(r){idx[r.contenedor]=String(r.estado||'').toUpperCase();});
-    document.querySelectorAll('select.sel-estado[data-hoja="PROGRAMACION ACTUAL"]').forEach(function(s){
-      var c=s.getAttribute('data-cont');
-      var orig=idx[c]!==undefined?idx[c]:String(s.value||'').toUpperCase();
-      s.setAttribute('data-orig-estado',orig);
-    });
-    document.querySelectorAll('select.sel-estado[data-hoja="PROGRAMACION PUERTO"]').forEach(function(s){
-      s.setAttribute('data-orig-estado',String(s.value||'').toUpperCase());
-    });
-    document.querySelectorAll('select.sel-estado:not([data-hoja])').forEach(function(s){
-      s.setAttribute('data-orig-estado',String(s.value||'').toUpperCase());
-    });
-  }
-  window.recalcKPIs=function(scope){
-    function setText(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
-    function count(sels){var ent=0,pen=0;Array.from(sels).forEach(function(s){var v=String(s.getAttribute('data-orig-estado')||'').toUpperCase().replace('ENTREGAO','ENTREGADO');if(v==='ENTREGADO')ent++;else if(v==='PENDIENTE')pen++;});return{total:sels.length,ent:ent,pen:pen};}
-    if(!scope||scope==='rm'){var c=count(document.querySelectorAll('select.sel-estado[data-hoja="PROGRAMACION ACTUAL"]'));setText('pg-e',c.ent);setText('pg-p',c.pen);setText('d-ent',c.ent);setText('d-pen',c.pen);}
-    if(!scope||scope==='pp'){var c=count(document.querySelectorAll('select.sel-estado[data-hoja="PROGRAMACION PUERTO"]'));setText('pp-ent',c.ent);setText('pp-pen',c.pen);}
-  };
-  function patch(){
-    if(typeof cambiarEstadoProg==='function'&&!cambiarEstadoProg.__wrapped){
-      var orig=cambiarEstadoProg;
-      window.cambiarEstadoProg=function(sel){sel.setAttribute('data-orig-estado',String(sel.value||'').toUpperCase());var hoja=sel.getAttribute('data-hoja');var ret=orig.apply(this,arguments);setTimeout(function(){window.recalcKPIs(hoja==='PROGRAMACION PUERTO'?'pp':'rm');},10);return ret;};
-      window.cambiarEstadoProg.__wrapped=true;
-    }
-    if(typeof cambiarEstado==='function'&&!cambiarEstado.__wrapped){
-      var origCE=cambiarEstado;
-      window.cambiarEstado=function(sel){sel.setAttribute('data-orig-estado',String(sel.value||'').toUpperCase());return origCE.apply(this,arguments);};
-      window.cambiarEstado.__wrapped=true;
-    }
-  }
-  function bootstrap(){init();patch();window.recalcKPIs();}
-  if(document.readyState==='complete')setTimeout(bootstrap,500);else window.addEventListener('load',function(){setTimeout(bootstrap,500);});
-  // Also re-bootstrap whenever Apps Script data reloads (renderP/renderPP get called)
-  ['renderP','renderPP','renderKPI'].forEach(function(fn){
-    var iv=setInterval(function(){
-      if(typeof window[fn]==='function'&&!window[fn].__wrappedReact){
-        var o=window[fn];
-        window[fn]=function(){var r=o.apply(this,arguments);setTimeout(bootstrap,100);return r;};
-        window[fn].__wrappedReact=true;
-        clearInterval(iv);
-      }
-    },500);
-  });
-})();
-</script>
-</body></html>');
+  w.document.write('<!DOCTYPE html><html><head><title>QR</title><style>body{font-family:sans-serif;text-align:center;padding:32px}h2{color:#1a237e}p{color:#666;font-size:13px;margin:6px 0 20px}@media print{button{display:none}}</style></head><body><h2>CD Lo Espejo</h2><p>'+tit+'</p><img src="'+img.src+'" width="220" style="border:2px solid #e0e0e0;border-radius:8px;padding:12px"/><br><br><button onclick="window.print()" style="background:#1a237e;color:#fff;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;margin-top:16px">Imprimir</button></body></html>');
   w.document.close();
 }
 
