@@ -4,11 +4,11 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>CD Lo Espejo — Transporte</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#f0f2f8;color:#1a1a2e;height:100vh;overflow:hidden}
 .app{display:flex;height:100vh;overflow:hidden}
+/* SIDEBAR */
 .sb{width:215px;min-width:215px;background:#1a3a8f;color:#fff;display:flex;flex-direction:column;overflow-y:auto}
 .sb-logo{padding:16px;border-bottom:1px solid rgba(255,255,255,0.15)}
 .sb-logo .t{font-size:14px;font-weight:600}
@@ -20,6 +20,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f2f8;color:#1a1a2e;height:1
 .si.sub{padding-left:28px;font-size:12px}
 .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.4);flex-shrink:0}
 .si.on .dot{background:#60c8ff}
+/* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{background:#2247b8;color:#fff;padding:0 20px;height:48px;display:flex;align-items:center;flex-shrink:0}
 .tl{font-size:13px;font-weight:600;margin-right:20px;white-space:nowrap}
@@ -32,41 +33,42 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f2f8;color:#1a1a2e;height:1
 .tclock{font-size:12px;opacity:.75;white-space:nowrap}
 .tupd{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer}
 .content{flex:1;overflow-y:auto;padding:20px;background:#f0f2f8}
-.page{display:none}
+/* PAGES */
+.page{display:none}.page.on{display:block}
 .ph{margin-bottom:18px}
 .ph h2{font-size:18px;font-weight:600}
 .ph p{font-size:13px;color:#666;margin-top:3px}
+/* CARDS */
 .card{background:#fff;border:1px solid #e8eaf0;border-radius:10px;padding:16px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
 .ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;flex-wrap:wrap}
 .ct{font-size:14px;font-weight:600}
-.chr{display:flex;align-items:center;gap:8px}
+.chright{display:flex;align-items:center;gap:8px}
 .badge{background:#e8f0fe;color:#1a3a8f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+/* TABLES */
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th{text-align:left;padding:7px 8px;color:#888;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #eee}
 td{padding:8px;border-bottom:1px solid #f5f5f5}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#fafbff}
 .gps{background:#fff3cd;color:#856404;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;white-space:nowrap;display:inline-block}
+/* PILLS */
 .pe{background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
 .pp{background:#fff3cd;color:#856404;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
 .pr{background:#e0e7ff;color:#3730a3;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
 .pc{background:#fee2e2;color:#991b1b;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
 .pd{background:#f3f4f6;color:#374151;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
+/* BUTTONS */
 .btn{background:#fff;border:1px solid #d0d5e8;color:#444;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
 .btn:hover{background:#f0f2f8}
 .btn.blue{background:#1a3a8f;border-color:#1a3a8f;color:#fff}
 .btn.blue:hover{background:#15317a}
 .btn.green{background:#1d6f42;border-color:#1d6f42;color:#fff}
 .btn.green:hover{background:#155233}
-.sel-estado{border:1px solid #d0d5e8;border-radius:6px;padding:3px 6px;font-size:11px;font-weight:500;cursor:pointer;outline:none;background:#fff}
-.sel-estado.retirado{background:#d1fae5;color:#065f46;border-color:#6ee7b7}
-.sel-estado.en-ruta{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
-.sel-estado.cancelado{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
-.sel-estado.entregado{background:#ecfdf5;color:#047857;border-color:#34d399}
-.sel-estado.no-disponible{background:#f3f4f6;color:#6b7280;border-color:#d1d5db}
+/* TABS */
 .tabrow{display:flex;border-bottom:1.5px solid #e0e0e0;margin-bottom:18px}
 .tabb{padding:8px 16px;font-size:13px;color:#666;cursor:pointer;border:none;border-bottom:2px solid transparent;margin-bottom:-1.5px;background:none}
 .tabb.on{color:#1a3a8f;border-bottom-color:#1a3a8f;font-weight:500}
+/* FORM */
 .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
 .fg label{font-size:12px;color:#555;font-weight:500}
 .fg input,.fg select{padding:7px 10px;border:1px solid #d0d5e8;border-radius:6px;font-size:13px;background:#fff;color:#1a1a2e;outline:none}
@@ -75,57 +77,70 @@ tr:hover td{background:#fafbff}
 .full{grid-column:1/-1}
 .ff{margin-top:14px;display:flex;gap:10px;justify-content:flex-end}
 .sdiv{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
+/* STATS */
 .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
 .sc{background:#fff;border-radius:8px;padding:14px;border:1px solid #e8eaf0}
 .sc .lbl{font-size:12px;color:#888;margin-bottom:4px}
 .sc .val{font-size:22px;font-weight:600}
 .sc .sub{font-size:11px;color:#aaa;margin-top:2px}
+/* FILTERS */
 .fr{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
 .fr select{padding:5px 9px;border:1px solid #d0d5e8;border-radius:6px;font-size:12px;background:#fff}
 .brow{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
 .es{text-align:center;padding:36px;color:#aaa;font-size:13px}
+/* QR */
 .qrgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-.qrc{background:#fff;border:1px solid #e8eaf0;border-radius:14px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.qrc{background:#fff;border:1px solid #e8eaf0;border-radius:14px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
 .qrc h3{font-size:16px;font-weight:700;text-align:center}
 .qrs{font-size:12px;color:#888;text-align:center}
 .qrbox{background:#fff;padding:14px;border-radius:10px;border:1.5px solid #e8eaf0;display:flex;align-items:center;justify-content:center;min-height:200px;min-width:200px}
 .qrurl{background:#f0f4ff;border:1px solid #d0d8f0;border-radius:8px;padding:7px 12px;font-size:11px;color:#445;font-family:monospace;text-align:center;word-break:break-all;width:100%}
 .qrprint{background:#1a3a8f;color:#fff;border:none;padding:11px 28px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%}
+/* OTHERS */
+.dbg{display:none;margin-top:14px;background:#f8f9ff;border:1px solid #e0e4f0;border-radius:8px;padding:12px}
+.dbg-t{font-size:11px;font-weight:600;color:#1a3a8f;margin-bottom:6px}
+pre{font-size:11px;color:#555;white-space:pre-wrap;margin:0}
 </style>
 </head>
 <body>
 <div class="app">
 <div class="sb">
   <div class="sb-logo">
-    <div style="width:32px;height:32px;background:#60c8ff;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 3h18v4H3zM3 10h12v4H3zM3 17h8v4H3z" fill="#1a3a8f"/></svg></div>
-    <div class="t">CD Lo Espejo</div><div class="s">Área de Transporte</div>
+    <div style="width:32px;height:32px;background:#60c8ff;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 3h18v4H3zM3 10h12v4H3zM3 17h8v4H3z" fill="#1a3a8f"/></svg>
+    </div>
+    <div class="t">CD Lo Espejo</div>
+    <div class="s">Área de Transporte</div>
   </div>
   <div class="sb-sec">Principal</div>
-  <div class="si on" id="sb-dashboard" onclick="SP('dashboard')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg> Dashboard</div>
+  <div class="si on" id="sb-dashboard" onclick="go('dashboard')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg> Dashboard</div>
   <div class="sb-sec">Módulos</div>
-  <div class="si" id="sb-abastecimiento" onclick="SP('abastecimiento')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 7h-4V5a2 2 0 00-4 0v2H8L6 21h12L20 7z"/></svg> Abastecimiento Tienda</div>
-  <div class="si" id="sb-despacho" onclick="SP('despacho')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M1 3h15v13H1zm15 4l5 3v6h-5z"/></svg> Despacho a Domicilio</div>
-  <div class="si" id="sb-contenedores" onclick="SP('contenedores')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M7 7V5a2 2 0 014 0v2"/></svg> Contenedores</div>
-  <div class="si sub" id="sb-programacion" onclick="SP('programacion')"><span class="dot"></span> Programación</div>
-  <div class="si sub" id="sb-progpuerto" onclick="SP('progpuerto')"><span class="dot"></span> Programa Puerto</div>
-  <div class="si sub" id="sb-retiro" onclick="SP('retiro')"><span class="dot"></span> Retiro Puerto</div>
-  <div class="si sub" id="sb-devolucion" onclick="SP('devolucion')"><span class="dot"></span> Devolución Vacíos</div>
-  <div class="si sub" id="sb-qr" onclick="SP('qr')"><span class="dot"></span> Códigos QR</div>
+  <div class="si" id="sb-abastecimiento" onclick="go('abastecimiento')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 7h-4V5a2 2 0 00-4 0v2H8L6 21h12L20 7z"/></svg> Abastecimiento Tienda</div>
+  <div class="si" id="sb-despacho" onclick="go('despacho')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M1 3h15v13H1zm15 4l5 3v6h-5z"/></svg> Despacho a Domicilio</div>
+  <div class="si" id="sb-contenedores" onclick="go('contenedores')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M7 7V5a2 2 0 014 0v2"/></svg> Contenedores</div>
+  <div class="si sub" id="sb-programacion" onclick="go('programacion')"><span class="dot"></span> Programación</div>
+  <div class="si sub" id="sb-retiro" onclick="go('retiro')"><span class="dot"></span> Retiro Puerto</div>
+  <div class="si sub" id="sb-devolucion" onclick="go('devolucion')"><span class="dot"></span> Devolución Vacíos</div>
+  <div class="si sub" id="sb-qr" onclick="go('qr')"><span class="dot"></span> Códigos QR</div>
   <div class="sb-sec">Sistema</div>
-  <div class="si" id="sb-config" onclick="SP('config')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Configuración</div>
+  <div class="si" id="sb-config" onclick="go('config')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Configuración</div>
 </div>
 <div class="main">
   <div class="topbar">
     <div class="tl">CD Lo Espejo <span>Área de Transporte</span></div>
     <div class="navtabs">
-      <div class="nt" id="nt-metricas" onclick="SP('metricas')">Métricas</div>
-      <div class="nt" id="nt-config" onclick="SP('config')">Configuración</div>
+      <div class="nt" id="nt-metricas" onclick="go('metricas')">Métricas</div>
+      <div class="nt" id="nt-config" onclick="go('config')">Configuración</div>
     </div>
-    <div class="tr"><span class="tclock" id="clk"></span><button class="tupd" onclick="cargar()">↻ Actualizar</button></div>
+    <div class="tr">
+      <span class="tclock" id="clk"></span>
+      <button class="tupd" onclick="load()">↻ Actualizar</button>
+    </div>
   </div>
   <div class="content">
 
-    <div id="page-dashboard" class="page">
+    <!-- DASHBOARD -->
+    <div id="p-dashboard" class="page on">
       <div class="ph"><h2>Dashboard de Transporte</h2><p>Resumen general de todos los módulos</p></div>
       <div class="sg">
         <div class="sc"><div class="lbl">Total programado</div><div class="val" id="d-tot">—</div><div class="sub">contenedores</div></div>
@@ -134,49 +149,25 @@ tr:hover td{background:#fafbff}
         <div class="sc"><div class="lbl">Demurrage crítico</div><div class="val" id="d-dem">—</div><div class="sub">&lt;10 días libres</div></div>
       </div>
       <div class="card">
-        <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><div class="chr"><span class="badge" id="d-rcnt">0</span><button class="btn green" onclick="xls('retiro','Retiro_Puerto')" style="padding:4px 10px;font-size:11px">↓ Excel</button></div></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Estado</th><th>Creado</th></tr></thead><tbody id="d-rtb"><tr><td colspan="10" class="es">Cargando datos...</td></tr></tbody></table></div>
+        <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span>
+          <div class="chright"><span class="badge" id="d-rcnt">0</span>
+            <button class="btn green" onclick="xls('retiro','Retiro_Puerto')"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Excel</button>
+          </div></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Creado</th></tr></thead>
+        <tbody id="d-rtb"><tr><td colspan="10" class="es">Cargando...</td></tr></tbody></table></div>
       </div>
       <div class="card">
-        <div class="ch"><span class="ct">Devoluciones Vacíos Navieros</span><div class="chr"><span class="badge" id="d-dcnt">0</span><button class="btn green" onclick="xls('devolucion','Devolucion_Vacios')" style="padding:4px 10px;font-size:11px">↓ Excel</button></div></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Transporte</th><th>Contenedor</th><th>EIR</th><th>Creado</th></tr></thead><tbody id="d-dtb"><tr><td colspan="6" class="es">Sin registros</td></tr></tbody></table></div>
+        <div class="ch"><span class="ct">Devoluciones Vacíos Navieros</span>
+          <div class="chright"><span class="badge" id="d-dcnt">0</span>
+            <button class="btn green" onclick="xls('devolucion','Devolucion_Vacios')"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Excel</button>
+          </div></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Transporte</th><th>Contenedor</th><th>EIR</th><th>Creado</th></tr></thead>
+        <tbody id="d-dtb"><tr><td colspan="6" class="es">Sin registros</td></tr></tbody></table></div>
       </div>
     </div>
 
-    <div id="page-contenedores" class="page">
-      <div class="ph"><h2>Centro de Control — Contenedores</h2><p>KPIs en tiempo real del programa activo</p></div>
-      <div class="sg" style="grid-template-columns:repeat(4,1fr)">
-        <div class="sc"><div class="lbl">Total programado</div><div class="val" id="c-tot">—</div><div class="sub">contenedores</div></div>
-        <div class="sc"><div class="lbl">Cumplimiento</div><div class="val" id="c-cumpl" style="color:#059669">—</div><div class="sub">% entregado</div></div>
-        <div class="sc"><div class="lbl">Demurrage crítico</div><div class="val" id="c-dem2" style="color:#dc2626">—</div><div class="sub">&lt;10 días libres</div></div>
-        <div class="sc"><div class="lbl">Retiro Puerto</div><div class="val" id="c-r">0</div><div class="sub">asignaciones</div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-        <div class="card"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:10px">Por estado</div>
-          <div id="kpi-leg-e" style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:#666;margin-bottom:8px"></div>
-          <div style="position:relative;height:160px"><canvas id="kpi-c1"></canvas></div>
-        </div>
-        <div class="card"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:10px">Por Bodega</div>
-          <div id="kpi-leg-t" style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:#666;margin-bottom:8px"></div>
-          <div style="position:relative;height:160px"><canvas id="kpi-c2"></canvas></div>
-        </div>
-      </div>
-      <div class="card" style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:10px">Por depósito de origen</div>
-        <div style="position:relative;height:120px"><canvas id="kpi-c3"></canvas></div>
-      </div>
-      <div class="card" id="kpi-alerts" style="display:none;margin-bottom:12px">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#dc2626;margin-bottom:10px">Alertas demurrage</div>
-        <div id="kpi-alert-list" style="display:flex;flex-direction:column;gap:6px"></div>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn blue" onclick="SP('programacion')">Programación →</button>
-        <button class="btn" onclick="SP('retiro')">Retiro Puerto →</button>
-        <button class="btn" onclick="SP('devolucion')">Devolución Vacíos →</button>
-        <button class="btn" onclick="SP('qr')">Códigos QR →</button>
-      </div>
-    </div>
-
-    <div id="page-programacion" class="page">
+    <!-- PROGRAMACIÓN -->
+    <div id="p-programacion" class="page">
       <div class="ph"><h2>Programación de Contenedores</h2><p>Programa activo del día</p></div>
       <div class="sg">
         <div class="sc"><div class="lbl">Total</div><div class="val" id="pg-t">—</div></div>
@@ -187,36 +178,44 @@ tr:hover td{background:#fafbff}
       <div class="fr">
         <select id="pg-ft" onchange="filterPG()"><option value="">Tipo: Todos</option><option>HC</option><option>STD</option><option>DRY</option></select>
         <select id="pg-fe" onchange="filterPG()"><option value="">Estado: Todos</option><option>PENDIENTE</option><option>ENTREGADO</option><option>DESCONSOLIDADO</option><option>REPROGRAMADO</option><option>CANCELADO</option></select>
-        <button class="btn green" onclick="xls('programacion','Programacion')" style="margin-left:auto;padding:5px 12px;font-size:12px">↓ Excel</button>
+        <button class="btn green" onclick="xls('programacion','Programacion_Actual')" style="margin-left:auto"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Exportar Excel</button>
       </div>
       <div class="card">
         <div class="ch"><span class="ct">Contenedores programados</span><span class="badge" id="pg-cnt">0</span></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Fecha</th><th>Hora</th><th>Depósito</th><th>Tipo</th><th>Cap</th><th>Contenedor</th><th>Peso</th><th>Demurrage</th><th>BL</th><th>SKU</th><th>Descripción</th><th>Transporte</th><th>Bodega</th><th>Servicio</th><th>Estado</th></tr></thead><tbody id="pg-tb"><tr><td colspan="16" class="es">Cargando...</td></tr></tbody></table></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Fecha</th><th>Hora</th><th>Depósito</th><th>Tipo</th><th>Cap</th><th>Contenedor</th><th>Peso</th><th>Demurrage</th><th>BL</th><th>SKU</th><th>Descripción</th><th>Transporte</th><th>Bodega</th><th>Servicio</th><th>Estado</th></tr></thead>
+        <tbody id="pg-tb"><tr><td colspan="16" class="es">Cargando...</td></tr></tbody></table></div>
       </div>
     </div>
 
-    <div id="page-retiro" class="page">
-      <div class="ph"><h2>Asignaciones Retiro Puerto</h2><p>Registro de retiro de contenedores en puerto</p></div>
+    <!-- RETIRO PUERTO -->
+    <div id="p-retiro" class="page">
+      <div class="ph"><h2>Área de Transporte</h2><p>Retiro Puerto</p></div>
       <div class="brow">
-        <button class="btn blue" id="brr" onclick="vtab('retiro','reg')">≡ Registros</button>
-        <button class="btn" id="brn" onclick="vtab('retiro','new')">+ Nueva Asignación</button>
-        <button class="btn green" onclick="xls('retiro','Retiro_Puerto')" style="margin-left:auto;padding:5px 12px;font-size:12px">↓ Excel</button>
+        <button class="btn blue" id="brr" onclick="tab('retiro','reg')">≡ Registros</button>
+        <button class="btn" id="brn" onclick="tab('retiro','new')">+ Nueva Asignación</button>
+        <button class="btn green" onclick="xls('retiro','Retiro_Puerto')" style="margin-left:auto"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Exportar Excel</button>
       </div>
       <div id="retiro-reg">
-        <div class="card"><div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><span class="badge" id="r-cnt">0</span></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Estado</th><th>Creado</th></tr></thead><tbody id="r-tb"><tr><td colspan="10" class="es">Cargando...</td></tr></tbody></table></div></div>
+        <div class="card">
+          <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><span class="badge" id="r-cnt">0</span></div>
+          <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Creado</th></tr></thead>
+          <tbody id="r-tb"><tr><td colspan="10" class="es">Cargando...</td></tr></tbody></table></div>
+        </div>
       </div>
       <div id="retiro-new" style="display:none">
-        <div class="card"><div class="ct" style="margin-bottom:14px">Nueva Asignación — Retiro Puerto</div>
+        <div class="card">
+          <div class="ct" style="margin-bottom:14px">Nueva Asignación — Retiro Puerto</div>
           <div class="sdiv">Datos Generales</div>
           <div class="fgrid">
             <div class="fg"><label>Fecha *</label><input type="date" id="rf-f"/></div>
             <div class="fg"><label>Tipo *</label><select id="rf-t"><option value="">Seleccionar...</option><option>Ingreso</option><option>Salida</option></select></div>
             <div class="fg full"><label>Depósito *</label><select id="rf-d"><option value="">Seleccionar...</option><option>SITRANS SAN ANTONIO</option><option>CIS SAN ANTONIO</option><option>HGT SAN ANTONIO</option><option>MEDLOG VALPARAISO</option><option>MEDLOG SAN ANTONIO</option><option>SITRANS VALPARAISO</option><option>HGT VALPARAISO</option><option>SITRANS SANTIAGO</option><option>HGT SANTIAGO</option><option>DEPOSITO CD</option><option>TERCOP</option></select></div>
           </div>
-          <div class="sdiv">Transporte</div>
-          <div class="fgrid"><div class="fg full"><label>Transportista *</label><select id="rf-tr"><option value="">Seleccionar...</option><option>85.131.900-K CASABLANCA</option><option>76.651.987-3 FR RENTAL</option><option>76107615-9 BYD</option><option>76.840.809-2 JUC CHILE</option><option>76.421.758-6 SERMOV</option><option>96.979.980-4 SAN FABIAN</option><option>76.501.883-8 CASTELLINI</option><option>77.082.997-6 CF</option><option>77.248.307-4 GLOBAL LOGISTIC</option><option>77.079.719-5 H. BUSTOS</option><option>77.304.186-5 CELMAR</option><option>96.500.950-7 SITRANS</option><option>77.090.481-1 PRECAM</option><option>76.228.166-K TRANVIAL</option><option>76.388.144-K MOVEONTRUCK</option><option>76.172.595-5 MEDLOG</option><option>76.381.392-4 JULIO HIDALGO</option></select></div></div>
-          <div class="sdiv">Conductor</div>
+          <div class="sdiv">Empresa de Transporte</div>
+          <div class="fgrid">
+            <div class="fg full"><label>Transportista *</label><select id="rf-tr"><option value="">Seleccionar...</option><option>85.131.900-K CASABLANCA</option><option>76.651.987-3 FR RENTAL</option><option>76107615-9 BYD</option><option>76.840.809-2 JUC CHILE</option><option>76.421.758-6 SERMOV</option><option>96.979.980-4 SAN FABIAN</option><option>76.501.883-8 CASTELLINI</option><option>77.082.997-6 CF</option><option>77.248.307-4 GLOBAL LOGISTIC</option><option>77.079.719-5 H. BUSTOS</option><option>77.304.186-5 CELMAR</option><option>96.500.950-7 SITRANS</option><option>77.090.481-1 PRECAM</option><option>76.228.166-K TRANVIAL</option><option>76.388.144-K MOVEONTRUCK</option><option>76.172.595-5 MEDLOG</option><option>76.381.392-4 JULIO HIDALGO</option></select></div>
+          </div>
+          <div class="sdiv">Datos del Conductor</div>
           <div class="fgrid">
             <div class="fg"><label>Nombre chofer *</label><input type="text" id="rf-ch" placeholder="Nombre completo"/></div>
             <div class="fg"><label>RUT *</label><input type="text" id="rf-ru" placeholder="12.345.678-9"/></div>
@@ -226,24 +225,29 @@ tr:hover td{background:#fafbff}
             <div class="fg"><label>Chofer reemplazo</label><input type="text" id="rf-re" placeholder="Opcional"/></div>
             <div class="fg full"><label>GPS *</label><select id="rf-gp"><option>Rampla + Tracto</option><option>Solo Tracto</option><option>Solo Rampla</option><option>Sin GPS</option></select></div>
           </div>
-          <div class="ff"><button class="btn">Limpiar</button><button class="btn blue" onclick="saveR()">Guardar en Google Sheets</button></div>
+          <div class="ff"><button class="btn">Limpiar</button><button class="btn blue" onclick="saveRetiro()">Guardar en Google Sheets</button></div>
         </div>
       </div>
     </div>
 
-    <div id="page-devolucion" class="page">
+    <!-- DEVOLUCIÓN -->
+    <div id="p-devolucion" class="page">
       <div class="ph"><h2>Área de Transporte</h2><p>Devolución Vacíos</p></div>
       <div class="brow">
-        <button class="btn blue" id="bdr" onclick="vtab('dev','reg')">≡ Registros</button>
-        <button class="btn" id="bdn" onclick="vtab('dev','new')">+ Nueva Devolución</button>
-        <button class="btn green" onclick="xls('devolucion','Devolucion_Vacios')" style="margin-left:auto;padding:5px 12px;font-size:12px">↓ Excel</button>
+        <button class="btn blue" id="bdr" onclick="tab('dev','reg')">≡ Registros</button>
+        <button class="btn" id="bdn" onclick="tab('dev','new')">+ Nueva Devolución</button>
+        <button class="btn green" onclick="xls('devolucion','Devolucion_Vacios')" style="margin-left:auto"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Exportar Excel</button>
       </div>
       <div id="dev-reg">
-        <div class="card"><div class="ch"><span class="ct">Devoluciones Vacíos Navieros</span><span class="badge" id="dv-cnt">0</span></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Transporte</th><th>Contenedor</th><th>EIR</th><th>Creado</th></tr></thead><tbody id="dv-tb"><tr><td colspan="6" class="es">Sin registros</td></tr></tbody></table></div></div>
+        <div class="card">
+          <div class="ch"><span class="ct">Devoluciones Vacíos Navieros</span><span class="badge" id="dv-cnt">0</span></div>
+          <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Transporte</th><th>Contenedor</th><th>EIR</th><th>Creado</th></tr></thead>
+          <tbody id="dv-tb"><tr><td colspan="6" class="es">Sin registros</td></tr></tbody></table></div>
+        </div>
       </div>
       <div id="dev-new" style="display:none">
-        <div class="card"><div class="ct" style="margin-bottom:14px">Nueva Devolución de Vacío Naviero</div>
+        <div class="card">
+          <div class="ct" style="margin-bottom:14px">Nueva Devolución de Vacío Naviero</div>
           <div class="fgrid">
             <div class="fg"><label>Fecha *</label><input type="date" id="dv-f"/></div>
             <div class="fg"><label>Depósito *</label><select id="dv-d"><option value="">Seleccionar...</option><option>SITRANS SAN ANTONIO</option><option>CIS SAN ANTONIO</option><option>HGT SAN ANTONIO</option><option>MEDLOG VALPARAISO</option><option>MEDLOG SAN ANTONIO</option><option>SITRANS VALPARAISO</option><option>DEPOSITO CD</option><option>TERCOP</option></select></div>
@@ -251,32 +255,58 @@ tr:hover td{background:#fafbff}
             <div class="fg"><label>Contenedor *</label><input type="text" id="dv-co" placeholder="XXXX0000000"/></div>
             <div class="fg"><label>EIR *</label><input type="text" id="dv-ei" placeholder="Número EIR"/></div>
           </div>
-          <div class="ff"><button class="btn">Limpiar</button><button class="btn blue" onclick="saveD()">Guardar en Google Sheets</button></div>
+          <div class="ff"><button class="btn">Limpiar</button><button class="btn blue" onclick="saveDev()">Guardar en Google Sheets</button></div>
         </div>
       </div>
     </div>
 
-    <div id="page-qr" class="page">
-      <div class="ph"><h2>Códigos QR — Acceso transportistas</h2></div>
-      <div class="qrgrid">
-        <div class="qrc">
-          <div style="width:48px;height:48px;border-radius:12px;background:#e8f5e9;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="#2e7d32"><path d="M1 3h15v13H1zm15 4l5 3v6h-5z"/></svg></div>
-          <h3>Retiro Puerto</h3><div class="qrs">Nueva asignación de retiro</div>
-          <div class="qrbox"><img id="qr1" src="" alt="QR Retiro" width="200" height="200"/></div>
-          <div class="qrurl">sodimac-cd.github.io/transporte/retiro-movil.html</div>
-          <button class="qrprint" onclick="pQR('qr1','Retiro Puerto')">Imprimir</button>
+    <!-- ASIGNACIONES -->
+    <div id="p-asignaciones" class="page">
+      <div class="ph"><h2>Asignaciones transportistas</h2><p>Registros en tiempo real</p></div>
+      <div class="tabrow">
+        <button class="tabb on" id="dbt-r" onclick="sdt('r')">Registros en tiempo real</button>
+        <button class="tabb" id="dbt-i" onclick="sdt('i')">Ingresar asignación</button>
+      </div>
+      <div id="dt-r">
+        <div class="card">
+          <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span>
+            <div class="chright"><span class="badge" id="as-cnt">0</span>
+              <button class="btn green" onclick="xls('retiro','Retiro_Puerto')"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Excel</button>
+            </div></div>
+          <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Depósito</th><th>Transportista</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th></tr></thead>
+          <tbody id="as-tb"><tr><td colspan="9" class="es">Cargando...</td></tr></tbody></table></div>
         </div>
-        <div class="qrc">
-          <div style="width:48px;height:48px;border-radius:12px;background:#e3f2fd;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="#1565c0"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M7 7V5a2 2 0 014 0v2"/></svg></div>
-          <h3>Devolución Vacíos</h3><div class="qrs">Nueva devolución naviera</div>
-          <div class="qrbox"><img id="qr2" src="" alt="QR Dev" width="200" height="200"/></div>
-          <div class="qrurl">sodimac-cd.github.io/transporte/devolucion-movil.html</div>
-          <button class="qrprint" onclick="pQR('qr2','Devolución Vacíos')">Imprimir</button>
+      </div>
+      <div id="dt-i" style="display:none">
+        <div class="card">
+          <a href="https://sodimac-cd.github.io/transporte/" target="_blank" style="color:#1a3a8f;font-size:13px;display:inline-block;margin-bottom:14px">Pantalla completa ↗</a>
+          <div style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden"><iframe src="https://sodimac-cd.github.io/transporte/" style="width:100%;height:520px;border:none"></iframe></div>
         </div>
       </div>
     </div>
 
-    <div id="page-metricas" class="page">
+    <!-- PROG RM -->
+    <div id="p-progRM" class="page">
+      <div class="ph"><h2>Programación RM</h2><p>Contenedores programados Región Metropolitana</p></div>
+      <div class="fr">
+        <select id="rm-fe" onchange="filterRM()"><option value="">Estado: Todos</option><option>PENDIENTE</option><option>ENTREGADO</option><option>DESCONSOLIDADO</option><option>REPROGRAMADO</option><option>CANCELADO</option></select>
+        <button class="btn green" onclick="xls('programacion','Programacion_RM')" style="margin-left:auto"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Exportar Excel</button>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">Contenedores programados</span><span class="badge" id="rm-cnt">0</span></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Fecha</th><th>Hora</th><th>Depósito</th><th>Tipo</th><th>Cap</th><th>Contenedor</th><th>Peso</th><th>Demurrage</th><th>BL</th><th>SKU</th><th>Descripción</th><th>Transporte</th><th>Bodega</th><th>Servicio</th><th>Estado</th></tr></thead>
+        <tbody id="rm-tb"><tr><td colspan="16" class="es">Cargando...</td></tr></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- PROG PUERTO -->
+    <div id="p-progPuerto" class="page">
+      <div class="ph"><h2>Programa de Puerto</h2></div>
+      <div class="card"><div class="es">Conecta Google Sheets en Configuración</div></div>
+    </div>
+
+    <!-- MÉTRICAS -->
+    <div id="p-metricas" class="page">
       <div class="ph"><h2>Métricas de cumplimiento</h2></div>
       <div class="sg">
         <div class="sc"><div class="lbl">Cumplimiento</div><div class="val" id="m-c">—</div><div class="sub">% entregado</div></div>
@@ -284,90 +314,97 @@ tr:hover td{background:#fafbff}
         <div class="sc"><div class="lbl">Demurrage crítico</div><div class="val" id="m-d">—</div><div class="sub">&lt;10 días</div></div>
         <div class="sc"><div class="lbl">Sin transportista</div><div class="val" id="m-s">—</div></div>
       </div>
-      <div class="card"><div class="ch"><span class="ct">Resumen por estado</span><button class="btn green" onclick="xls('programacion','Metricas')" style="padding:4px 10px;font-size:11px">↓ Excel</button></div>
-        <table><thead><tr><th>Estado</th><th>Cantidad</th><th>%</th></tr></thead><tbody id="m-tb"><tr><td colspan="3" class="es">Cargando...</td></tr></tbody></table>
+      <div class="card">
+        <div class="ch"><span class="ct">Resumen por estado</span>
+          <button class="btn green" onclick="xls('programacion','Metricas')"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Excel</button>
+        </div>
+        <table><thead><tr><th>Estado</th><th>Cantidad</th><th>%</th></tr></thead>
+        <tbody id="m-tb"><tr><td colspan="3" class="es">Cargando...</td></tr></tbody></table>
       </div>
     </div>
 
-    <div id="page-config" class="page">
+    <!-- CONFIG -->
+    <div id="p-config" class="page">
       <div class="ph"><h2>Configuración</h2><p>Conexión con Google Sheets</p></div>
       <div class="card">
-        <div class="ct" style="margin-bottom:6px">⚡ Apps Script</div>
-        <p style="font-size:12px;color:#888;margin-bottom:14px">URL del Web App (termina en /exec)</p>
-        <div class="fg" style="margin-bottom:14px"><label>URL</label><input type="text" id="cfgUrl" style="width:100%"/></div>
-        <div style="display:flex;gap:10px"><button class="btn blue" onclick="saveUrl()">Guardar y cargar</button><button class="btn" onclick="demo()">Demo</button></div>
-        <div id="dbg-box" style="display:none;margin-top:14px;background:#f8f9ff;border:1px solid #e0e4f0;border-radius:8px;padding:12px"><div style="font-size:11px;font-weight:600;color:#1a3a8f;margin-bottom:6px">Hojas detectadas:</div><pre id="dbg-txt" style="font-size:11px;color:#555;white-space:pre-wrap"></pre></div>
+        <div class="ct" style="margin-bottom:6px">⚡ Apps Script — URL de conexión</div>
+        <p style="font-size:12px;color:#888;margin-bottom:14px">La URL ya está configurada. Puedes cambiarla aquí si reimplementas el script.</p>
+        <div class="fg" style="margin-bottom:14px"><label>URL del Web App</label>
+          <input type="text" id="cfgUrl" style="width:100%"/>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn blue" onclick="saveUrl()">Guardar y cargar datos</button>
+          <button class="btn" onclick="demo()">Ver datos demo</button>
+        </div>
+        <div class="dbg" id="dbg-box"><div class="dbg-t">Hojas detectadas:</div><pre id="dbg-txt"></pre></div>
       </div>
     </div>
 
-    
-    <div id="page-progpuerto" class="page">
-      <div class="ph"><h2>Programa de Puerto</h2><p>Contenedores por retirar desde depósitos de origen</p></div>
-      <div class="sg" style="grid-template-columns:repeat(4,1fr)">
-        <div class="sc"><div class="lbl">Total</div><div class="val" id="pp-tot">—</div><div class="sub">contenedores</div></div>
-        <div class="sc"><div class="lbl">Entregados</div><div class="val" id="pp-ent">—</div></div>
-        <div class="sc"><div class="lbl">Pendientes</div><div class="val" id="pp-pen">—</div></div>
-        <div class="sc"><div class="lbl">Sin transporte</div><div class="val" id="pp-sin">—</div></div>
-      </div>
-      <div class="fr">
-        <select id="pp-fe" onchange="filterPP()"><option value="">Estado: Todos</option><option>PENDIENTE</option><option>ENTREGADO</option><option>DESCONSOLIDADO</option><option>REPROGRAMADO</option><option>CANCELADO</option></select>
-        <button class="btn green" onclick="xls('programapuerto','Programa_Puerto')" style="margin-left:auto;padding:5px 12px;font-size:12px">&#8595; Excel</button>
-      </div>
-      <div class="card">
-        <div class="ch"><span class="ct">Contenedores Programa Puerto</span><span class="badge" id="pp-cnt">0</span></div>
-        <div style="overflow-x:auto"><table>
-          <thead><tr><th>Depósito</th><th>Contenedor</th><th>Peso (kg)</th><th>Demurrage</th><th>Transporte</th><th>Estado</th></tr></thead>
-          <tbody id="pp-tb"><tr><td colspan="6" class="es">Cargando...</td></tr></tbody>
-        </table></div>
+    <!-- QR -->
+    <div id="p-qr" class="page">
+      <div class="ph"><h2>Códigos QR — Acceso transportistas</h2><p>Escanea para ingresar directamente al formulario correspondiente</p></div>
+      <div class="qrgrid">
+        <div class="qrc">
+          <div style="width:48px;height:48px;border-radius:12px;background:#e8f5e9;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="#2e7d32"><path d="M1 3h15v13H1zm15 4l5 3v6h-5z"/></svg></div>
+          <h3>Retiro Puerto</h3><div class="qrs">Nueva asignación de retiro</div>
+          <div class="qrbox"><img id="qr1" src="" alt="QR Retiro" width="200" height="200"/></div>
+          <div class="qrurl">https://sodimac-cd.github.io/transporte/retiro-movil.html</div>
+          <button class="qrprint" onclick="printQR('qr1','Retiro Puerto')">Imprimir</button>
+        </div>
+        <div class="qrc">
+          <div style="width:48px;height:48px;border-radius:12px;background:#e3f2fd;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="#1565c0"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M7 7V5a2 2 0 014 0v2"/></svg></div>
+          <h3>Devolución Vacíos</h3><div class="qrs">Nueva devolución naviera</div>
+          <div class="qrbox"><img id="qr2" src="" alt="QR Devolución" width="200" height="200"/></div>
+          <div class="qrurl">https://sodimac-cd.github.io/transporte/devolucion-movil.html</div>
+          <button class="qrprint" onclick="printQR('qr2','Devolución Vacíos')">Imprimir</button>
+        </div>
       </div>
     </div>
-    <div id="page-abastecimiento" class="page"><div class="ph"><h2>Abastecimiento Tienda</h2></div><div class="card"><div class="es">🏗️ Próximamente</div></div></div>
-    <div id="page-despacho" class="page"><div class="ph"><h2>Despacho a Domicilio</h2></div><div class="card"><div class="es">🚚 Próximamente</div></div></div>
 
+    <div id="p-abastecimiento" class="page"><div class="ph"><h2>Abastecimiento Tienda</h2></div><div class="card"><div class="es">🏗️ Próximamente</div></div></div>
+    <div id="p-despacho" class="page"><div class="ph"><h2>Despacho a Domicilio</h2></div><div class="card"><div class="es">🚚 Próximamente</div></div></div>
+    <div id="p-contenedores" class="page">
+      <div class="ph"><h2>Contenedores</h2><p>Resumen por módulo</p></div>
+      <div class="sg">
+        <div class="sc"><div class="lbl">Programados</div><div class="val" id="c-p">—</div></div>
+        <div class="sc"><div class="lbl">Retiro Puerto</div><div class="val" id="c-r">0</div></div>
+        <div class="sc"><div class="lbl">Devolución</div><div class="val" id="c-d">0</div></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn blue" onclick="go('programacion')">Programación →</button>
+        <button class="btn" onclick="go('retiro')">Retiro Puerto →</button>
+        <button class="btn" onclick="go('devolucion')">Devolución Vacíos →</button>
+        <button class="btn" onclick="go('qr')">Códigos QR →</button>
+      </div>
+    </div>
   </div>
 </div>
 </div>
+
 <script>
-var APPS_URL='https://script.google.com/macros/s/AKfycbykZe2S_KzXGD1qdYZMGtgK_HpBNIa218kXvPczwvBa-_l8mYy1waPC9Bc1TQblELclFQ/exec';
-var store={retiro:[],devolucion:[],programacion:[],programapuerto:[]};
-var pgData=[], kpiC={};
-var ppData=[];
-function renderPP(rows){
-  store.programapuerto=rows; ppData=rows;
-  filterPP();
-  var t=rows.length;
-  var e=rows.filter(function(r){return String(r.estado).toUpperCase()==='ENTREGADO';}).length;
-  var p=rows.filter(function(r){return String(r.estado).toUpperCase()==='PENDIENTE';}).length;
-  var sin=rows.filter(function(r){return !r.transporte&&!r.transportista;}).length;
-  [['pp-tot',t],['pp-ent',e],['pp-pen',p],['pp-sin',sin]].forEach(function(x){var el=document.getElementById(x[0]);if(el)el.textContent=x[1];});
-}
-function filterPP(){
-  var fe=document.getElementById('pp-fe')&&document.getElementById('pp-fe').value||'';
-  var rows=ppData.filter(function(r){return !fe||String(r.estado).toUpperCase()===fe.toUpperCase();});
-  var cnt=document.getElementById('pp-cnt');if(cnt)cnt.textContent=rows.length;
-  var html=rows.length?rows.map(function(r){
-    var estPP=r.estado||'';var clsPP=getEstadoClass(estPP);var optsPP=ESTADOS_RETIRO.map(function(s){return '<option value="'+s+'"'+(s===estPP?' selected':'')+'>'+( s||'— Sin estado')+'</option>';}).join('');return '<tr><td>'+r.deposito+'</td><td style="font-family:monospace;font-weight:500">'+r.contenedor+'</td><td>'+r.peso+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td><select class="sel-estado '+clsPP+'" data-hoja="PROGRAMACION PUERTO" data-cont="'+r.contenedor+'" onchange="cambiarEstadoProg(this)">'+optsPP+'</select></td></tr>';
-  }).join(''):'<tr><td colspan="6" class="es">Sin registros</td></tr>';
-  var tb=document.getElementById('pp-tb');if(tb)tb.innerHTML=html;
-}
+var URL_AS='https://script.google.com/macros/s/AKfycbykZe2S_KzXGD1qdYZMGtgK_HpBNIa218kXvPczwvBa-_l8mYy1waPC9Bc1TQblELclFQ/exec';
+var store={retiro:[],devolucion:[],programacion:[]};
+var pgData=[];
 
-
-function tick(){var n=new Date();var el=document.getElementById('clk');if(el)el.textContent=n.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+' · '+n.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});}
+// CLOCK
+function tick(){var n=new Date();document.getElementById('clk').textContent=n.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+' · '+n.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});}
 tick();setInterval(tick,30000);
 
-function SP(id){
-  document.querySelectorAll('.page').forEach(function(p){p.style.display='none';});
-  var pg=document.getElementById('page-'+id);
-  if(pg)pg.style.display='block';
+// INIT CONFIG URL
+(function(){var u=localStorage.getItem('asUrl')||URL_AS;localStorage.setItem('asUrl',u);document.getElementById('cfgUrl').value=u;})();
+
+// NAV
+var NM={metricas:'nt-metricas',config:'nt-config'};
+function go(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  var pg=document.getElementById('p-'+id);if(pg)pg.classList.add('on');
+  document.querySelectorAll('.nt').forEach(function(t){t.classList.remove('on');});
+  if(NM[id])document.getElementById(NM[id]).classList.add('on');
   document.querySelectorAll('.si').forEach(function(i){i.classList.remove('on');});
   var sb=document.getElementById('sb-'+id);if(sb)sb.classList.add('on');
-  document.querySelectorAll('.nt').forEach(function(t){t.classList.remove('on');});
-  var nt=document.getElementById('nt-'+id);if(nt)nt.classList.add('on');
   if(id==='qr')genQR();
-  if(id==='contenedores'&&store.programacion.length)renderKPI(store.programacion);
 }
-
-function vtab(m,t){
+function tab(m,t){
   if(m==='retiro'){
     document.getElementById('retiro-reg').style.display=t==='reg'?'block':'none';
     document.getElementById('retiro-new').style.display=t==='new'?'block':'none';
@@ -380,177 +417,120 @@ function vtab(m,t){
     document.getElementById('bdn').className='btn'+(t==='new'?' blue':'');
   }
 }
-
-function saveUrl(){var u=document.getElementById('cfgUrl').value.trim();if(u){APPS_URL=u;localStorage.setItem('asUrl',u);cargar();}}
-
-function cargar(){
-  var url=localStorage.getItem('asUrl')||APPS_URL;
-  localStorage.setItem('asUrl',url);APPS_URL=url;
-  var el=document.getElementById('cfgUrl');if(el)el.value=url;
-  fetch(url,{redirect:'follow'})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(d.debug){var b=document.getElementById('dbg-box'),t=document.getElementById('dbg-txt');if(b&&t){b.style.display='block';t.textContent=JSON.stringify(d.debug,null,2);}}
-      if(d.retiro&&d.retiro.length)renderR(d.retiro);
-      if(d.devolucion&&d.devolucion.length)renderD(d.devolucion);
-      if(d.programacion&&d.programacion.length)renderP(d.programacion);
-      if(d.programaPuerto&&d.programaPuerto.length)renderPP(d.programaPuerto);
-    })
-    .catch(function(e){console.warn('Error:',e.message);});
+function sdt(t){
+  document.getElementById('dbt-r').className='tabb'+(t==='r'?' on':'');
+  document.getElementById('dbt-i').className='tabb'+(t==='i'?' on':'');
+  document.getElementById('dt-r').style.display=t==='r'?'block':'none';
+  document.getElementById('dt-i').style.display=t==='i'?'block':'none';
 }
 
+// CONFIG
+function saveUrl(){var u=document.getElementById('cfgUrl').value.trim();if(u){localStorage.setItem('asUrl',u);URL_AS=u;load();}}
+
+// LOAD via JSONP
+function load(){
+  var url=localStorage.getItem('asUrl')||URL_AS;
+  var cb='_cb'+Date.now();
+  window[cb]=function(d){
+    try{delete window[cb];}catch(e){}
+    var s=document.getElementById('_jscript');if(s)s.remove();
+    if(d.debug){var box=document.getElementById('dbg-box'),txt=document.getElementById('dbg-txt');if(box&&txt){box.style.display='block';txt.textContent=JSON.stringify(d.debug,null,2);}}
+    if(d.retiro&&d.retiro.length)renderR(d.retiro);
+    if(d.devolucion&&d.devolucion.length)renderD(d.devolucion);
+    if(d.programacion&&d.programacion.length)renderP(d.programacion);
+  };
+  var s=document.createElement('script');
+  s.id='_jscript';
+  s.src=url+'?callback='+cb+'&t='+Date.now();
+  s.onerror=function(){console.warn('Error cargando datos');};
+  document.head.appendChild(s);
+}
+
+// PILL
 function pill(e){var s=String(e||'').toUpperCase();var m={ENTREGADO:'pe',PENDIENTE:'pp',REPROGRAMADO:'pr',CANCELADO:'pc',DESCONSOLIDADO:'pd'};return '<span class="'+(m[s]||'pp')+'">'+e+'</span>';}
 
-var ESTADOS_RETIRO=['','RETIRADO','EN RUTA','ENTREGADO','CANCELADO','NO DISPONIBLE'];
-function getEstadoClass(e){var m={'RETIRADO':'retirado','EN RUTA':'en-ruta','ENTREGADO':'entregado','CANCELADO':'cancelado','NO DISPONIBLE':'no-disponible'};return m[String(e).toUpperCase()]||'';}
+// RENDER RETIRO
 function renderR(rows){
   store.retiro=rows;
-  var h1=rows.map(function(r,i){
-    var est=r.estado||'';
-    var cls=getEstadoClass(est);
-    var opts=ESTADOS_RETIRO.map(function(s){return '<option value="'+s+'"'+(s===est?' selected':'')+'>'+( s||'— Sin estado')+'</option>';}).join('');
-    return '<tr><td>'+r.fecha+'</td><td>'+r.deposito+'</td><td>'+(r.tipo||'—')+'</td><td>'+(r.transportista||r.transporte||'—')+'</td><td>'+r.chofer+'</td><td>'+r.rut+'</td><td>'+r.tracto+'</td><td>'+r.rampla+'</td><td><span class="gps">'+(r.gps||'—')+'</span></td><td><select class="sel-estado '+cls+'" data-rut="'+r.rut+'" data-tracto="'+r.tracto+'" onchange="cambiarEstado(this)">'+opts+'</select></td><td style="font-size:11px;color:#999">'+r.creado+'</td></tr>';
-  }).join('');
+  var h1=rows.map(function(r){return '<tr><td>'+r.fecha+'</td><td>'+r.deposito+'</td><td>'+(r.tipo||'—')+'</td><td>'+(r.transportista||r.transporte||'—')+'</td><td>'+r.chofer+'</td><td>'+r.rut+'</td><td>'+r.tracto+'</td><td>'+r.rampla+'</td><td><span class="gps">'+(r.gps||'—')+'</span></td><td style="font-size:11px;color:#999">'+r.creado+'</td></tr>';}).join('');
+  var h2=rows.map(function(r){return '<tr><td>'+r.fecha+'</td><td>'+(r.tipo||'—')+'</td><td>'+r.deposito+'</td><td>'+(r.transportista||r.transporte||'—')+'</td><td>'+r.chofer+'</td><td>'+r.rut+'</td><td>'+r.tracto+'</td><td>'+r.rampla+'</td><td><span class="gps">'+(r.gps||'—')+'</span></td></tr>';}).join('');
   ['r-tb','d-rtb'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h1||'<tr><td colspan="10" class="es">Sin registros</td></tr>';});
-  ['r-cnt','d-rcnt','c-r'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=rows.length;});
+  var at=document.getElementById('as-tb');if(at)at.innerHTML=h2||'<tr><td colspan="9" class="es">Sin registros</td></tr>';
+  ['r-cnt','d-rcnt','as-cnt','c-r'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=rows.length;});
 }
 
+// RENDER DEVOLUCION
 function renderD(rows){
   store.devolucion=rows;
   var h=rows.map(function(r){return '<tr><td>'+r.fecha+'</td><td>'+r.deposito+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+r.contenedor+'</td><td>'+r.eir+'</td><td style="font-size:11px;color:#999">'+r.creado+'</td></tr>';}).join('');
   ['dv-tb','d-dtb'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h||'<tr><td colspan="6" class="es">Sin registros</td></tr>';});
-  ['dv-cnt','d-dcnt'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=rows.length;});
+  ['dv-cnt','d-dcnt','c-d'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=rows.length;});
 }
 
+// RENDER PROGRAMACION
 function renderP(rows){
-  store.programacion=rows;pgData=rows;
-  filterPG();
+  store.programacion=rows;pgData=rows;filterPG();filterRM();
   var t=rows.length,e=rows.filter(function(r){return String(r.estado).toUpperCase()==='ENTREGADO';}).length;
   var p=rows.filter(function(r){return String(r.estado).toUpperCase()==='PENDIENTE';}).length;
-  var dem=rows.filter(function(r){var n=parseInt(r.demurrage);return !isNaN(n)&&n<10&&n>-9999;}).length;
+  var dem=rows.filter(function(r){var n=parseInt(r.demurrage);return !isNaN(n)&&n<10&&n>-999;}).length;
   var sin=rows.filter(function(r){return !r.transporte&&!r.transportista;}).length;
   var pct=t>0?Math.round(e/t*100):0;
-  [['pg-t',t],['pg-e',e],['pg-p',p],['pg-d',dem],['d-tot',t],['d-ent',e],['d-pen',p],['d-dem',dem],['m-c',pct+'%'],['m-t',t],['m-d',dem],['m-s',sin]].forEach(function(x){var el=document.getElementById(x[0]);if(el)el.textContent=x[1];});
+  [['pg-t',t],['pg-e',e],['pg-p',p],['pg-d',dem],['d-tot',t],['d-ent',e],['d-pen',p],['d-dem',dem],['c-p',t],['rm-cnt',t],['m-c',pct+'%'],['m-t',t],['m-d',dem],['m-s',sin]].forEach(function(x){var el=document.getElementById(x[0]);if(el)el.textContent=x[1];});
   var es={};rows.forEach(function(r){var s=r.estado||'SIN ESTADO';es[s]=(es[s]||0)+1;});
   var mt=document.getElementById('m-tb');if(mt)mt.innerHTML=Object.keys(es).map(function(s){return '<tr><td>'+pill(s)+'</td><td>'+es[s]+'</td><td>'+(t>0?Math.round(es[s]/t*100):0)+'%</td></tr>';}).join('');
-  renderKPI(rows);
 }
 
-function renderKPI(rows){
-  if(!rows||!rows.length) return;
-  var t=rows.length;
-  var e=rows.filter(function(r){return String(r.estado).toUpperCase()==='ENTREGADO';}).length;
-  var dem=rows.filter(function(r){var n=parseInt(r.demurrage);return !isNaN(n)&&n>=0&&n<=10;}).length;
-  var pct=t>0?Math.round(e/t*100):0;
-  var ct=document.getElementById('c-tot');if(ct)ct.textContent=t;
-  var cc=document.getElementById('c-cumpl');if(cc)cc.textContent=pct+'%';
-  var cd=document.getElementById('c-dem2');if(cd)cd.textContent=dem;
-  var es={},bod={},dp={};
-  rows.forEach(function(r){
-    var s=(r.estado&&r.estado!=='—'&&r.estado!=='')?r.estado:'POR ARRIBAR';
-    es[s]=(es[s]||0)+1;
-    var b=(r.bodega&&r.bodega!=='—'&&r.bodega!=='')?r.bodega:'SIN BODEGA';
-    bod[b]=(bod[b]||0)+1;
-    var d=r.deposito||'—'; dp[d]=(dp[d]||0)+1;
-  });
-  var eK=Object.keys(es), bodK=Object.keys(bod).sort(function(a,b){return bod[b]-bod[a];}).slice(0,6);
-  var dK=Object.keys(dp).sort(function(a,b){return dp[b]-dp[a];}).slice(0,6);
-  var eC=['#059669','#6366f1','#f59e0b','#dc2626','#64748b','#3266ad'];
-  var bodC=['#3266ad','#64748b','#94a3b8','#1d6f42','#f59e0b','#dc2626'];
-  var le=document.getElementById('kpi-leg-e');
-  if(le)le.innerHTML=eK.map(function(k,i){return '<span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:'+eC[i%eC.length]+';display:inline-block"></span>'+k+' '+es[k]+'</span>';}).join('');
-  var lt=document.getElementById('kpi-leg-t');
-  if(lt)lt.innerHTML=bodK.map(function(k,i){return '<span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:'+bodC[i%bodC.length]+';display:inline-block"></span>'+k.replace('BODEGA ','').replace('DEPOSITO ','').replace('CD ','')+' '+bod[k]+'</span>';}).join('');
-  if(typeof Chart==='undefined')return;
-  if(kpiC.e)kpiC.e.destroy();if(kpiC.t)kpiC.t.destroy();if(kpiC.d)kpiC.d.destroy();
-  var dO={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'68%'};
-  var c1=document.getElementById('kpi-c1');
-  if(c1)kpiC.e=new Chart(c1,{type:'doughnut',data:{labels:eK,datasets:[{data:eK.map(function(k){return es[k];}),backgroundColor:eC.slice(0,eK.length),borderWidth:0}]},options:dO});
-  var c2=document.getElementById('kpi-c2');
-  if(c2)kpiC.t=new Chart(c2,{type:'doughnut',data:{labels:bodK,datasets:[{data:bodK.map(function(k){return bod[k];}),backgroundColor:bodC.slice(0,bodK.length),borderWidth:0}]},options:dO});
-  var c3=document.getElementById('kpi-c3');
-  if(c3)kpiC.d=new Chart(c3,{type:'bar',data:{labels:dK,datasets:[{data:dK.map(function(k){return dp[k];}),backgroundColor:'#3266ad',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},stepSize:1}}}}});
-  var arows=rows.filter(function(r){var n=parseInt(r.demurrage);return !isNaN(n)&&n>=0&&n<=10;}).sort(function(a,b){return parseInt(a.demurrage)-parseInt(b.demurrage);}).slice(0,5);
-  var ac=document.getElementById('kpi-alerts'),al=document.getElementById('kpi-alert-list');
-  if(ac)ac.style.display=arows.length?'block':'none';
-  if(al&&arows.length)al.innerHTML=arows.map(function(r){var n=parseInt(r.demurrage);var col=n<=3?'background:#fee2e2;color:#991b1b':n<=7?'background:#fef3c7;color:#92400e':'background:#dbeafe;color:#1e40af';return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f8f9ff;border-radius:6px;font-size:12px"><div><div style="font-weight:500;font-family:monospace;font-size:11px">'+r.contenedor+'</div><div style="color:#666;font-size:11px">'+r.deposito+'</div></div><span style="font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;'+col+'">'+n+' días</span></div>';}).join('');
-}
-
-function getEC(e){var m={'PENDIENTE':'pendiente','ENTREGADO':'entregado','DESCONSOLIDADO':'retirado','REPROGRAMADO':'en-ruta','CANCELADO':'cancelado'};return m[String(e).toUpperCase()]||'';}
-function mkOpts(cur){return ['','PENDIENTE','ENTREGADO','DESCONSOLIDADO','REPROGRAMADO','CANCELADO'].map(function(s){return '<option value="'+s+'"'+(s===cur?' selected':'')+'>'+( s||'— Estado')+'</option>';}).join('');}
-function filtrarPP(){
-  var fe=(document.getElementById('pp-fe')&&document.getElementById('pp-fe').value)||'';
-  var rows=ppData.filter(function(r){return !fe||String(r.estado).toUpperCase()===fe.toUpperCase();});
-  var cnt=document.getElementById('pp-cnt');if(cnt)cnt.textContent=rows.length;
-  var html=rows.length?rows.map(function(r){var ec=getEC(r.estado);return '<tr><td>'+r.deposito+'</td><td style="font-family:monospace;font-weight:500">'+r.contenedor+'</td><td>'+r.peso+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td><select class="sel-e '+ec+'" data-cont="'+r.contenedor+'" data-sheet="PROGRAMACION PUERTO" onchange="cambiarEstado(this)">'+mkOpts(r.estado||'')+'</select></td></tr>';}).join(''):'<tr><td colspan="6" class="es">Sin registros</td></tr>';
-  var tb=document.getElementById('pp-tb');if(tb)tb.innerHTML=html;
-}
 function filterPG(){
-  var ft=document.getElementById('pg-ft')&&document.getElementById('pg-ft').value;
-  var fe=document.getElementById('pg-fe')&&document.getElementById('pg-fe').value;
+  var ft=document.getElementById('pg-ft').value,fe=document.getElementById('pg-fe').value;
   var rows=pgData.filter(function(r){return(!ft||r.tipo===ft)&&(!fe||String(r.estado).toUpperCase()===fe.toUpperCase());});
   var cnt=document.getElementById('pg-cnt');if(cnt)cnt.textContent=rows.length;
-  var html=rows.length?rows.map(function(r,i){var estPG=r.estado||'';var clsPG=getEstadoClass(estPG);var optsPG=ESTADOS_RETIRO.map(function(s){return '<option value="'+s+'"'+(s===estPG?' selected':'')+'>'+( s||'— Sin estado')+'</option>';}).join('');return '<tr><td>'+(i+1)+'</td><td>'+r.fecha+'</td><td>'+(r.hora||'—')+'</td><td>'+r.deposito+'</td><td>'+r.tipo+'</td><td>'+(r.capacidad||'—')+'</td><td>'+r.contenedor+'</td><td>'+(r.peso||'—')+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.bl||'—')+'</td><td>'+(r.sku||'—')+'</td><td>'+(r.descripcion||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+(r.bodega||'—')+'</td><td>'+(r.servicio||'—')+'</td><td><select class="sel-estado '+clsPG+'" data-hoja="PROGRAMACION ACTUAL" data-cont="'+r.contenedor+'" onchange="cambiarEstadoProg(this)">'+optsPG+'</select></td></tr>';}).join(''):'<tr><td colspan="16" class="es">Sin registros</td></tr>';
+  var html=rows.length?rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td>'+r.fecha+'</td><td>'+(r.hora||'—')+'</td><td>'+r.deposito+'</td><td>'+r.tipo+'</td><td>'+(r.capacidad||'—')+'</td><td>'+r.contenedor+'</td><td>'+(r.peso||'—')+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.bl||'—')+'</td><td>'+(r.sku||'—')+'</td><td>'+(r.descripcion||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+(r.bodega||'—')+'</td><td>'+(r.servicio||'—')+'</td><td>'+pill(r.estado)+'</td></tr>';}).join(''):'<tr><td colspan="16" class="es">Sin registros</td></tr>';
   var tb=document.getElementById('pg-tb');if(tb)tb.innerHTML=html;
 }
+function filterRM(){
+  var fe=document.getElementById('rm-fe').value;
+  var rows=pgData.filter(function(r){return !fe||String(r.estado).toUpperCase()===fe.toUpperCase();});
+  var cnt=document.getElementById('rm-cnt');if(cnt)cnt.textContent=rows.length;
+  var html=rows.length?rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td>'+r.fecha+'</td><td>'+(r.hora||'—')+'</td><td>'+r.deposito+'</td><td>'+r.tipo+'</td><td>'+(r.capacidad||'—')+'</td><td>'+r.contenedor+'</td><td>'+(r.peso||'—')+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.bl||'—')+'</td><td>'+(r.sku||'—')+'</td><td>'+(r.descripcion||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+(r.bodega||'—')+'</td><td>'+(r.servicio||'—')+'</td><td>'+pill(r.estado)+'</td></tr>';}).join(''):'<tr><td colspan="16" class="es">Sin registros</td></tr>';
+  var tb=document.getElementById('rm-tb');if(tb)tb.innerHTML=html;
+}
 
-function cambiarEstadoProg(sel){
-  var url=localStorage.getItem('asUrl')||APPS_URL;
-  var hoja=sel.getAttribute('data-hoja');
-  var cont=sel.getAttribute('data-cont');
-  var estado=sel.value;
-  var cls=getEstadoClass(estado);
-  sel.className='sel-estado '+(cls||'');
-  fetch(url,{method:'POST',body:JSON.stringify({modulo:'updateEstadoProg',hoja:hoja,contenedor:cont,estado:estado})})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(d.ok){sel.style.boxShadow='0 0 0 2px #34d399';setTimeout(function(){sel.style.boxShadow='';},1500);}
-      else{alert('Error: '+(d.error||'desconocido'));}
-    }).catch(function(){alert('Error de conexión');});
-}
-function cambiarEstado(sel){
-  var url=localStorage.getItem('asUrl')||APPS_URL;
-  var cont=sel.getAttribute('data-cont');
-  var sheet=sel.getAttribute('data-sheet');
-  var estado=sel.value;
-  sel.className='sel-e '+(getEC(estado)||'');
-  fetch(url,{method:'POST',body:JSON.stringify({modulo:'updateEstado',contenedor:cont,sheet:sheet,estado:estado})})
-    .then(function(r){return r.json();})
-    .then(function(d){if(d.ok){sel.style.boxShadow='0 0 0 2px #34d399';setTimeout(function(){sel.style.boxShadow='';},1500);}else{alert('Error: '+(d.error||'?'));
-    }}).catch(function(){alert('Error de conexión');});
-}
+// EXPORT CSV
 function xls(mod,nom){
   var rows=store[mod];if(!rows||!rows.length){alert('Sin datos para exportar.');return;}
-  var hd,cl;
-  if(mod==='retiro'){hd=['Fecha','Deposito','Tipo','Transporte','Chofer','RUT','Tracto','Rampla','GPS','Creado'];cl=['fecha','deposito','tipo','transportista','chofer','rut','tracto','rampla','gps','creado'];}
-  else if(mod==='devolucion'){hd=['Fecha','Deposito','Transporte','Contenedor','EIR','Creado'];cl=['fecha','deposito','transporte','contenedor','eir','creado'];}
-  else if(mod==='programapuerto'){hd=['Deposito','Contenedor','Peso','Demurrage','Transporte','Estado'];cl=['deposito','contenedor','peso','demurrage','transporte','estado'];}
-  else{hd=['Fecha','Hora','Deposito','Tipo','Cap','Contenedor','Peso','Demurrage','BL','SKU','Descripcion','Transporte','Bodega','Servicio','Estado'];cl=['fecha','hora','deposito','tipo','capacidad','contenedor','peso','demurrage','bl','sku','descripcion','transporte','bodega','servicio','estado'];}
-  var csv='\uFEFF'+hd.join(';')+'\n';
-  rows.forEach(function(r){csv+=cl.map(function(k){return '"'+String(r[k]||'').replace(/"/g,'""')+'"';}).join(';')+'\n';});
+  var h,c;
+  if(mod==='retiro'){h=['Fecha','Depósito','Tipo','Transporte','Chofer','RUT','Teléfono','Tracto','Rampla','Reemplazo','GPS','Creado'];c=['fecha','deposito','tipo','transportista','chofer','rut','telefono','tracto','rampla','reemplazo','gps','creado'];}
+  else if(mod==='devolucion'){h=['Fecha','Depósito','Transporte','Contenedor','EIR','Creado'];c=['fecha','deposito','transporte','contenedor','eir','creado'];}
+  else{h=['Fecha','Hora','Depósito','Tipo','Cap','Contenedor','Peso','Demurrage','BL','SKU','Descripción','Transporte','Bodega','Servicio','Estado'];c=['fecha','hora','deposito','tipo','capacidad','contenedor','peso','demurrage','bl','sku','descripcion','transporte','bodega','servicio','estado'];}
+  var csv='\uFEFF'+h.join(';')+'\n';
+  rows.forEach(function(r){csv+=c.map(function(k){return '"'+String(r[k]||'').replace(/"/g,'""')+'"';}).join(';')+'\n';});
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
   a.download=nom+'_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);
 }
 
-function saveR(){
-  var url=localStorage.getItem('asUrl')||APPS_URL;
+// SAVE RETIRO
+function saveRetiro(){
+  var url=localStorage.getItem('asUrl')||URL_AS;
   var d={fecha:document.getElementById('rf-f').value,tipo:document.getElementById('rf-t').value,deposito:document.getElementById('rf-d').value,transportista:document.getElementById('rf-tr').value,chofer:document.getElementById('rf-ch').value,rut:document.getElementById('rf-ru').value,tel:document.getElementById('rf-te').value,tracto:document.getElementById('rf-tc').value,rampla:document.getElementById('rf-ra').value,reemplazo:document.getElementById('rf-re').value,gps:document.getElementById('rf-gp').value};
   if(!d.fecha||!d.deposito||!d.transportista||!d.chofer||!d.rut){alert('Completa los campos obligatorios (*).');return;}
-  fetch(url,{method:'POST',body:JSON.stringify({modulo:'retiro',datos:d})}).then(function(){alert('Guardado.');vtab('retiro','reg');cargar();}).catch(function(){alert('Error al guardar.');});
+  fetch(url,{method:'POST',body:JSON.stringify({modulo:'retiro',datos:d})}).then(function(){alert('Guardado.');tab('retiro','reg');load();}).catch(function(){alert('Error al guardar.');});
 }
 
-function saveD(){
-  var url=localStorage.getItem('asUrl')||APPS_URL;
+// SAVE DEVOLUCION
+function saveDev(){
+  var url=localStorage.getItem('asUrl')||URL_AS;
   var d={fecha:document.getElementById('dv-f').value,deposito:document.getElementById('dv-d').value,transportista:document.getElementById('dv-tr').value,contenedor:document.getElementById('dv-co').value,eir:document.getElementById('dv-ei').value};
   if(!d.fecha||!d.deposito||!d.transportista||!d.contenedor||!d.eir){alert('Completa los campos obligatorios (*).');return;}
-  fetch(url,{method:'POST',body:JSON.stringify({modulo:'devolucion',datos:d})}).then(function(){alert('Guardado.');vtab('dev','reg');cargar();}).catch(function(){alert('Error al guardar.');});
+  fetch(url,{method:'POST',body:JSON.stringify({modulo:'devolucion',datos:d})}).then(function(){alert('Guardado.');tab('dev','reg');load();}).catch(function(){alert('Error al guardar.');});
 }
 
+// DEMO
 function demo(){
-  renderR([{fecha:'02-05-2026',deposito:'SITRANS SAN ANTONIO',tipo:'Ingreso',transportista:'H. BUSTOS',transporte:'H. BUSTOS',chofer:'Juan Perez',rut:'12.345.678-9',tracto:'ABCD-12',rampla:'EFGH-34',gps:'RAMPLA-TRACTO',creado:'02-05-2026 16:28'}]);
-  renderP([{fecha:'05-05-2026',hora:'08:30',deposito:'SITRANS SAN ANTONIO',tipo:'HC',capacidad:'40',contenedor:'TCKU1234567',peso:'24500',demurrage:'5',bl:'BL123456',sku:'7891234',descripcion:'Herramientas',transporte:'H. BUSTOS',bodega:'CD LO ESPEJO',servicio:'DESPACHO',estado:'PENDIENTE'},{fecha:'05-05-2026',hora:'10:00',deposito:'MEDLOG VALPARAISO',tipo:'STD',capacidad:'20',contenedor:'MSCU7654321',peso:'18000',demurrage:'15',bl:'BL654321',sku:'1234567',descripcion:'Linea blanca',transporte:'SITRANS',bodega:'CD LO ESPEJO',servicio:'DESPACHO',estado:'ENTREGADO'}]);
+  renderR([{fecha:'02-05-2026',deposito:'SITRANS SAN ANTONIO',tipo:'Ingreso',transportista:'H. BUSTOS',chofer:'Juan Pérez',rut:'12.345.678-9',tracto:'ABCD-12',rampla:'EFGH-34',gps:'RAMPLA-TRACTO',creado:'02-05-2026 16:28'}]);
+  renderP([{fecha:'05-05-2026',hora:'08:30',deposito:'SITRANS SAN ANTONIO',tipo:'HC',capacidad:'40',contenedor:'TCKU1234567',peso:'24500',demurrage:'5',bl:'BL123456',sku:'7891234',descripcion:'Herramientas',transporte:'H. BUSTOS',bodega:'CD LO ESPEJO',servicio:'DESPACHO',estado:'PENDIENTE'},{fecha:'05-05-2026',hora:'10:00',deposito:'MEDLOG VALPARAISO',tipo:'STD',capacidad:'20',contenedor:'MSCU7654321',peso:'18000',demurrage:'15',bl:'BL654321',sku:'1234567',descripcion:'Línea blanca',transporte:'SITRANS',bodega:'CD LO ESPEJO',servicio:'DESPACHO',estado:'ENTREGADO'}]);
 }
 
+// QR
 var qrDone=false;
 function genQR(){
   if(qrDone)return;
@@ -559,17 +539,15 @@ function genQR(){
   document.getElementById('qr2').src=b+encodeURIComponent('https://sodimac-cd.github.io/transporte/devolucion-movil.html');
   qrDone=true;
 }
-function pQR(id,tit){
+function printQR(id,tit){
   var img=document.getElementById(id);
   var w=window.open('','_blank','width=420,height=500');
-  w.document.write('<!DOCTYPE html><html><head><title>QR</title><style>body{font-family:sans-serif;text-align:center;padding:32px}h2{color:#1a237e}p{color:#666;font-size:13px;margin:6px 0 20px}@media print{button{display:none}}</style></head><body><h2>CD Lo Espejo</h2><p>'+tit+'</p><img src="'+img.src+'" width="220" style="border:2px solid #e0e0e0;border-radius:8px;padding:12px"/><br><br><button onclick="window.print()" style="background:#1a237e;color:#fff;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;margin-top:16px">Imprimir</button></body></html>');
+  w.document.write('<!DOCTYPE html><html><head><title>QR '+tit+'</title><style>body{font-family:sans-serif;text-align:center;padding:32px}h2{color:#1a237e}p{color:#666;font-size:13px;margin:6px 0 20px}img{border:2px solid #e0e0e0;border-radius:8px;padding:12px}@media print{button{display:none}}</style></head><body><h2>CD Lo Espejo</h2><p>'+tit+'</p><img src="'+img.src+'" width="220"/><br><br><button onclick="window.print()" style="background:#1a237e;color:#fff;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;margin-top:16px">Imprimir</button></body></html>');
   w.document.close();
 }
 
-window.addEventListener('load',function(){
-  SP('dashboard');
-  cargar();
-});
+// AUTO LOAD
+window.addEventListener('load', load);
 </script>
 </body>
 </html>
