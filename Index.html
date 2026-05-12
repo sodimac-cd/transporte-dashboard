@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<base target="_top">
+<title>Torre de Control · Programación Puerto</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-900:#0B1220; --ink-700:#1E293B; --ink-500:#475569; --ink-300:#CBD5E1;
+    --paper:#F6F7F9; --line:#E5E8EE;
+    --accent:#0F62FE; --critical:#DC2626; --warn:#D97706; --ok:#059669; --info:#0369A1;
+  }
+  *{ -webkit-font-smoothing: antialiased; }
+  html,body{ background: var(--paper); font-family:'Inter',sans-serif; color: var(--ink-900); }
+  .font-display{ font-family:'Bricolage Grotesque',sans-serif; letter-spacing:-.02em; }
+  .font-mono{ font-family:'JetBrains Mono',monospace; }
+  .dot{ width:8px; height:8px; border-radius:9999px; display:inline-block; }
+  .dot-pulse{ position:relative; }
+  .dot-pulse::after{
+    content:''; position:absolute; inset:-4px; border-radius:9999px;
+    background:inherit; opacity:.35; animation: pulse 1.6s ease-out infinite;
+  }
+  @keyframes pulse{ 0%{transform:scale(.6);opacity:.55} 100%{transform:scale(2.2);opacity:0} }
+  .tile{ transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+  .tile:hover{ transform: translateY(-2px); }
+  tbody tr{ transition: background-color .15s ease; }
+  tbody tr:hover{ background:#FBFCFE; }
+  .modal-backdrop{ animation: fadeIn .18s ease both; }
+  .modal-card{ animation: popIn .22s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+  @keyframes popIn{ from{opacity:0; transform: translateY(8px) scale(.98)} to{opacity:1; transform:none} }
+  .toast{ animation: slideIn .25s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes slideIn{ from{opacity:0; transform: translateY(-8px)} to{opacity:1; transform:none} }
+  .spinner{ width:14px; height:14px; border:2px solid currentColor; border-right-color:transparent; border-radius:9999px; animation: spin .7s linear infinite; }
+  @keyframes spin{ to{ transform: rotate(360deg) } }
+  thead th{ text-transform: uppercase; letter-spacing:.08em; font-size:11px; font-weight:600; color:#64748B; }
+  .row-critical{ box-shadow: inset 3px 0 0 var(--critical); }
+  .row-vencido{ box-shadow: inset 3px 0 0 #7F1D1D; background:#FEF2F2; }
+  .seg{ display:inline-flex; padding:3px; background:#F1F4F9; border-radius:10px; border:1px solid var(--line); }
+  .seg button{ font-size:12px; font-weight:500; padding:6px 12px; border-radius:7px; color:#475569; transition: all .15s ease; }
+  .seg button.active{ background:white; color:var(--ink-900); box-shadow: 0 1px 2px rgba(15,23,42,.08); }
+  input:focus, select:focus{ outline:none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,98,254,.12); }
+  .divider-label{ display:flex; align-items:center; gap:10px; color:#94A3B8; font-size:11px; letter-spacing:.12em; text-transform:uppercase; }
+  .divider-label::before, .divider-label::after{ content:''; flex:1; height:1px; background: var(--line); }
+  .sk{ background: linear-gradient(90deg, #EEF1F6 25%, #F6F8FB 50%, #EEF1F6 75%); background-size: 200% 100%; animation: sh 1.4s linear infinite; border-radius:6px; }
+  @keyframes sh{ 0%{ background-position: 200% 0 } 100%{ background-position: -200% 0 } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<header class="border-b border-[color:var(--line)] bg-white">
+  <div class="max-w-[1400px] mx-auto px-8 py-5 flex items-center justify-between gap-6">
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-lg bg-[color:var(--ink-900)] grid place-items-center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
+          <path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6M9 12h.01M15 12h.01"/>
+        </svg>
+      </div>
+      <div>
+        <div class="text-[11px] tracking-[.18em] text-slate-500 font-medium uppercase">Torre de Control</div>
+        <h1 class="font-display text-[22px] font-semibold leading-tight">Programación Puerto</h1>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="text-right">
+        <div class="text-[10px] tracking-[.18em] text-slate-400 uppercase">Hora local</div>
+        <div id="liveClock" class="font-mono text-sm font-medium tabular-nums">--:--:--</div>
+      </div>
+      <div class="h-8 w-px bg-[color:var(--line)]"></div>
+      <div class="flex items-center gap-2">
+        <span id="connDot" class="dot bg-slate-300"></span>
+        <span id="connText" class="text-xs font-medium text-slate-500">Conectando...</span>
+      </div>
+      <button id="btnRefresh" class="px-3 py-2 rounded-lg border border-[color:var(--line)] hover:border-slate-400 bg-white text-sm font-medium flex items-center gap-2 transition">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.3L3 16M3 21v-5h5"/>
+        </svg>
+        Recargar
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-[1400px] mx-auto px-8 py-8">
+
+  <section class="grid grid-cols-12 gap-4 mb-8">
+
+    <article class="tile col-span-12 md:col-span-3 bg-white rounded-xl border border-[color:var(--line)] p-5 hover:shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="text-[11px] tracking-[.14em] text-slate-500 uppercase font-medium">Pendientes</div>
+        <span class="dot bg-amber-500"></span>
+      </div>
+      <div class="mt-3 flex items-baseline gap-2">
+        <div id="kpiPendientes" class="font-display text-5xl font-semibold tabular-nums">—</div>
+        <div class="text-xs text-slate-400">contenedores</div>
+      </div>
+      <div class="mt-3 text-xs text-slate-500">A la espera de asignación</div>
+    </article>
+
+    <article class="tile col-span-12 md:col-span-3 bg-white rounded-xl border border-[color:var(--line)] p-5 hover:shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="text-[11px] tracking-[.14em] text-slate-500 uppercase font-medium">Asignados</div>
+        <span class="dot bg-sky-600"></span>
+      </div>
+      <div class="mt-3 flex items-baseline gap-2">
+        <div id="kpiAsignados" class="font-display text-5xl font-semibold tabular-nums">—</div>
+        <div class="text-xs text-slate-400">con transporte</div>
+      </div>
+      <div class="mt-3 text-xs text-slate-500">Listos para retiro</div>
+    </article>
+
+    <article id="kpiCriticosCard" class="tile col-span-12 md:col-span-3 bg-white rounded-xl border border-[color:var(--line)] p-5 hover:shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="text-[11px] tracking-[.14em] uppercase font-medium" id="kpiCriticosLabel">Demurrage Crítico</div>
+        <span id="kpiCriticosDot" class="dot bg-slate-300"></span>
+      </div>
+      <div class="mt-3 flex items-baseline gap-2">
+        <div id="kpiCriticos" class="font-display text-5xl font-semibold tabular-nums">—</div>
+        <div class="text-xs text-slate-400">&lt; 48 h libres</div>
+      </div>
+      <div id="kpiCriticosFoot" class="mt-3 text-xs text-slate-500">Sin alertas críticas</div>
+    </article>
+
+    <article class="tile col-span-12 md:col-span-3 bg-[color:var(--ink-900)] text-white rounded-xl p-5">
+      <div class="flex items-start justify-between">
+        <div class="text-[11px] tracking-[.14em] uppercase font-medium text-slate-400">Total flota</div>
+        <span class="dot bg-emerald-400 dot-pulse"></span>
+      </div>
+      <div class="mt-3 flex items-baseline gap-2">
+        <div id="kpiTotal" class="font-display text-5xl font-semibold tabular-nums">—</div>
+        <div class="text-xs text-slate-500">registros</div>
+      </div>
+      <div class="mt-3 text-xs text-slate-400 flex items-center gap-3">
+        <span><span id="kpiRetirados">0</span> retirados</span>
+        <span class="w-px h-3 bg-slate-700"></span>
+        <span><span id="kpiEntregados">0</span> entregados</span>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="bg-white rounded-xl border border-[color:var(--line)] overflow-hidden">
+
+    <div class="px-6 py-4 border-b border-[color:var(--line)] flex flex-wrap items-center gap-4">
+      <div class="flex items-center gap-2">
+        <h2 class="font-display text-lg font-semibold">Operaciones</h2>
+        <span id="rowCount" class="text-xs text-slate-400 font-mono">0 filas</span>
+      </div>
+      <div class="seg" id="filterSeg">
+        <button data-filter="all" class="active">Todos</button>
+        <button data-filter="Pendiente">Pendientes</button>
+        <button data-filter="Asignado">Asignados</button>
+        <button data-filter="critico">Críticos</button>
+      </div>
+      <div class="flex-1"></div>
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="searchInput" type="text" placeholder="Buscar contenedor, depósito, transporte..."
+               class="pl-9 pr-3 py-2 w-72 rounded-lg border border-[color:var(--line)] text-sm bg-white">
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-[#FAFBFD] border-b border-[color:var(--line)]">
+          <tr>
+            <th class="text-left px-6 py-3">Fecha</th>
+            <th class="text-left px-6 py-3">Contenedor</th>
+            <th class="text-left px-6 py-3">Depósito Destino</th>
+            <th class="text-left px-6 py-3">Transporte</th>
+            <th class="text-left px-6 py-3">Estado</th>
+            <th class="text-left px-6 py-3">Demurrage</th>
+            <th class="text-right px-6 py-3">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div id="emptyState" class="hidden px-6 py-16 text-center">
+      <div class="font-display text-base text-slate-700">Sin resultados</div>
+      <div class="text-sm text-slate-500 mt-1">Ajusta los filtros o recarga la operación.</div>
+    </div>
+
+    <div class="border-t border-[color:var(--line)] px-6 py-3 flex items-center justify-between text-xs text-slate-500">
+      <div class="font-mono">SHEET · 1KvR2I-hmosy-BulD6JeztFyPYO5-XYqQiTDlnhw_rZQ</div>
+      <div id="lastSync">Sin sincronización</div>
+    </div>
+  </section>
+</main>
+
+<div id="modal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm modal-backdrop" data-close></div>
+  <div class="relative h-full w-full grid place-items-center p-4">
+    <div class="modal-card relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-[color:var(--line)]">
+      <div class="px-6 py-5 border-b border-[color:var(--line)] flex items-start justify-between">
+        <div>
+          <div class="text-[11px] tracking-[.18em] text-slate-500 uppercase">Asignar transporte</div>
+          <div class="mt-1 font-mono text-base font-semibold" id="modalContenedor">—</div>
+        </div>
+        <button data-close class="text-slate-400 hover:text-slate-700 p-1 -mr-1">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-5">
+        <div class="grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <div class="text-slate-400 uppercase tracking-wider mb-1">Arribo</div>
+            <div id="modalFecha" class="font-mono text-slate-800">—</div>
+          </div>
+          <div>
+            <div class="text-slate-400 uppercase tracking-wider mb-1">Depósito</div>
+            <div id="modalDeposito" class="text-slate-800">—</div>
+          </div>
+        </div>
+        <div class="divider-label">Edición</div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1.5">Transportista</label>
+          <input id="inputTransporte" type="text" placeholder="Ej: Transportes Andes SpA"
+                 class="w-full px-3 py-2.5 rounded-lg border border-[color:var(--line)] text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1.5">Estado operativo</label>
+          <div class="grid grid-cols-4 gap-2" id="estadoSelector">
+            <button data-estado="Pendiente" class="estado-btn px-2 py-2 rounded-lg border border-[color:var(--line)] text-xs font-medium hover:border-slate-400 transition">
+              <span class="dot bg-amber-500 mr-1.5"></span>Pendiente
+            </button>
+            <button data-estado="Asignado" class="estado-btn px-2 py-2 rounded-lg border border-[color:var(--line)] text-xs font-medium hover:border-slate-400 transition">
+              <span class="dot bg-sky-600 mr-1.5"></span>Asignado
+            </button>
+            <button data-estado="Retirado" class="estado-btn px-2 py-2 rounded-lg border border-[color:var(--line)] text-xs font-medium hover:border-slate-400 transition">
+              <span class="dot bg-violet-600 mr-1.5"></span>Retirado
+            </button>
+            <button data-estado="Entregado" class="estado-btn px-2 py-2 rounded-lg border border-[color:var(--line)] text-xs font-medium hover:border-slate-400 transition">
+              <span class="dot bg-emerald-600 mr-1.5"></span>Entregado
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-[#FAFBFD] border-t border-[color:var(--line)] flex items-center justify-between">
+        <div id="modalFeedback" class="text-xs text-slate-500"></div>
+        <div class="flex gap-2">
+          <button data-close class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
+          <button id="btnGuardar" class="px-4 py-2 rounded-lg bg-[color:var(--ink-900)] text-white text-sm font-medium hover:bg-black transition flex items-center gap-2">
+            <span id="guardarLabel">Guardar cambios</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer" class="fixed top-6 right-6 z-[60] space-y-2"></div>
+
+<script>
+/* URL del propio Web App. Como el HTML lo sirve Apps Script,
+   tomamos la URL actual del navegador (sin parámetros). */
+const WEB_APP_URL = window.location.href.split('?')[0];
+
+const ESTADOS = ['Pendiente','Asignado','Retirado','Entregado'];
+let DATA = [];
+let CURRENT_FILTER = 'all';
+let CURRENT_SEARCH = '';
+let CURRENT_ROW = null;
+let SELECTED_ESTADO = 'Pendiente';
+
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+const fmtFecha = (iso) => {
+  if (!iso) return '—';
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('es-CL', { day:'2-digit', month:'short', year:'numeric' });
+};
+
+const escapeHtml = (s='') => String(s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+function toast(msg, type='ok'){
+  const colors = {
+    ok:    { bg:'bg-emerald-600', icon:'M5 13l4 4L19 7' },
+    error: { bg:'bg-red-600',     icon:'M6 18 18 6M6 6l12 12' },
+    info:  { bg:'bg-slate-800',   icon:'M12 8v4M12 16h.01' }
+  };
+  const c = colors[type] || colors.ok;
+  const el = document.createElement('div');
+  el.className = `toast ${c.bg} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 text-sm font-medium min-w-[280px]`;
+  el.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="${c.icon}"/></svg><span>${escapeHtml(msg)}</span>`;
+  $('#toastContainer').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform='translateY(-8px)'; el.style.transition='all .25s'; }, 3000);
+  setTimeout(() => el.remove(), 3300);
+}
+
+function setConnState(state, label){
+  const dot = $('#connDot'); const txt = $('#connText');
+  dot.className = 'dot';
+  if (state === 'live')      { dot.classList.add('bg-emerald-500','dot-pulse'); txt.textContent = label || 'En línea'; txt.className='text-xs font-medium text-emerald-700'; }
+  else if (state === 'error'){ dot.classList.add('bg-red-500');                 txt.textContent = label || 'Error';     txt.className='text-xs font-medium text-red-700'; }
+  else                       { dot.classList.add('bg-slate-300');               txt.textContent = label || 'Conectando...'; txt.className='text-xs font-medium text-slate-500'; }
+}
+
+setInterval(() => {
+  $('#liveClock').textContent = new Date().toLocaleTimeString('es-CL', { hour12:false });
+}, 1000);
+
+async function fetchData(){
+  renderSkeleton();
+  setConnState('off', 'Cargando...');
+  try {
+    const res = await fetch(WEB_APP_URL + '?api=1', { method:'GET' });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Error en el backend');
+    DATA = json.data || [];
+    setConnState('live', 'En línea · ' + DATA.length + ' registros');
+    $('#lastSync').textContent = 'Última sincronización: ' + new Date().toLocaleTimeString('es-CL');
+    render();
+  } catch (err) {
+    setConnState('error', 'Error de conexión');
+    toast('No se pudo obtener datos: ' + err.message, 'error');
+    DATA = [];
+    render();
+  }
+}
+
+function computeKPIs(rows){
+  const activos = rows.filter(r => r.estado !== 'Retirado' && r.estado !== 'Entregado');
+  return {
+    total: rows.length,
+    pendientes: rows.filter(r => r.estado === 'Pendiente').length,
+    asignados:  rows.filter(r => r.estado === 'Asignado').length,
+    retirados:  rows.filter(r => r.estado === 'Retirado').length,
+    entregados: rows.filter(r => r.estado === 'Entregado').length,
+    criticos:   activos.filter(r => r.critico).length,
+    vencidos:   activos.filter(r => r.vencido).length
+  };
+}
+
+function paintKPIs(k){
+  $('#kpiPendientes').textContent = k.pendientes;
+  $('#kpiAsignados').textContent  = k.asignados;
+  $('#kpiCriticos').textContent   = k.criticos + k.vencidos;
+  $('#kpiTotal').textContent      = k.total;
+  $('#kpiRetirados').textContent  = k.retirados;
+  $('#kpiEntregados').textContent = k.entregados;
+
+  const card = $('#kpiCriticosCard');
+  const label = $('#kpiCriticosLabel');
+  const dot = $('#kpiCriticosDot');
+  const foot = $('#kpiCriticosFoot');
+  card.classList.remove('bg-white','bg-red-50','border-red-200');
+
+  if (k.criticos + k.vencidos > 0){
+    card.classList.add('bg-red-50','border-red-200','border');
+    label.className = 'text-[11px] tracking-[.14em] uppercase font-medium text-red-700';
+    dot.className = 'dot bg-red-600 dot-pulse';
+    foot.textContent = k.vencidos > 0 ? `⚠ ${k.vencidos} vencido(s) · ${k.criticos} en riesgo` : `⚠ ${k.criticos} contenedor(es) en riesgo`;
+    foot.className = 'mt-3 text-xs text-red-700 font-medium';
+  } else {
+    card.classList.add('bg-white','border');
+    label.className = 'text-[11px] tracking-[.14em] uppercase font-medium text-slate-500';
+    dot.className = 'dot bg-slate-300';
+    foot.textContent = 'Sin alertas críticas';
+    foot.className = 'mt-3 text-xs text-slate-500';
+  }
+}
+
+function badgeEstado(estado){
+  const map = {
+    'Pendiente': ['bg-amber-50','text-amber-700','bg-amber-500'],
+    'Asignado':  ['bg-sky-50','text-sky-700','bg-sky-600'],
+    'Retirado':  ['bg-violet-50','text-violet-700','bg-violet-600'],
+    'Entregado': ['bg-emerald-50','text-emerald-700','bg-emerald-600']
+  };
+  const [bg, txt, dot] = map[estado] || ['bg-slate-100','text-slate-600','bg-slate-400'];
+  return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md ${bg} ${txt} text-xs font-medium"><span class="dot ${dot}"></span>${escapeHtml(estado)}</span>`;
+}
+
+function badgeDemurrage(r){
+  if (r.estado === 'Retirado' || r.estado === 'Entregado') return '<span class="text-xs text-slate-400">—</span>';
+  if (r.vencido) return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-100 text-red-800 text-xs font-mono font-semibold"><span class="dot bg-red-700 dot-pulse"></span>VENCIDO · ${Math.abs(r.horasRestantes)}h</span>`;
+  if (r.critico) return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 text-red-700 text-xs font-mono font-semibold"><span class="dot bg-red-600 dot-pulse"></span>${r.horasRestantes}h restantes</span>`;
+  if (r.horasRestantes !== null && r.horasRestantes < 96) return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 text-xs font-mono"><span class="dot bg-amber-500"></span>${r.horasRestantes}h</span>`;
+  const dias = Math.floor((r.horasRestantes||0)/24);
+  return `<span class="text-xs text-slate-500 font-mono">${dias}d ${r.horasRestantes%24}h</span>`;
+}
+
+function filteredRows(){
+  return DATA.filter(r => {
+    if (CURRENT_FILTER === 'critico'){
+      if (!(r.critico || r.vencido)) return false;
+      if (r.estado === 'Retirado' || r.estado === 'Entregado') return false;
+    } else if (CURRENT_FILTER !== 'all' && r.estado !== CURRENT_FILTER){
+      return false;
+    }
+    if (CURRENT_SEARCH){
+      const q = CURRENT_SEARCH.toLowerCase();
+      const hay = [r.contenedor, r.deposito, r.transporte, r.estado].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function render(){
+  paintKPIs(computeKPIs(DATA));
+  const rows = filteredRows();
+  $('#rowCount').textContent = rows.length + ' filas';
+  const tbody = $('#tbody');
+  if (rows.length === 0){
+    tbody.innerHTML = '';
+    $('#emptyState').classList.remove('hidden');
+    return;
+  }
+  $('#emptyState').classList.add('hidden');
+  tbody.innerHTML = rows.map(r => {
+    const rowCls = (r.vencido && r.estado !== 'Retirado' && r.estado !== 'Entregado') ? 'row-vencido' :
+                   (r.critico && r.estado !== 'Retirado' && r.estado !== 'Entregado') ? 'row-critical' : '';
+    const transporte = r.transporte ? `<span class="text-slate-800">${escapeHtml(r.transporte)}</span>` : `<span class="text-slate-400 italic">Sin asignar</span>`;
+    return `<tr class="border-b border-[color:var(--line)] ${rowCls}">
+        <td class="px-6 py-3.5 font-mono text-xs text-slate-600 whitespace-nowrap">${fmtFecha(r.fecha)}</td>
+        <td class="px-6 py-3.5 font-mono font-semibold text-slate-900">${escapeHtml(r.contenedor)}</td>
+        <td class="px-6 py-3.5 text-slate-700">${escapeHtml(r.deposito)}</td>
+        <td class="px-6 py-3.5">${transporte}</td>
+        <td class="px-6 py-3.5">${badgeEstado(r.estado)}</td>
+        <td class="px-6 py-3.5">${badgeDemurrage(r)}</td>
+        <td class="px-6 py-3.5 text-right">
+          <button data-edit="${escapeHtml(r.contenedor)}" class="px-3 py-1.5 rounded-md border border-[color:var(--line)] hover:border-slate-900 hover:bg-[color:var(--ink-900)] hover:text-white text-xs font-medium transition inline-flex items-center gap-1.5">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            Asignar / Editar
+          </button>
+        </td>
+      </tr>`;
+  }).join('');
+  $$('button[data-edit]').forEach(b => b.addEventListener('click', () => openModal(b.dataset.edit)));
+}
+
+function renderSkeleton(){
+  const tbody = $('#tbody');
+  tbody.innerHTML = Array(5).fill(0).map(() => `<tr class="border-b border-[color:var(--line)]">
+      ${Array(6).fill('<td class="px-6 py-4"><div class="sk h-3 w-24"></div></td>').join('')}
+      <td class="px-6 py-4 text-right"><div class="sk h-7 w-24 inline-block"></div></td></tr>`).join('');
+  $('#emptyState').classList.add('hidden');
+}
+
+function openModal(contenedorId){
+  const row = DATA.find(r => r.contenedor === contenedorId);
+  if (!row) return;
+  CURRENT_ROW = row;
+  $('#modalContenedor').textContent = row.contenedor;
+  $('#modalFecha').textContent = fmtFecha(row.fecha);
+  $('#modalDeposito').textContent = row.deposito || '—';
+  $('#inputTransporte').value = row.transporte || '';
+  $('#modalFeedback').textContent = '';
+  $('#guardarLabel').textContent = 'Guardar cambios';
+  $('#btnGuardar').disabled = false;
+  selectEstado(row.estado || 'Pendiente');
+  $('#modal').classList.remove('hidden');
+  setTimeout(() => $('#inputTransporte').focus(), 50);
+}
+
+function closeModal(){ $('#modal').classList.add('hidden'); CURRENT_ROW = null; }
+
+function selectEstado(estado){
+  SELECTED_ESTADO = estado;
+  $$('.estado-btn').forEach(b => {
+    if (b.dataset.estado === estado){
+      b.classList.add('border-slate-900','bg-slate-900','text-white');
+      b.classList.remove('border-[color:var(--line)]');
+    } else {
+      b.classList.remove('border-slate-900','bg-slate-900','text-white');
+      b.classList.add('border-[color:var(--line)]');
+    }
+  });
+}
+
+$$('.estado-btn').forEach(b => b.addEventListener('click', () => selectEstado(b.dataset.estado)));
+$$('[data-close]').forEach(el => el.addEventListener('click', closeModal));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+$('#btnGuardar').addEventListener('click', async () => {
+  if (!CURRENT_ROW) return;
+  const transporte = $('#inputTransporte').value.trim();
+  const estado     = SELECTED_ESTADO;
+  if (estado === 'Asignado' && !transporte){
+    $('#modalFeedback').innerHTML = '<span class="text-red-600 font-medium">Indica el transportista para marcar como Asignado.</span>';
+    return;
+  }
+  const payload = {
+    modulo: 'updateTransporte', hoja: 'PROGRAMACION PUERTO',
+    contenedor: CURRENT_ROW.contenedor, transporte, estado
+  };
+  $('#btnGuardar').disabled = true;
+  $('#guardarLabel').innerHTML = '<span class="flex items-center gap-2"><span class="spinner"></span>Guardando...</span>';
+  $('#modalFeedback').textContent = '';
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method:'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Error desconocido');
+    toast('Transporte actualizado correctamente', 'ok');
+    closeModal();
+    await fetchData();
+  } catch (err) {
+    $('#modalFeedback').innerHTML = '<span class="text-red-600 font-medium">Error: ' + escapeHtml(err.message) + '</span>';
+    $('#btnGuardar').disabled = false;
+    $('#guardarLabel').textContent = 'Reintentar';
+    toast('No se pudo guardar: ' + err.message, 'error');
+  }
+});
+
+$$('#filterSeg button').forEach(b => b.addEventListener('click', () => {
+  $$('#filterSeg button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  CURRENT_FILTER = b.dataset.filter;
+  render();
+}));
+$('#searchInput').addEventListener('input', e => { CURRENT_SEARCH = e.target.value; render(); });
+$('#btnRefresh').addEventListener('click', fetchData);
+
+fetchData();
+</script>
+</body>
+</html>
