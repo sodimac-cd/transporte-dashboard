@@ -1,590 +1,537 @@
-<html lang="es"><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>CD Lo Espejo — Transporte</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<base target="_top">
+<title>Torre de Control · Programación Puerto</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',sans-serif;background:#f0f2f8;color:#1a1a2e;height:100vh;overflow:hidden}
-.app{display:flex;height:100vh;overflow:hidden}
-.sb{width:215px;min-width:215px;background:#1a3a8f;color:#fff;display:flex;flex-direction:column;overflow-y:auto}
-.sb-logo{padding:16px;border-bottom:1px solid rgba(255,255,255,0.15)}
-.sb-logo .t{font-size:14px;font-weight:600}
-.sb-logo .s{font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px}
-.sb-sec{padding:8px 12px 4px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
-.si{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:13px;color:rgba(255,255,255,0.8);cursor:pointer;transition:background .15s}
-.si:hover{background:rgba(255,255,255,0.1);color:#fff}
-.si.on{background:rgba(255,255,255,0.18);color:#fff;font-weight:500}
-.si.sub{padding-left:28px;font-size:12px}
-.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.4);flex-shrink:0}
-.si.on .dot{background:#60c8ff}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{background:#2247b8;color:#fff;padding:0 20px;height:48px;display:flex;align-items:center;flex-shrink:0}
-.tl{font-size:13px;font-weight:600;margin-right:20px;white-space:nowrap}
-.tl span{font-size:11px;font-weight:400;opacity:.75;display:block}
-.navtabs{display:flex;height:100%;overflow-x:auto}
-.nt{padding:0 13px;font-size:13px;color:rgba(255,255,255,0.75);cursor:pointer;border-bottom:2px solid transparent;height:100%;display:flex;align-items:center;white-space:nowrap;transition:all .15s}
-.nt:hover{color:#fff;background:rgba(255,255,255,0.08)}
-.nt.on{color:#fff;border-bottom-color:#60c8ff;background:rgba(255,255,255,0.1)}
-.tr{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.tclock{font-size:12px;opacity:.75;white-space:nowrap}
-.tupd{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer}
-.content{flex:1;overflow-y:auto;padding:20px;background:#f0f2f8}
-.page{display:none}
-.ph{margin-bottom:18px}
-.ph h2{font-size:18px;font-weight:600}
-.ph p{font-size:13px;color:#666;margin-top:3px}
-.card{background:#fff;border:1px solid #e8eaf0;border-radius:10px;padding:16px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
-.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;flex-wrap:wrap}
-.ct{font-size:14px;font-weight:600}
-.chr{display:flex;align-items:center;gap:8px}
-.badge{background:#e8f0fe;color:#1a3a8f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
-table{width:100%;border-collapse:collapse;font-size:12.5px}
-th{text-align:left;padding:7px 8px;color:#888;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #eee}
-td{padding:8px;border-bottom:1px solid #f5f5f5}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#fafbff}
-.gps{background:#fff3cd;color:#856404;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;white-space:nowrap;display:inline-block}
-.pe{background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
-.pp{background:#fff3cd;color:#856404;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
-.pr{background:#e0e7ff;color:#3730a3;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
-.pc{background:#fee2e2;color:#991b1b;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
-.pd{background:#f3f4f6;color:#374151;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
-.btn{background:#fff;border:1px solid #d0d5e8;color:#444;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
-.btn:hover{background:#f0f2f8}
-.btn.blue{background:#1a3a8f;border-color:#1a3a8f;color:#fff}
-.btn.blue:hover{background:#15317a}
-.btn.green{background:#1d6f42;border-color:#1d6f42;color:#fff}
-.btn.green:hover{background:#155233}
-.sel-estado{border:1px solid #d0d5e8;border-radius:6px;padding:3px 6px;font-size:11px;font-weight:500;cursor:pointer;outline:none;background:#fff}
-.sel-estado.retirado{background:#d1fae5;color:#065f46;border-color:#6ee7b7}
-.sel-estado.en-ruta{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
-.sel-estado.cancelado{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
-.sel-estado.entregado{background:#ecfdf5;color:#047857;border-color:#34d399}
-.sel-estado.no-disponible{background:#f3f4f6;color:#6b7280;border-color:#d1d5db}
-.tabrow{display:flex;border-bottom:1.5px solid #e0e0e0;margin-bottom:18px}
-.tabb{padding:8px 16px;font-size:13px;color:#666;cursor:pointer;border:none;border-bottom:2px solid transparent;margin-bottom:-1.5px;background:none}
-.tabb.on{color:#1a3a8f;border-bottom-color:#1a3a8f;font-weight:500}
-.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
-.fg label{font-size:12px;color:#555;font-weight:500}
-.fg input,.fg select{padding:7px 10px;border:1px solid #d0d5e8;border-radius:6px;font-size:13px;background:#fff;color:#1a1a2e;outline:none}
-.fg input:focus,.fg select:focus{border-color:#1a3a8f}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.full{grid-column:1/-1}
-.ff{margin-top:14px;display:flex;gap:10px;justify-content:flex-end}
-.sdiv{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
-.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
-.sc{background:#fff;border-radius:8px;padding:14px;border:1px solid #e8eaf0}
-.sc .lbl{font-size:12px;color:#888;margin-bottom:4px}
-.sc .val{font-size:22px;font-weight:600}
-.sc .sub{font-size:11px;color:#aaa;margin-top:2px}
-.fr{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
-.fr select{padding:5px 9px;border:1px solid #d0d5e8;border-radius:6px;font-size:12px;background:#fff}
-.brow{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-.es{text-align:center;padding:36px;color:#aaa;font-size:13px}
-.qrgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-.qrc{background:#fff;border:1px solid #e8eaf0;border-radius:14px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:14px}
-.qrc h3{font-size:16px;font-weight:700;text-align:center}
-.qrs{font-size:12px;color:#888;text-align:center}
-.qrbox{background:#fff;padding:14px;border-radius:10px;border:1.5px solid #e8eaf0;display:flex;align-items:center;justify-content:center;min-height:200px;min-width:200px}
-.qrurl{background:#f0f4ff;border:1px solid #d0d8f0;border-radius:8px;padding:7px 12px;font-size:11px;color:#445;font-family:monospace;text-align:center;word-break:break-all;width:100%}
-.qrprint{background:#1a3a8f;color:#fff;border:none;padding:11px 28px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%}
+  :root{
+    --ink-900:#0B1220; --ink-700:#1E293B; --ink-500:#475569; --ink-300:#CBD5E1;
+    --paper:#F6F7F9; --line:#E5E8EE;
+    --accent:#0F62FE; --critical:#DC2626; --warn:#D97706; --ok:#059669; --info:#0369A1;
+  }
+  *{ -webkit-font-smoothing: antialiased; }
+  html,body{ background: var(--paper); font-family:'Inter',sans-serif; color: var(--ink-900); }
+  .font-display{ font-family:'Bricolage Grotesque',sans-serif; letter-spacing:-.02em; }
+  .font-mono{ font-family:'JetBrains Mono',monospace; }
+  .dot{ width:8px; height:8px; border-radius:9999px; display:inline-block; }
+  .dot-pulse{ position:relative; }
+  .dot-pulse::after{
+    content:''; position:absolute; inset:-4px; border-radius:9999px;
+    background:inherit; opacity:.35; animation: pulse 1.6s ease-out infinite;
+  }
+  @keyframes pulse{ 0%{transform:scale(.6);opacity:.55} 100%{transform:scale(2.2);opacity:0} }
+  .tile{ transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+  .tile:hover{ transform: translateY(-2px); }
+  tbody tr{ transition: background-color .15s ease; }
+  tbody tr:hover{ background:#FBFCFE; }
+  .modal-backdrop{ animation: fadeIn .18s ease both; }
+  .modal-card{ animation: popIn .22s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+  @keyframes popIn{ from{opacity:0; transform: translateY(8px) scale(.98)} to{opacity:1; transform:none} }
+  .toast{ animation: slideIn .25s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes slideIn{ from{opacity:0; transform: translateY(-8px)} to{opacity:1; transform:none} }
+  .spinner{ width:14px; height:14px; border:2px solid currentColor; border-right-color:transparent; border-radius:9999px; animation: spin .7s linear infinite; }
+  @keyframes spin{ to{ transform: rotate(360deg) } }
+  thead th{ text-transform: uppercase; letter-spacing:.08em; font-size:11px; font-weight:600; color:#64748B; }
+  .row-critical{ box-shadow: inset 3px 0 0 var(--critical); }
+  .row-vencido{ box-shadow: inset 3px 0 0 #7F1D1D; background:#FEF2F2; }
+  .seg{ display:inline-flex; padding:3px; background:#F1F4F9; border-radius:10px; border:1px solid var(--line); }
+  .seg button{ font-size:12px; font-weight:500; padding:6px 12px; border-radius:7px; color:#475569; transition: all .15s ease; }
+  .seg button.active{ background:white; color:var(--ink-900); box-shadow: 0 1px 2px rgba(15,23,42,.08); }
+  input:focus, select:focus{ outline:none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,98,254,.12); }
+  .divider-label{ display:flex; align-items:center; gap:10px; color:#94A3B8; font-size:11px; letter-spacing:.12em; text-transform:uppercase; }
+  .divider-label::before, .divider-label::after{ content:''; flex:1; height:1px; background: var(--line); }
+  .sk{ background: linear-gradient(90deg, #EEF1F6 25%, #F6F8FB 50%, #EEF1F6 75%); background-size: 200% 100%; animation: sh 1.4s linear infinite; border-radius:6px; }
+  @keyframes sh{ 0%{ background-position: 200% 0 } 100%{ background-position: -200% 0 } }
 </style>
-<script src="chrome-extension://liecbddmkiiihnedobmlmillhodjkdmb/js/recordConsoleEvents.js"></script></head>
-<body>
-<div class="app">
-<div class="sb">
-  <div class="sb-logo">
-    <div style="width:32px;height:32px;background:#60c8ff;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 3h18v4H3zM3 10h12v4H3zM3 17h8v4H3z" fill="#1a3a8f"></path></svg></div>
-    <div class="t">CD Lo Espejo</div><div class="s">Área de Transporte</div>
+</head>
+<body class="min-h-screen">
+
+<header class="border-b border-[color:var(--line)] bg-white">
+  <div class="max-w-[1400px] mx-auto px-8 py-5 flex items-center justify-between gap-6">
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-lg bg-[color:var(--ink-900)] grid place-items-center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
+          <path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6M9 12h.01M15 12h.01"/>
+        </svg>
+      </div>
+      <div>
+        <div class="text-[11px] tracking-[.18em] text-slate-500 font-medium uppercase">Torre de Control</div>
+        <h1 class="font-display text-[22px] font-semibold leading-tight">Programación Puerto</h1>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="text-right">
+        <div class="text-[10px] tracking-[.18em] text-slate-400 uppercase">Hora local</div>
+        <div id="liveClock" class="font-mono text-sm font-medium tabular-nums">--:--:--</div>
+      </div>
+      <div class="h-8 w-px bg-[color:var(--line)]"></div>
+      <div class="flex items-center gap-2">
+        <span id="connDot" class="dot bg-slate-300"></span>
+        <span id="connText" class="text-xs font-medium text-slate-500">Conectando...</span>
+      </div>
+      <button id="btnRefresh" class="px-3 py-2 rounded-lg border border-[color:var(--line)] hover:border-slate-400 bg-white text-sm font-medium flex items-center gap-2 transition">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.3L3 16M3 21v-5h5"/>
+        </svg>
+        Recargar
+      </button>
+    </div>
   </div>
-  <div class="sb-sec">Principal</div>
-  <div class="si on" id="sb-dashboard" onclick="SP('dashboard')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8"></rect><rect x="13" y="3" width="8" height="8"></rect><rect x="3" y="13" width="8" height="8"></rect><rect x="13" y="13" width="8" height="8"></rect></svg> Dashboard</div>
-  <div class="sb-sec">Módulos</div>
-  <div class="si" id="sb-abastecimiento" onclick="SP('abastecimiento')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 7h-4V5a2 2 0 00-4 0v2H8L6 21h12L20 7z"></path></svg> Abastecimiento Tienda</div>
-  <div class="si" id="sb-despacho" onclick="SP('despacho')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M1 3h15v13H1zm15 4l5 3v6h-5z"></path></svg> Despacho a Domicilio</div>
-  <div class="si" id="sb-contenedores" onclick="SP('contenedores')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="20" height="14" rx="1"></rect><path d="M7 7V5a2 2 0 014 0v2"></path></svg> Contenedores</div>
-  <div class="si sub" id="sb-programacion" onclick="SP('programacion')"><span class="dot"></span> Programación RM</div>
-  <div class="si sub" id="sb-progpuerto" onclick="SP('progpuerto')"><span class="dot"></span> Programa Puerto</div>
-  <div class="si sub" id="sb-retiro" onclick="SP('retiro')"><span class="dot"></span> Retiro Puerto</div>
-  <div class="si sub" id="sb-devolucion" onclick="SP('devolucion')"><span class="dot"></span> Devolución Vacíos</div>
-  <div class="si sub" id="sb-qr" onclick="SP('qr')"><span class="dot"></span> Códigos QR</div>
-  <div class="sb-sec">Sistema</div>
-  <div class="si" id="sb-config" onclick="SP('config')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg> Configuración</div>
-</div>
-<div class="main">
-  <div class="topbar">
-    <div class="tl">CD Lo Espejo <span>Área de Transporte</span></div>
-    <div class="navtabs">
-      <div class="nt" id="nt-metricas" onclick="SP('metricas')">Métricas</div>
-      <div class="nt" id="nt-config" onclick="SP('config')">Configuración</div>
-    </div>
-    <div class="tr"><span class="tclock" id="clk">dom, 10 may 2026 · 10:07 a.&nbsp;m.</span><button class="tupd" onclick="cargar()">↻ Actualizar</button></div>
-  </div>
-  <div class="content">
+</header>
 
-    <div id="page-dashboard" class="page" style="display: block;">
-      <div class="ph"><h2>Dashboard de Transporte</h2><p>Resumen general de todos los módulos</p></div>
-      <div class="sg">
-        <div class="sc"><div class="lbl">Total programado</div><div class="val" id="d-tot">81</div><div class="sub">contenedores</div></div>
-        <div class="sc"><div class="lbl">Entregados</div><div class="val" id="d-ent">0</div><div class="sub">confirmados</div></div>
-        <div class="sc"><div class="lbl">Pendientes</div><div class="val" id="d-pen">2</div><div class="sub">sin confirmar</div></div>
-        <div class="sc"><div class="lbl">Demurrage crítico</div><div class="val" id="d-dem">81</div><div class="sub">&lt;10 días libres</div></div>
+<main class="max-w-[1400px] mx-auto px-8 py-8">
+
+  <section class="grid grid-cols-12 gap-4 mb-8">
+
+    <article class="tile col-span-12 md:col-span-3 bg-white rounded-xl border border-[color:var(--line)] p-5 hover:shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="text-[11px] tracking-[.14em] text-slate-500 uppercase font-medium">Pendientes</div>
+        <span class="dot bg-amber-500"></span>
       </div>
-      <div class="card">
-        <div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><div class="chr"><span class="badge" id="d-rcnt">22</span><button class="btn green" onclick="xls('retiro','Retiro_Puerto')" style="padding:4px 10px;font-size:11px">↓ Excel</button></div></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Estado</th><th>Creado</th></tr></thead><tbody id="d-rtb"><tr><td>02-05-2026</td><td>HGT SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>TEST</td><td>12345678-9</td><td>AB1234</td><td>CD5678</td><td><span class="gps">GPS</span></td><td><select class="sel-estado en-ruta" data-rut="12345678-9" data-tracto="AB1234" onchange="cambiarEstado(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA" selected="">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>02-05-2026</td><td>HGT SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>TEST</td><td>12345678-9</td><td>AB1234</td><td>CD5678</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="12345678-9" data-tracto="AB1234" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:27:19 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>CASABLANCA</td><td>FREDDY ARAYA</td><td>11870024-4</td><td>KGBX44</td><td>JK53154</td><td><span class="gps">GPS</span></td><td><select class="sel-estado entregado" data-rut="11870024-4" data-tracto="KGBX44" onchange="cambiarEstado(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO" selected="">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>CASABLANCA</td><td>PATRICIO VEGA</td><td>8437274-9</td><td>LVHS68</td><td>JC. 8451</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="8437274-9" data-tracto="LVHS68" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>CASABLANCA</td><td>FREDDY ARAYA</td><td>11870024-4</td><td>KGBX44</td><td>JK53154</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="11870024-4" data-tracto="KGBX44" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>CASABLANCA</td><td>CRISTIAN PLAZA</td><td>13916071-1</td><td>JFWC94</td><td>JK5525</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="13916071-1" data-tracto="JFWC94" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>FR RENTAL</td><td>Nelson Andara</td><td>27.101.338-8</td><td>BZCL46</td><td>JL9554</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="27.101.338-8" data-tracto="BZCL46" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>FR RENTAL</td><td>Nelson Andara</td><td>27.101.338-8</td><td>BZCL46</td><td>JL9554</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="27.101.338-8" data-tracto="BZCL46" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>FR RENTAL</td><td>Carlos Castro</td><td>12.840.452-K</td><td>BWBK64</td><td>JF6668</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="12.840.452-K" data-tracto="BWBK64" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>FR RENTAL</td><td>Carlos Castro</td><td>12.840.452-K</td><td>BWBK64</td><td>JF6668</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="12.840.452-K" data-tracto="BWBK64" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>FR RENTAL</td><td>Mauricio Rivera</td><td>8.409.199-5</td><td>YU3564</td><td>JF4160</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="8.409.199-5" data-tracto="YU3564" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>Jose&nbsp; Yepez</td><td>26457136-7</td><td>FHFB-89</td><td>JJ-2627</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="26457136-7" data-tracto="FHFB-89" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>Andres&nbsp;Merentes</td><td>26317967-6</td><td>HLFZ-41</td><td>JB-2115</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="26317967-6" data-tracto="HLFZ-41" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>Jose&nbsp;Matamala</td><td>9187481-4</td><td>JWCG-61</td><td>JJ-5984</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="9187481-4" data-tracto="JWCG-61" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>Ricardo&nbsp;Valenzuela</td><td>11742160-0</td><td>DKSG-38</td><td>JB-2310</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="11742160-0" data-tracto="DKSG-38" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>JUC</td><td>ARMANDO MATEO</td><td>25.191.219-K</td><td>KCTC-58</td><td>JB-5997</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="25.191.219-K" data-tracto="KCTC-58" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>JUC</td><td>JHON CONGOLINO</td><td>27.104.919-6</td><td>GWXH-14</td><td>JA-1111</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="27.104.919-6" data-tracto="GWXH-14" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>JUC</td><td>JOSE PEREZ</td><td>12.939.515-K</td><td>LJKX-20</td><td>JG-3552</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="12.939.515-K" data-tracto="LJKX-20" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>JUC</td><td>SALVADOR SEDAN</td><td>10.888.919-5</td><td>LJWB-32</td><td>HGJS-64</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="10.888.919-5" data-tracto="LJWB-32" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>JUC</td><td>PEDRO TOBAR</td><td>7.772.649-7</td><td>LLXG-79</td><td>JJ-2907</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="7.772.649-7" data-tracto="LLXG-79" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>09-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>85.131.900-K CASABLANCA</td><td>Jun perez</td><td>123456</td><td>GWYDV</td><td>VWUW</td><td><span class="gps">—</span></td><td><select class="sel-estado " data-rut="123456" data-tracto="GWYDV" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">09-05-2026</td></tr><tr><td>09-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>76.501.883-8 CASTELLINI</td><td>Efe</td><td>12309</td><td>123</td><td>H1B</td><td><span class="gps">—</span></td><td><select class="sel-estado " data-rut="12309" data-tracto="123" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">09-05-2026</td></tr></tbody></table></div>
+      <div class="mt-3 flex items-baseline gap-2">
+        <div id="kpiPendientes" class="font-display text-5xl font-semibold tabular-nums">—</div>
+        <div class="text-xs text-slate-400">contenedores</div>
       </div>
-      <div class="card">
-        <div class="ch"><span class="ct">Devoluciones Vacíos Navieros</span><div class="chr"><span class="badge" id="d-dcnt">3</span><button class="btn green" onclick="xls('devolucion','Devolucion_Vacios')" style="padding:4px 10px;font-size:11px">↓ Excel</button></div></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Transporte</th><th>Contenedor</th><th>EIR</th><th>Creado</th></tr></thead><tbody id="d-dtb"><tr><td>09-05-2026</td><td>CIS SAN ANTONIO</td><td>85.131.900-K CASABLANCA</td><td>VSBDJEJ123</td><td>1234</td><td style="font-size:11px;color:#999">09-05-2026</td></tr><tr><td>09-05-2026</td><td>SITRANS SAN ANTONIO</td><td>85.131.900-K CASABLANCA</td><td>WQAS16499</td><td>1234</td><td style="font-size:11px;color:#999">09-05-2026</td></tr><tr><td>10-05-2026</td><td>SITRANS SAN ANTONIO</td><td>76.421.758-6 SERMOV</td><td>GTHS1234</td><td>1234</td><td style="font-size:11px;color:#999">10-05-2026</td></tr></tbody></table></div>
+      <div class="mt-3 text-xs text-slate-500">A la espera de asignación</div>
+    </article>
+
+    <article class="tile col-span-12 md:col-span-3 bg-white rounded-xl border border-[color:var(--line)] p-5 hover:shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="text-[11px] tracking-[.14em] text-slate-500 uppercase font-medium">Asignados</div>
+        <span class="dot bg-sky-600"></span>
+      </div>
+      <div class="mt-3 flex items-baseline gap-2">
+        <div id="kpiAsignados" class="font-display text-5xl font-semibold tabular-nums">—</div>
+        <div class="text-xs text-slate-400">con transporte</div>
+      </div>
+      <div class="mt-3 text-xs text-slate-500">Listos para retiro</div>
+    </article>
+
+    <article id="kpiCriticosCard" class="tile col-span-12 md:col-span-3 bg-white rounded-xl border border-[color:var(--line)] p-5 hover:shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="text-[11px] tracking-[.14em] uppercase font-medium" id="kpiCriticosLabel">Demurrage Crítico</div>
+        <span id="kpiCriticosDot" class="dot bg-slate-300"></span>
+      </div>
+      <div class="mt-3 flex items-baseline gap-2">
+        <div id="kpiCriticos" class="font-display text-5xl font-semibold tabular-nums">—</div>
+        <div class="text-xs text-slate-400">&lt; 48 h libres</div>
+      </div>
+      <div id="kpiCriticosFoot" class="mt-3 text-xs text-slate-500">Sin alertas críticas</div>
+    </article>
+
+    <article class="tile col-span-12 md:col-span-3 bg-[color:var(--ink-900)] text-white rounded-xl p-5">
+      <div class="flex items-start justify-between">
+        <div class="text-[11px] tracking-[.14em] uppercase font-medium text-slate-400">Total flota</div>
+        <span class="dot bg-emerald-400 dot-pulse"></span>
+      </div>
+      <div class="mt-3 flex items-baseline gap-2">
+        <div id="kpiTotal" class="font-display text-5xl font-semibold tabular-nums">—</div>
+        <div class="text-xs text-slate-500">registros</div>
+      </div>
+      <div class="mt-3 text-xs text-slate-400 flex items-center gap-3">
+        <span><span id="kpiRetirados">0</span> retirados</span>
+        <span class="w-px h-3 bg-slate-700"></span>
+        <span><span id="kpiEntregados">0</span> entregados</span>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="bg-white rounded-xl border border-[color:var(--line)] overflow-hidden">
+
+    <div class="px-6 py-4 border-b border-[color:var(--line)] flex flex-wrap items-center gap-4">
+      <div class="flex items-center gap-2">
+        <h2 class="font-display text-lg font-semibold">Operaciones</h2>
+        <span id="rowCount" class="text-xs text-slate-400 font-mono">0 filas</span>
+      </div>
+      <div class="seg" id="filterSeg">
+        <button data-filter="all" class="active">Todos</button>
+        <button data-filter="Pendiente">Pendientes</button>
+        <button data-filter="Asignado">Asignados</button>
+        <button data-filter="critico">Críticos</button>
+      </div>
+      <div class="flex-1"></div>
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="searchInput" type="text" placeholder="Buscar contenedor, depósito, transporte..."
+               class="pl-9 pr-3 py-2 w-72 rounded-lg border border-[color:var(--line)] text-sm bg-white">
       </div>
     </div>
 
-    <div id="page-contenedores" class="page" style="display: none;">
-      <div class="ph"><h2>Centro de Control — Contenedores</h2><p>KPIs en tiempo real del programa activo</p></div>
-      <div class="sg" style="grid-template-columns:repeat(4,1fr)">
-        <div class="sc"><div class="lbl">Total programado</div><div class="val" id="c-tot">81</div><div class="sub">contenedores</div></div>
-        <div class="sc"><div class="lbl">Cumplimiento</div><div class="val" id="c-cumpl" style="color:#059669">0%</div><div class="sub">% entregado</div></div>
-        <div class="sc"><div class="lbl">Demurrage crítico</div><div class="val" id="c-dem2" style="color:#dc2626">0</div><div class="sub">&lt;10 días libres</div></div>
-        <div class="sc"><div class="lbl">Retiro Puerto</div><div class="val" id="c-r">22</div><div class="sub">asignaciones</div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-        <div class="card"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:10px">Por estado</div>
-          <div id="kpi-leg-e" style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:#666;margin-bottom:8px"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#059669;display:inline-block"></span>ENTREGAO 25</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#6366f1;display:inline-block"></span>RETIRADO 1</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#f59e0b;display:inline-block"></span>PENDIENTE 2</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#dc2626;display:inline-block"></span>POR ARRIBAR 53</span></div>
-          <div style="position:relative;height:160px"><canvas id="kpi-c1" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-[#FAFBFD] border-b border-[color:var(--line)]">
+          <tr>
+            <th class="text-left px-6 py-3">Fecha</th>
+            <th class="text-left px-6 py-3">Contenedor</th>
+            <th class="text-left px-6 py-3">Depósito Destino</th>
+            <th class="text-left px-6 py-3">Transporte</th>
+            <th class="text-left px-6 py-3">Estado</th>
+            <th class="text-left px-6 py-3">Demurrage</th>
+            <th class="text-right px-6 py-3">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div id="emptyState" class="hidden px-6 py-16 text-center">
+      <div class="font-display text-base text-slate-700">Sin resultados</div>
+      <div class="text-sm text-slate-500 mt-1">Ajusta los filtros o recarga la operación.</div>
+    </div>
+
+    <div class="border-t border-[color:var(--line)] px-6 py-3 flex items-center justify-between text-xs text-slate-500">
+      <div class="font-mono">SHEET · 1KvR2I-hmosy-BulD6JeztFyPYO5-XYqQiTDlnhw_rZQ</div>
+      <div id="lastSync">Sin sincronización</div>
+    </div>
+  </section>
+</main>
+
+<div id="modal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm modal-backdrop" data-close></div>
+  <div class="relative h-full w-full grid place-items-center p-4">
+    <div class="modal-card relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-[color:var(--line)]">
+      <div class="px-6 py-5 border-b border-[color:var(--line)] flex items-start justify-between">
+        <div>
+          <div class="text-[11px] tracking-[.18em] text-slate-500 uppercase">Asignar transporte</div>
+          <div class="mt-1 font-mono text-base font-semibold" id="modalContenedor">—</div>
         </div>
-        <div class="card"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:10px">Por Bodega</div>
-          <div id="kpi-leg-t" style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:#666;margin-bottom:8px"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#3266ad;display:inline-block"></span>LA FARFANA 257 30</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#64748b;display:inline-block"></span>LO ESPEJO 15</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#94a3b8;display:inline-block"></span>LA FARFANA 214 15</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#1d6f42;display:inline-block"></span>CD 15</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#f59e0b;display:inline-block"></span>LO RUIZ 4</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#dc2626;display:inline-block"></span>RENGO 2</span></div>
-          <div style="position:relative;height:160px"><canvas id="kpi-c2" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
-        </div>
+        <button data-close class="text-slate-400 hover:text-slate-700 p-1 -mr-1">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
       </div>
-      <div class="card" style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:10px">Por depósito de origen</div>
-        <div style="position:relative;height:120px"><canvas id="kpi-c3" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
-      </div>
-      <div class="card" id="kpi-alerts" style="display:none;margin-bottom:12px">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#dc2626;margin-bottom:10px">Alertas demurrage</div>
-        <div id="kpi-alert-list" style="display:flex;flex-direction:column;gap:6px"></div>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn blue" onclick="SP('programacion')">Programación →</button>
-        <button class="btn" onclick="SP('retiro')">Retiro Puerto →</button>
-        <button class="btn" onclick="SP('devolucion')">Devolución Vacíos →</button>
-        <button class="btn" onclick="SP('qr')">Códigos QR →</button>
-      </div>
-    </div>
-
-    <div id="page-programacion" class="page" style="display: none;">
-      <div class="ph"><h2>Programación RM</h2><p>Programa activo del día</p></div>
-      <div class="sg">
-        <div class="sc"><div class="lbl">Total</div><div class="val" id="pg-t">81</div></div>
-        <div class="sc"><div class="lbl">Entregados</div><div class="val" id="pg-e">0</div></div>
-        <div class="sc"><div class="lbl">Pendientes</div><div class="val" id="pg-p">2</div></div>
-        <div class="sc"><div class="lbl">Demurrage crítico</div><div class="val" id="pg-d">81</div><div class="sub">&lt;10 días</div></div>
-      </div>
-      <div class="fr">
-        <select id="pg-ft" onchange="filterPG()"><option value="">Tipo: Todos</option><option>HC</option><option>STD</option><option>DRY</option></select>
-        <select id="pg-fe" onchange="filterPG()"><option value="">Estado: Todos</option><option>PENDIENTE</option><option>ENTREGADO</option><option>DESCONSOLIDADO</option><option>REPROGRAMADO</option><option>CANCELADO</option></select>
-        <button class="btn green" onclick="xls('programacion','Programacion')" style="margin-left:auto;padding:5px 12px;font-size:12px">↓ Excel</button>
-      </div>
-      <div class="card">
-        <div class="ch"><span class="ct">Contenedores programados</span><span class="badge" id="pg-cnt">81</span></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Fecha</th><th>Hora</th><th>Depósito</th><th>Tipo</th><th>Cap</th><th>Contenedor</th><th>Peso</th><th>Demurrage</th><th>BL</th><th>SKU</th><th>Descripción</th><th>Transporte</th><th>Bodega</th><th>Servicio</th><th>Estado</th></tr></thead><tbody id="pg-tb"><tr><td>1</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>FANU1040977</td><td>9108</td><td>-24</td><td>HLCUDL22601AQWZ8</td><td>9150994</td><td>SIDING RANU 16X350MM 3,8M GRIS</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESCONSOLIDADO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FANU1040977" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>2</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>HAMU2648661</td><td>9667</td><td>-40</td><td>HLCUNG12511RPZV9</td><td>9072438</td><td>CHIMENEA ELEC MURO O INSERTA</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HAMU2648661" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>3</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>UACU4066370</td><td>1443</td><td>-40</td><td>HLCUSZX2603ATZX2</td><td>9133445</td><td>TENDEDERO BLACK CON BANDEJA</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado retirado" data-hoja="PROGRAMACION ACTUAL" data-cont="UACU4066370" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO" selected="">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>4</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>FFAU4827514</td><td>11082</td><td>-35</td><td>264652761</td><td>8995729</td><td>SET 2 SILLA BAR C GAS STRUL NG</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FFAU4827514" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>5</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>FANU3765638</td><td>5902</td><td>-37</td><td>HLCUSZX2602BSVU9</td><td>2849011</td><td>PLAFON LIGHTWOOD 1XE27, BRANC</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FANU3765638" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>6</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>FCIU5986082</td><td>2783</td><td>-37</td><td>HLCUNG12511RQBR5</td><td>8814872</td><td>PACK2 FAROL MURO SOLAR CUAD NG</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FCIU5986082" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>7</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>DRY</td><td>40</td><td>HLBU1396502</td><td>3939</td><td>-37</td><td>HLCUNG12511RQEB6</td><td>287198X</td><td>FAROL MURO E27 4LADOS OXFORD</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HLBU1396502" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>8</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>HLBU3996609</td><td>11072</td><td>-37</td><td>HLCUMA3260126150</td><td>9015108</td><td>LIMPIAPIES COC SAY HELLO 45X75</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HLBU3996609" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>9</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>HLXU1177688</td><td>2361</td><td>-37</td><td>HLCUNG12511RQDD2</td><td>2814021</td><td>TOALLERO BARRA 45 CM VIENA</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HLXU1177688" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>10</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>UACU5894506</td><td>8793</td><td>-39</td><td>HLCUNG12511RQBY2</td><td>9057730</td><td>SILLA GAMER MASAJ MATRIX BC/NG</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="UACU5894506" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>11</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>CMAU3641419</td><td>8648</td><td>-38</td><td>TYO0734625</td><td>2898322</td><td>ESTUFA PARAFINA LC-28 CLAS TOY</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="CMAU3641419" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>12</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>TCLU6447843</td><td>6267</td><td>-38</td><td>TYO0734628</td><td>638552</td><td>ESTUFA PARAFINA OMNI 230 TOYOT</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TCLU6447843" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>13</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>TRHU7981089</td><td>11646</td><td>-39</td><td>SGN3092996</td><td>3286770</td><td>SET 2 MACET CEUTA PI3761B2</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TRHU7981089" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>14</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>TXGU7301513</td><td>6267</td><td>-38</td><td>TYO0734628</td><td>638552</td><td>ESTUFA PARAFINA OMNI 230 TOYOT</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TXGU7301513" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>15</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>NIDU5228308</td><td>13548</td><td>-39</td><td>HLCUNG12511RQCC6</td><td>2318946</td><td>VELO BORD 2P 140X230 PRES BCO</td><td>DEPOSITO CD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="NIDU5228308" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>16</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>CAIU9774782</td><td>13925</td><td>-39</td><td>HLCUNG12511RPYT0</td><td>406545X</td><td>MAMPARA AJUST 6MM 135-135X185</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="CAIU9774782" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>17</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>TCNU1815220</td><td>15526</td><td>-39</td><td>HLCUNG12511RPYT0</td><td>261538X</td><td>CABINA CUR 6MM 6J 90X90</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TCNU1815220" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>18</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>TCNU7420968</td><td>12954</td><td>-39</td><td>HLCUNG12511RPXL8</td><td>3933865</td><td>BOTIQUIN 58X66X22 C/ESPEJO</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TCNU7420968" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>19</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>DRY</td><td>40</td><td>UACU6042269</td><td>4693</td><td>-3660</td><td>—</td><td>9163751</td><td>LANA VIDRIO 50MM R139 1,2X24M</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="UACU6042269" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>20</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>HAMU1169880</td><td>19584</td><td>-40</td><td>HLCUSZX2602BSTV4</td><td>5460204</td><td>ONE PIECE ROMA</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HAMU1169880" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>21</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>HLBU1032497</td><td>8541</td><td>-40</td><td>HLCUSZX2602BSTV4</td><td>5460204</td><td>ONE PIECE ROMA</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HLBU1032497" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>22</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>DRY</td><td>40</td><td>HAMU4973383</td><td>5428</td><td>-3660</td><td>—</td><td>1612646</td><td>TROMPO VOLTEO 130L 0,8HP BAUKE</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HAMU4973383" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>23</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>DRY</td><td>40</td><td>FCIU9087172</td><td>5508</td><td>-3660</td><td>—</td><td>913395X</td><td>SANITARIO TWO PIECES ZULU</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FCIU9087172" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>24</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>DRY</td><td>40</td><td>FCIU9087172 1</td><td>4080</td><td>-3660</td><td>—</td><td>913395X</td><td>SANITARIO TWO PIECES ZULU</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FCIU9087172 1" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>25</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>DRY</td><td>40</td><td>FCIU9087172 2</td><td>4080</td><td>-3660</td><td>—</td><td>913395X</td><td>SANITARIO TWO PIECES ZULU</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FCIU9087172 2" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>26</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>DRY</td><td>40</td><td>FCIU9087172 3</td><td>4080</td><td>-3660</td><td>—</td><td>913395X</td><td>SANITARIO TWO PIECES ZULU</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FCIU9087172 3" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>27</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>DRY</td><td>40</td><td>MRKU1026430</td><td>18524</td><td>-37</td><td>266998636</td><td>943746</td><td>TINA AC-ESMAL 140 BLANCA</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="MRKU1026430" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>28</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>DRY</td><td>40</td><td>CMAU7553933</td><td>18452</td><td>-23</td><td>SNG0495788</td><td>9065946</td><td>PISO LAM 8MM B AC4 WR24 2,22M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="CMAU7553933" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>29</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>DRY</td><td>40</td><td>CMAU8864436</td><td>20205</td><td>-37</td><td>SNG0497766</td><td>8775311</td><td>PLAM 8MM OAK BRWN GR 1,99 M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="CMAU8864436" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>30</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>DRY</td><td>40</td><td>MRKU0476011</td><td>18720</td><td>-29</td><td>266638635</td><td>8775222</td><td>PLAM 8MM OAK BRWN 1,99M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="MRKU0476011" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>31</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>MRKU6908581</td><td>18612</td><td>-29</td><td>267157440</td><td>302489X</td><td>PISO LAMINA 7MM WINTER 2,390M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="MRKU6908581" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>32</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>TEMU0029294</td><td>23400</td><td>-33</td><td>GGZ2903101</td><td>9004149</td><td>PORCELANA VETA BC 60X60 1,44M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TEMU0029294" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>33</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>TEMU2200240</td><td>18144</td><td>-38</td><td>HLCUSGN2601AZJP0</td><td>8992878</td><td>SPC XL CENTENI 5,0/1 IX 1,74M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TEMU2200240" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>34</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>TRHU3628387</td><td>23400</td><td>-33</td><td>GGZ2903101</td><td>9004149</td><td>PORCELANA VETA BC 60X60 1,44M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TRHU3628387" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>35</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>TRHU3731902</td><td>24375</td><td>-33</td><td>GGZ2903101</td><td>9088652</td><td>PORCELANATO MAR GR 60X60 1,44M</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TRHU3731902" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>36</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>UACU3956002</td><td>23199</td><td>-33</td><td>HLCUSS5260362530</td><td>8989907</td><td>CERAMICA ORLANDO 45X45 2,0M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="UACU3956002" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>37</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>MRKU7791993</td><td>23230</td><td>-35</td><td>266826123</td><td>9002456</td><td>PORCELANATO CEM GR 60X60 1,44M</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="MRKU7791993" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>38</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>MRKU9961609</td><td>23512</td><td>-35</td><td>266715852</td><td>8919321</td><td>GR LISO BEIGE ST 60X60 1,44M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="MRKU9961609" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>39</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>TCLU3966681</td><td>23664</td><td>-33</td><td>GGZ2903101</td><td>9004165</td><td>PORCELANATO RU GRA 60X60 1,44M</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TCLU3966681" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>40</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>TEMU4652430</td><td>22957</td><td>-35</td><td>266715852</td><td>8919402</td><td>GR RST GREIGE MT 60X60 1,44M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TEMU4652430" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>41</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>TGHU0169636</td><td>23221</td><td>-35</td><td>266826123</td><td>8919291</td><td>GRES RST DK GREY 60X60 1,44M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TGHU0169636" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>42</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>CMAU0623216</td><td>21754</td><td>-30</td><td>IBC1460744</td><td>8986193</td><td>POR PURSUE BLUE 60X120 1,44M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="CMAU0623216" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>43</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>CMAU2840041</td><td>24650</td><td>-33</td><td>GGZ2903101</td><td>9004165</td><td>PORCELANATO RU GRA 60X60 1,44M</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="CMAU2840041" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>44</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>MRKU6743054</td><td>23230</td><td>-35</td><td>266826123</td><td>9002391</td><td>POR CEM DARK 60X60 1,44M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="MRKU6743054" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>45</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>FCIU6104105</td><td>23180</td><td>-37</td><td>HLCUXM1251235006</td><td>8860564</td><td>GR HOME LT TAN 15X90 1,08M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FCIU6104105" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>46</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>HAMU1070270</td><td>22800</td><td>-37</td><td>HLCUXM1251235006</td><td>8919364</td><td>PORCELANATO 20X100 WAS BRI 1M2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 257</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HAMU1070270" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>47</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>DFSU1980372</td><td>23328</td><td>-18</td><td>GGZ2884974</td><td>8708983</td><td>PORCELANATO 60X60 SS BG 1,44M2</td><td>SODIMAC</td><td>BODEGA LO RUIZ</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="DFSU1980372" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>48</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>CMAU2186917</td><td>21614</td><td>-26</td><td>FOC0343529</td><td>1791893</td><td>CERAMICA 20X30 BLANCA EN M 1.5</td><td>SODIMAC</td><td>BODEGA LO RUIZ</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="CMAU2186917" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>49</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>HLBU1385766</td><td>8127</td><td>-38</td><td>HLCUNG12511RPXK6</td><td>1783548</td><td>ESPEJO CON REPISA 45X60 CMS</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HLBU1385766" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>50</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>MSKU0702316</td><td>10752</td><td>-35</td><td>264489642</td><td>3772446</td><td>JUEGO COMEDOR GRAPH</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="MSKU0702316" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>51</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>HC</td><td>40</td><td>TRHU8916180</td><td>18720</td><td>-30</td><td>SNG0499323</td><td>8775222</td><td>PLAM 8MM OAK BRWN 1,99M2</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TRHU8916180" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>52</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>HLBU1745522</td><td>21900</td><td>-38</td><td>HLCUTS1251114528</td><td>3678881</td><td>PIEDRA 60X15 MOSA MULT OXI 0,6</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HLBU1745522" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>53</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>DAYU2163900</td><td>26352</td><td>-32</td><td>HLCUSS52604RBYP9</td><td>2906619</td><td>CERAMICA 62X62 LAM MIX HD 2,32</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="DAYU2163900" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>54</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>HLBU2746077</td><td>21900</td><td>-37</td><td>HLCUTS1251114528</td><td>3678881</td><td>PIEDRA 60X15 MOSA MULT OXI 0,6</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HLBU2746077" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>55</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>HLBU3989467</td><td>23400</td><td>-37</td><td>HLCUSZX2602BVZQ8</td><td>9004114</td><td>PORCELANATO PUR WH 60X60 1,44M</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HLBU3989467" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>56</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>MRKU7409078</td><td>26352</td><td>-18</td><td>267742824</td><td>2906619</td><td>CERAMICA 62X62 LAM MIX HD 2,32</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="MRKU7409078" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>57</td><td>11-05-2026</td><td>08.30</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>CAIU3332274</td><td>24200</td><td>-37</td><td>HLCUXM1251234902</td><td>9179631</td><td>GRES AERO BROWN 20X120 1,44M2</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="CAIU3332274" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>58</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>FCIU3759310</td><td>23328</td><td>-32</td><td>GGZ2882721</td><td>8708983</td><td>PORCELANATO 60X60 SS BG 1,44M2</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FCIU3759310" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>59</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>FCIU4602536</td><td>23328</td><td>-32</td><td>GGZ2904305</td><td>8708983</td><td>PORCELANATO 60X60 SS BG 1,44M2</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FCIU4602536" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>60</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>TRHU2969964</td><td>23328</td><td>-32</td><td>GGZ2882721</td><td>8708983</td><td>PORCELANATO 60X60 SS BG 1,44M2</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TRHU2969964" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>61</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>TIIU2722706</td><td>23328</td><td>-32</td><td>GGZ2882721</td><td>8708983</td><td>PORCELANATO 60X60 SS BG 1,44M2</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TIIU2722706" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>62</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>TLLU2088527</td><td>23328</td><td>-32</td><td>GGZ2882721</td><td>8708983</td><td>PORCELANATO 60X60 SS BG 1,44M2</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>TRASVASIJE</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TLLU2088527" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>63</td><td>11-05-2026</td><td>30-12-1899</td><td>DEPOSITO CD</td><td>STD</td><td>20</td><td>TRHU1016422</td><td>23328</td><td>-32</td><td>GGZ2904305</td><td>8708983</td><td>PORCELANATO 60X60 SS BG 1,44M2</td><td>DEPOSITO CD</td><td>DEPOSITO CD</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TRHU1016422" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>64</td><td>11-05-2026</td><td>30-12-1899</td><td>SITRANS SANTIAGO</td><td>HC</td><td>40</td><td>CMAU9333075</td><td>28641</td><td>-26</td><td>QGD2690489</td><td>52760</td><td>OSB ESTRUCTURAL 9,5MM 122X244</td><td>BYD</td><td>BODEGA RENGO</td><td>DESCONSOLIDADO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="CMAU9333075" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>65</td><td>11-05-2026</td><td>30-12-1899</td><td>SITRANS SANTIAGO</td><td>HC</td><td>40</td><td>ECMU7620361</td><td>28641</td><td>-26</td><td>QGD2663783</td><td>52760</td><td>OSB ESTRUCTURAL 9,5MM 122X244</td><td>JUC</td><td>BODEGA RENGO</td><td>DESCONSOLIDADO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="ECMU7620361" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>66</td><td>11-05-2026</td><td>30-12-1899</td><td>SITRANS SANTIAGO</td><td>STD</td><td>20</td><td>CMAU2064631</td><td>25200</td><td>-33</td><td>FOC0343997</td><td>2311127</td><td>CERAMICA 30X60 WALL TILE 1,62</td><td>FR RENTAL</td><td>BODEGA LO RUIZ</td><td>DESCONSOLIDADO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="CMAU2064631" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>67</td><td>11-05-2026</td><td>30-12-1899</td><td>SITRANS SANTIAGO</td><td>HC</td><td>40</td><td>HPCU4341309</td><td>23280</td><td>-26</td><td>QGD2675026</td><td>8759057</td><td>OSB2 ESTRUCTURAL 9MM 1,22X2,44</td><td>JUC</td><td>BODEGA LO RUIZ</td><td>DESCONSOLIDADO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HPCU4341309" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>68</td><td>11-05-2026</td><td>30-12-1899</td><td>SITRANS SANTIAGO</td><td>STD</td><td>20</td><td>BSIU2563382</td><td>26949</td><td>-33</td><td>FOC0343997</td><td>9086420</td><td>CER VULCANO BGE 30X60 1,8M2</td><td>FR RENTAL</td><td>BODEGA LA FARFANA 257</td><td>DESCONSOLIDADO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="BSIU2563382" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>69</td><td>11-05-2026</td><td>30-12-1899</td><td>SITRANS SANTIAGO</td><td>HC</td><td>40</td><td>GESU6278210</td><td>23297</td><td>-33</td><td>QGD2665203</td><td>8721769</td><td>BOWL BISTRO BLANCO</td><td>BYD</td><td>BODEGA CD LO ESPEJO</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="GESU6278210" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>70</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>STD</td><td>20</td><td>CAIU6654757</td><td>1300</td><td>-39</td><td>HLCUNG12511RQBD1</td><td>8725012</td><td>TINA HIDROMASAJE 2P 150X150X66</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="CAIU6654757" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>71</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>HC</td><td>40</td><td>FANU1086345</td><td>15099</td><td>-39</td><td>HLCUNG12511RQBH5</td><td>4065433</td><td>MAMPARA AJUS 6MM 135-150X150CM</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FANU1086345" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>72</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>HC</td><td>40</td><td>FANU1268864</td><td>7669</td><td>-39</td><td>HLCUNG12511RPXL8</td><td>3933873</td><td>BOTIQUIN 45X52X16 C/ESPEJO</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FANU1268864" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>73</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>HC</td><td>40</td><td>FANU3593652</td><td>15342</td><td>-39</td><td>HLCUNG12511RQBH5</td><td>4065328</td><td>RECEPTACULO RECT ACR 140X72X7</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="FANU3593652" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>74</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>HC</td><td>40</td><td>HAMU1881180</td><td>11070</td><td>-39</td><td>HLCUNG12511RPYR9</td><td>900792X</td><td>NEUMATICO 185 65R14 86H Z-108</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HAMU1881180" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>75</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>HC</td><td>40</td><td>HAMU3106460</td><td>2900</td><td>-39</td><td>HLCUNG12511RQBD1</td><td>8725012</td><td>TINA HIDROMASAJE 2P 150X150X66</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HAMU3106460" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>76</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>HC</td><td>40</td><td>HAMU3449664</td><td>12868</td><td>-37</td><td>HLCUNG12511RQDC1</td><td>3933873</td><td>BOTIQUIN 45X52X16 C/ESPEJO</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HAMU3449664" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>77</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>HC</td><td>40</td><td>HAMU4981136</td><td>11432</td><td>-39</td><td>HLCUNG12511RPYR9</td><td>9007857</td><td>NEUMATICO 175 65R14 82H Z-108</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HAMU4981136" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>78</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>STD</td><td>20</td><td>HLBU1749111</td><td>3502</td><td>-37</td><td>HLCUNG12511RQBT7</td><td>208192X</td><td>COLUMNA DUCHA 6JT BAMBO 150X2</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HLBU1749111" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>79</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>HC</td><td>40</td><td>HLBU2815732</td><td>11301</td><td>-39</td><td>HLCUNG12511RPYR9</td><td>9007857</td><td>NEUMATICO 175 65R14 82H Z-108</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HLBU2815732" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>80</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>HC</td><td>40</td><td>HLBU3304090</td><td>27713</td><td>-37</td><td>HLCUSZX2603ARCA7</td><td>3242943</td><td>LAVAMANOS CATANIA TR4921 BL</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="HLBU3304090" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>81</td><td>11-05-2026</td><td>30-12-1899</td><td>TERCOP</td><td>STD</td><td>20</td><td>TEMU1863830</td><td>5972</td><td>-37</td><td>HLCUNG12511RQBU8</td><td>8771790</td><td>SOPORTE/MECANISM CORT ENR 32MM</td><td>SODIMAC</td><td>BODEGA LA FARFANA 214</td><td>DESPACHO</td><td><select class="sel-estado " data-hoja="PROGRAMACION ACTUAL" data-cont="TEMU1863830" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr></tbody></table></div>
-      </div>
-    </div>
-
-    <div id="page-retiro" class="page" style="display: none;">
-      <div class="ph"><h2>Asignaciones Retiro Puerto</h2><p>Registro de retiro de contenedores en puerto</p></div>
-      <div class="brow">
-        <button class="btn blue" id="brr" onclick="vtab('retiro','reg')">≡ Registros</button>
-        <button class="btn" id="brn" onclick="vtab('retiro','new')">+ Nueva Asignación</button>
-        <button class="btn green" onclick="xls('retiro','Retiro_Puerto')" style="margin-left:auto;padding:5px 12px;font-size:12px">↓ Excel</button>
-      </div>
-      <div id="retiro-reg">
-        <div class="card"><div class="ch"><span class="ct">Asignaciones Retiro Puerto</span><span class="badge" id="r-cnt">22</span></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Tipo</th><th>Transporte</th><th>Chofer</th><th>RUT</th><th>Tracto</th><th>Rampla</th><th>GPS</th><th>Estado</th><th>Creado</th></tr></thead><tbody id="r-tb"><tr><td>02-05-2026</td><td>HGT SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>TEST</td><td>12345678-9</td><td>AB1234</td><td>CD5678</td><td><span class="gps">GPS</span></td><td><select class="sel-estado en-ruta" data-rut="12345678-9" data-tracto="AB1234" onchange="cambiarEstado(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA" selected="">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>02-05-2026</td><td>HGT SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>TEST</td><td>12345678-9</td><td>AB1234</td><td>CD5678</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="12345678-9" data-tracto="AB1234" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:27:19 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>CASABLANCA</td><td>FREDDY ARAYA</td><td>11870024-4</td><td>KGBX44</td><td>JK53154</td><td><span class="gps">GPS</span></td><td><select class="sel-estado entregado" data-rut="11870024-4" data-tracto="KGBX44" onchange="cambiarEstado(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO" selected="">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>CASABLANCA</td><td>PATRICIO VEGA</td><td>8437274-9</td><td>LVHS68</td><td>JC. 8451</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="8437274-9" data-tracto="LVHS68" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>CASABLANCA</td><td>FREDDY ARAYA</td><td>11870024-4</td><td>KGBX44</td><td>JK53154</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="11870024-4" data-tracto="KGBX44" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>CASABLANCA</td><td>CRISTIAN PLAZA</td><td>13916071-1</td><td>JFWC94</td><td>JK5525</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="13916071-1" data-tracto="JFWC94" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>FR RENTAL</td><td>Nelson Andara</td><td>27.101.338-8</td><td>BZCL46</td><td>JL9554</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="27.101.338-8" data-tracto="BZCL46" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>FR RENTAL</td><td>Nelson Andara</td><td>27.101.338-8</td><td>BZCL46</td><td>JL9554</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="27.101.338-8" data-tracto="BZCL46" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>FR RENTAL</td><td>Carlos Castro</td><td>12.840.452-K</td><td>BWBK64</td><td>JF6668</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="12.840.452-K" data-tracto="BWBK64" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>FR RENTAL</td><td>Carlos Castro</td><td>12.840.452-K</td><td>BWBK64</td><td>JF6668</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="12.840.452-K" data-tracto="BWBK64" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>FR RENTAL</td><td>Mauricio Rivera</td><td>8.409.199-5</td><td>YU3564</td><td>JF4160</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="8.409.199-5" data-tracto="YU3564" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>Jose&nbsp; Yepez</td><td>26457136-7</td><td>FHFB-89</td><td>JJ-2627</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="26457136-7" data-tracto="FHFB-89" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>Andres&nbsp;Merentes</td><td>26317967-6</td><td>HLFZ-41</td><td>JB-2115</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="26317967-6" data-tracto="HLFZ-41" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>Jose&nbsp;Matamala</td><td>9187481-4</td><td>JWCG-61</td><td>JJ-5984</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="9187481-4" data-tracto="JWCG-61" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>BYD</td><td>Ricardo&nbsp;Valenzuela</td><td>11742160-0</td><td>DKSG-38</td><td>JB-2310</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="11742160-0" data-tracto="DKSG-38" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>JUC</td><td>ARMANDO MATEO</td><td>25.191.219-K</td><td>KCTC-58</td><td>JB-5997</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="25.191.219-K" data-tracto="KCTC-58" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>JUC</td><td>JHON CONGOLINO</td><td>27.104.919-6</td><td>GWXH-14</td><td>JA-1111</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="27.104.919-6" data-tracto="GWXH-14" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>JUC</td><td>JOSE PEREZ</td><td>12.939.515-K</td><td>LJKX-20</td><td>JG-3552</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="12.939.515-K" data-tracto="LJKX-20" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>JUC</td><td>SALVADOR SEDAN</td><td>10.888.919-5</td><td>LJWB-32</td><td>HGJS-64</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="10.888.919-5" data-tracto="LJWB-32" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>04-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>JUC</td><td>PEDRO TOBAR</td><td>7.772.649-7</td><td>LLXG-79</td><td>JJ-2907</td><td><span class="gps">GPS</span></td><td><select class="sel-estado " data-rut="7.772.649-7" data-tracto="LLXG-79" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">02-05-2026, 2:00:39 p. m.</td></tr><tr><td>09-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>85.131.900-K CASABLANCA</td><td>Jun perez</td><td>123456</td><td>GWYDV</td><td>VWUW</td><td><span class="gps">—</span></td><td><select class="sel-estado " data-rut="123456" data-tracto="GWYDV" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">09-05-2026</td></tr><tr><td>09-05-2026</td><td>SITRANS SAN ANTONIO</td><td>Ingreso</td><td>76.501.883-8 CASTELLINI</td><td>Efe</td><td>12309</td><td>123</td><td>H1B</td><td><span class="gps">—</span></td><td><select class="sel-estado " data-rut="12309" data-tracto="123" onchange="cambiarEstado(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td><td style="font-size:11px;color:#999">09-05-2026</td></tr></tbody></table></div></div>
-      </div>
-      <div id="retiro-new" style="display:none">
-        <div class="card"><div class="ct" style="margin-bottom:14px">Nueva Asignación — Retiro Puerto</div>
-          <div class="sdiv">Datos Generales</div>
-          <div class="fgrid">
-            <div class="fg"><label>Fecha *</label><input type="date" id="rf-f"></div>
-            <div class="fg"><label>Tipo *</label><select id="rf-t"><option value="">Seleccionar...</option><option>Ingreso</option><option>Salida</option></select></div>
-            <div class="fg full"><label>Depósito *</label><select id="rf-d"><option value="">Seleccionar...</option><option>SITRANS SAN ANTONIO</option><option>CIS SAN ANTONIO</option><option>HGT SAN ANTONIO</option><option>MEDLOG VALPARAISO</option><option>MEDLOG SAN ANTONIO</option><option>SITRANS VALPARAISO</option><option>HGT VALPARAISO</option><option>SITRANS SANTIAGO</option><option>HGT SANTIAGO</option><option>DEPOSITO CD</option><option>TERCOP</option></select></div>
+      <div class="px-6 py-5 space-y-5">
+        <div class="grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <div class="text-slate-400 uppercase tracking-wider mb-1">Arribo</div>
+            <div id="modalFecha" class="font-mono text-slate-800">—</div>
           </div>
-          <div class="sdiv">Transporte</div>
-          <div class="fgrid"><div class="fg full"><label>Transportista *</label><select id="rf-tr"><option value="">Seleccionar...</option><option>85.131.900-K CASABLANCA</option><option>76.651.987-3 FR RENTAL</option><option>76107615-9 BYD</option><option>76.840.809-2 JUC CHILE</option><option>76.421.758-6 SERMOV</option><option>96.979.980-4 SAN FABIAN</option><option>76.501.883-8 CASTELLINI</option><option>77.082.997-6 CF</option><option>77.248.307-4 GLOBAL LOGISTIC</option><option>77.079.719-5 H. BUSTOS</option><option>77.304.186-5 CELMAR</option><option>96.500.950-7 SITRANS</option><option>77.090.481-1 PRECAM</option><option>76.228.166-K TRANVIAL</option><option>76.388.144-K MOVEONTRUCK</option><option>76.172.595-5 MEDLOG</option><option>76.381.392-4 JULIO HIDALGO</option></select></div></div>
-          <div class="sdiv">Conductor</div>
-          <div class="fgrid">
-            <div class="fg"><label>Nombre chofer *</label><input type="text" id="rf-ch" placeholder="Nombre completo"></div>
-            <div class="fg"><label>RUT *</label><input type="text" id="rf-ru" placeholder="12.345.678-9"></div>
-            <div class="fg"><label>Teléfono</label><input type="tel" id="rf-te" placeholder="+56 9 xxxx"></div>
-            <div class="fg"><label>Patente tracto *</label><input type="text" id="rf-tc" placeholder="XXXX-XX"></div>
-            <div class="fg"><label>Patente rampla *</label><input type="text" id="rf-ra" placeholder="XXXX-XX"></div>
-            <div class="fg"><label>Chofer reemplazo</label><input type="text" id="rf-re" placeholder="Opcional"></div>
-            <div class="fg full"><label>GPS *</label><select id="rf-gp"><option>Rampla + Tracto</option><option>Solo Tracto</option><option>Solo Rampla</option><option>Sin GPS</option></select></div>
+          <div>
+            <div class="text-slate-400 uppercase tracking-wider mb-1">Depósito</div>
+            <div id="modalDeposito" class="text-slate-800">—</div>
           </div>
-          <div class="ff"><button class="btn">Limpiar</button><button class="btn blue" onclick="saveR()">Guardar en Google Sheets</button></div>
         </div>
-      </div>
-    </div>
-
-    <div id="page-devolucion" class="page" style="display: none;">
-      <div class="ph"><h2>Área de Transporte</h2><p>Devolución Vacíos</p></div>
-      <div class="brow">
-        <button class="btn blue" id="bdr" onclick="vtab('dev','reg')">≡ Registros</button>
-        <button class="btn" id="bdn" onclick="vtab('dev','new')">+ Nueva Devolución</button>
-        <button class="btn green" onclick="xls('devolucion','Devolucion_Vacios')" style="margin-left:auto;padding:5px 12px;font-size:12px">↓ Excel</button>
-      </div>
-      <div id="dev-reg">
-        <div class="card"><div class="ch"><span class="ct">Devoluciones Vacíos Navieros</span><span class="badge" id="dv-cnt">3</span></div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Depósito</th><th>Transporte</th><th>Contenedor</th><th>EIR</th><th>Creado</th></tr></thead><tbody id="dv-tb"><tr><td>09-05-2026</td><td>CIS SAN ANTONIO</td><td>85.131.900-K CASABLANCA</td><td>VSBDJEJ123</td><td>1234</td><td style="font-size:11px;color:#999">09-05-2026</td></tr><tr><td>09-05-2026</td><td>SITRANS SAN ANTONIO</td><td>85.131.900-K CASABLANCA</td><td>WQAS16499</td><td>1234</td><td style="font-size:11px;color:#999">09-05-2026</td></tr><tr><td>10-05-2026</td><td>SITRANS SAN ANTONIO</td><td>76.421.758-6 SERMOV</td><td>GTHS1234</td><td>1234</td><td style="font-size:11px;color:#999">10-05-2026</td></tr></tbody></table></div></div>
-      </div>
-      <div id="dev-new" style="display:none">
-        <div class="card"><div class="ct" style="margin-bottom:14px">Nueva Devolución de Vacío Naviero</div>
-          <div class="fgrid">
-            <div class="fg"><label>Fecha *</label><input type="date" id="dv-f"></div>
-            <div class="fg"><label>Depósito *</label><select id="dv-d"><option value="">Seleccionar...</option><option>SITRANS SAN ANTONIO</option><option>CIS SAN ANTONIO</option><option>HGT SAN ANTONIO</option><option>MEDLOG VALPARAISO</option><option>MEDLOG SAN ANTONIO</option><option>SITRANS VALPARAISO</option><option>DEPOSITO CD</option><option>TERCOP</option></select></div>
-            <div class="fg full"><label>Transportista *</label><select id="dv-tr"><option value="">Seleccionar...</option><option>85.131.900-K CASABLANCA</option><option>76.651.987-3 FR RENTAL</option><option>76107615-9 BYD</option><option>76.840.809-2 JUC CHILE</option><option>76.421.758-6 SERMOV</option><option>96.979.980-4 SAN FABIAN</option><option>76.501.883-8 CASTELLINI</option><option>77.082.997-6 CF</option><option>77.248.307-4 GLOBAL LOGISTIC</option><option>77.079.719-5 H. BUSTOS</option><option>77.304.186-5 CELMAR</option><option>96.500.950-7 SITRANS</option><option>77.090.481-1 PRECAM</option><option>76.228.166-K TRANVIAL</option><option>76.388.144-K MOVEONTRUCK</option><option>76.172.595-5 MEDLOG</option><option>76.381.392-4 JULIO HIDALGO</option></select></div>
-            <div class="fg"><label>Contenedor *</label><input type="text" id="dv-co" placeholder="XXXX0000000"></div>
-            <div class="fg"><label>EIR *</label><input type="text" id="dv-ei" placeholder="Número EIR"></div>
+        <div class="divider-label">Edición</div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1.5">Transportista</label>
+          <input id="inputTransporte" type="text" placeholder="Ej: Transportes Andes SpA"
+                 class="w-full px-3 py-2.5 rounded-lg border border-[color:var(--line)] text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1.5">Estado operativo</label>
+          <div class="grid grid-cols-4 gap-2" id="estadoSelector">
+            <button data-estado="Pendiente" class="estado-btn px-2 py-2 rounded-lg border border-[color:var(--line)] text-xs font-medium hover:border-slate-400 transition">
+              <span class="dot bg-amber-500 mr-1.5"></span>Pendiente
+            </button>
+            <button data-estado="Asignado" class="estado-btn px-2 py-2 rounded-lg border border-[color:var(--line)] text-xs font-medium hover:border-slate-400 transition">
+              <span class="dot bg-sky-600 mr-1.5"></span>Asignado
+            </button>
+            <button data-estado="Retirado" class="estado-btn px-2 py-2 rounded-lg border border-[color:var(--line)] text-xs font-medium hover:border-slate-400 transition">
+              <span class="dot bg-violet-600 mr-1.5"></span>Retirado
+            </button>
+            <button data-estado="Entregado" class="estado-btn px-2 py-2 rounded-lg border border-[color:var(--line)] text-xs font-medium hover:border-slate-400 transition">
+              <span class="dot bg-emerald-600 mr-1.5"></span>Entregado
+            </button>
           </div>
-          <div class="ff"><button class="btn">Limpiar</button><button class="btn blue" onclick="saveD()">Guardar en Google Sheets</button></div>
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-[#FAFBFD] border-t border-[color:var(--line)] flex items-center justify-between">
+        <div id="modalFeedback" class="text-xs text-slate-500"></div>
+        <div class="flex gap-2">
+          <button data-close class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
+          <button id="btnGuardar" class="px-4 py-2 rounded-lg bg-[color:var(--ink-900)] text-white text-sm font-medium hover:bg-black transition flex items-center gap-2">
+            <span id="guardarLabel">Guardar cambios</span>
+          </button>
         </div>
       </div>
     </div>
-
-    <div id="page-qr" class="page" style="display: none;">
-      <div class="ph"><h2>Códigos QR — Acceso transportistas</h2></div>
-      <div class="qrgrid">
-        <div class="qrc">
-          <div style="width:48px;height:48px;border-radius:12px;background:#e8f5e9;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="#2e7d32"><path d="M1 3h15v13H1zm15 4l5 3v6h-5z"></path></svg></div>
-          <h3>Retiro Puerto</h3><div class="qrs">Nueva asignación de retiro</div>
-          <div class="qrbox"><img id="qr1" src="" alt="QR Retiro" width="200" height="200"></div>
-          <div class="qrurl">sodimac-cd.github.io/transporte/retiro-movil.html</div>
-          <button class="qrprint" onclick="pQR('qr1','Retiro Puerto')">Imprimir</button>
-        </div>
-        <div class="qrc">
-          <div style="width:48px;height:48px;border-radius:12px;background:#e3f2fd;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="#1565c0"><rect x="2" y="7" width="20" height="14" rx="1"></rect><path d="M7 7V5a2 2 0 014 0v2"></path></svg></div>
-          <h3>Devolución Vacíos</h3><div class="qrs">Nueva devolución naviera</div>
-          <div class="qrbox"><img id="qr2" src="" alt="QR Dev" width="200" height="200"></div>
-          <div class="qrurl">sodimac-cd.github.io/transporte/devolucion-movil.html</div>
-          <button class="qrprint" onclick="pQR('qr2','Devolución Vacíos')">Imprimir</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="page-metricas" class="page" style="display: none;">
-      <div class="ph"><h2>Métricas de cumplimiento</h2></div>
-      <div class="sg">
-        <div class="sc"><div class="lbl">Cumplimiento</div><div class="val" id="m-c">0%</div><div class="sub">% entregado</div></div>
-        <div class="sc"><div class="lbl">Total</div><div class="val" id="m-t">81</div></div>
-        <div class="sc"><div class="lbl">Demurrage crítico</div><div class="val" id="m-d">81</div><div class="sub">&lt;10 días</div></div>
-        <div class="sc"><div class="lbl">Sin transportista</div><div class="val" id="m-s">0</div></div>
-      </div>
-      <div class="card"><div class="ch"><span class="ct">Resumen por estado</span><button class="btn green" onclick="xls('programacion','Metricas')" style="padding:4px 10px;font-size:11px">↓ Excel</button></div>
-        <table><thead><tr><th>Estado</th><th>Cantidad</th><th>%</th></tr></thead><tbody id="m-tb"><tr><td><span class="pp">ENTREGAO</span></td><td>25</td><td>31%</td></tr><tr><td><span class="pp">RETIRADO</span></td><td>1</td><td>1%</td></tr><tr><td><span class="pp">PENDIENTE</span></td><td>2</td><td>2%</td></tr><tr><td><span class="pp">SIN ESTADO</span></td><td>53</td><td>65%</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <div id="page-config" class="page" style="display: none;">
-      <div class="ph"><h2>Configuración</h2><p>Conexión con Google Sheets</p></div>
-      <div class="card">
-        <div class="ct" style="margin-bottom:6px">⚡ Apps Script</div>
-        <p style="font-size:12px;color:#888;margin-bottom:14px">URL del Web App (termina en /exec)</p>
-        <div class="fg" style="margin-bottom:14px"><label>URL</label><input type="text" id="cfgUrl" style="width:100%"></div>
-        <div style="display:flex;gap:10px"><button class="btn blue" onclick="saveUrl()">Guardar y cargar</button><button class="btn" onclick="demo()">Demo</button></div>
-        <div id="dbg-box" style="display: block; margin-top: 14px; background: rgb(248, 249, 255); border: 1px solid rgb(224, 228, 240); border-radius: 8px; padding: 12px;"><div style="font-size:11px;font-weight:600;color:#1a3a8f;margin-bottom:6px">Hojas detectadas:</div><pre id="dbg-txt" style="font-size:11px;color:#555;white-space:pre-wrap">{
-  "PROGRAMACION ACTUAL": "81 filas",
-  "PROGRAMACION PUERTO": "34 filas",
-  "RETIRO PUERTO": "22 filas",
-  "DEVOLUCION VACIOS": "3 filas"
-}</pre></div>
-      </div>
-    </div>
-
-    
-    <div id="page-progpuerto" class="page" style="display: none;">
-      <div class="ph"><h2>Programa de Puerto</h2><p>Contenedores por retirar desde depósitos de origen</p></div>
-      <div class="sg" style="grid-template-columns:repeat(4,1fr)">
-        <div class="sc"><div class="lbl">Total</div><div class="val" id="pp-tot">34</div><div class="sub">contenedores</div></div>
-        <div class="sc"><div class="lbl">Entregados</div><div class="val" id="pp-ent">2</div></div>
-        <div class="sc"><div class="lbl">Pendientes</div><div class="val" id="pp-pen">0</div></div>
-        <div class="sc"><div class="lbl">Sin transporte</div><div class="val" id="pp-sin">34</div></div>
-      </div>
-      <div class="fr">
-        <select id="pp-fe" onchange="filterPP()"><option value="">Estado: Todos</option><option>PENDIENTE</option><option>ENTREGADO</option><option>DESCONSOLIDADO</option><option>REPROGRAMADO</option><option>CANCELADO</option></select>
-        <button class="btn green" onclick="xls('programapuerto','Programa_Puerto')" style="margin-left:auto;padding:5px 12px;font-size:12px">↓ Excel</button>
-      </div>
-      <div class="card">
-        <div class="ch"><span class="ct">Contenedores Programa Puerto</span><span class="badge" id="pp-cnt">34</span></div>
-        <div style="overflow-x:auto"><table>
-          <thead><tr><th>Depósito</th><th>Contenedor</th><th>Peso (kg)</th><th>Demurrage</th><th>Transporte</th><th>Estado</th></tr></thead>
-          <tbody id="pp-tb"><tr><td>CIS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">FFAU7642556</td><td>9084</td><td>-38</td><td>—</td><td><select class="sel-estado entregado" data-hoja="PROGRAMACION PUERTO" data-cont="FFAU7642556" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO" selected="">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>CIS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">TRHU2507185</td><td>10138</td><td>-39</td><td>—</td><td><select class="sel-estado retirado" data-hoja="PROGRAMACION PUERTO" data-cont="TRHU2507185" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO" selected="">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>CIS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">CAIU9377656</td><td>12484</td><td>-38</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="CAIU9377656" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>CIS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">CMAU8562673</td><td>14818</td><td>-39</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="CMAU8562673" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>CIS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">CMAU9730067</td><td>16719</td><td>-39</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="CMAU9730067" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>CIS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">BEAU4066301</td><td>20319</td><td>-39</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="BEAU4066301" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>CIS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">UETU6916667</td><td>20427</td><td>-39</td><td>—</td><td><select class="sel-estado entregado" data-hoja="PROGRAMACION PUERTO" data-cont="UETU6916667" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO" selected="">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>SITRANS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">TRHU2120323</td><td>3600</td><td>-39</td><td>—</td><td><select class="sel-estado retirado" data-hoja="PROGRAMACION PUERTO" data-cont="TRHU2120323" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO" selected="">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>SITRANS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">APZU3783090</td><td>6000</td><td>-39</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="APZU3783090" onchange="cambiarEstadoProg(this)"><option value="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>SITRANS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">TRHU3243997</td><td>8000</td><td>-39</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="TRHU3243997" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>SITRANS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">SEKU1884466</td><td>25000</td><td>-38</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="SEKU1884466" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>SITRANS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">BSIU3007670</td><td>25600</td><td>-38</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="BSIU3007670" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>SITRANS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">TGHU1358700</td><td>25600</td><td>-38</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="TGHU1358700" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>SITRANS SAN ANTONIO</td><td style="font-family:monospace;font-weight:500">DFSU1974791</td><td>25700</td><td>-38</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="DFSU1974791" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">HLBU1145024</td><td>14792.6</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="HLBU1145024" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">HAMU3120426</td><td>11432.5</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="HAMU3120426" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">HAMU3174063</td><td>8500</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="HAMU3174063" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">HAMU3502590</td><td>6155</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="HAMU3502590" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">HLBU3144496</td><td>13656.5</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="HLBU3144496" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">FCIU7498493</td><td>8500</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="FCIU7498493" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">UETU6886813</td><td>27655</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="UETU6886813" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">HAMU2936518</td><td>18030</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="HAMU2936518" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">HAMU4634184</td><td>14100</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="HAMU4634184" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">TRHU4754121</td><td>11630</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="TRHU4754121" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">HLBU1059991</td><td>13312.7</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="HLBU1059991" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">HLBU1550177</td><td>01-09-9106</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="HLBU1550177" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">HLBU3082840</td><td>9955</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="HLBU3082840" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">HLBU3091903</td><td>10360</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="HLBU3091903" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">SEGU5690124</td><td>01-06-6667</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="SEGU5690124" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">TCLU5562858</td><td>6155</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="TCLU5562858" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">UACU8358770</td><td>01-07-8211</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="UACU8358770" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">UACU8394530</td><td>14938.5</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="UACU8394530" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">UACU8546320</td><td>11719.7</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="UACU8546320" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr><tr><td>MEDLOG VALPARAISO</td><td style="font-family:monospace;font-weight:500">UACU8555065</td><td>8249</td><td>-41</td><td>—</td><td><select class="sel-estado " data-hoja="PROGRAMACION PUERTO" data-cont="UACU8555065" onchange="cambiarEstadoProg(this)"><option value="" selected="">— Sin estado</option><option value="RETIRADO">RETIRADO</option><option value="EN RUTA">EN RUTA</option><option value="ENTREGADO">ENTREGADO</option><option value="CANCELADO">CANCELADO</option><option value="NO DISPONIBLE">NO DISPONIBLE</option></select></td></tr></tbody>
-        </table></div>
-      </div>
-    </div>
-    <div id="page-abastecimiento" class="page" style="display: none;"><div class="ph"><h2>Abastecimiento Tienda</h2></div><div class="card"><div class="es">🏗️ Próximamente</div></div></div>
-    <div id="page-despacho" class="page" style="display: none;"><div class="ph"><h2>Despacho a Domicilio</h2></div><div class="card"><div class="es">🚚 Próximamente</div></div></div>
-
   </div>
 </div>
-</div>
+
+<div id="toastContainer" class="fixed top-6 right-6 z-[60] space-y-2"></div>
+
 <script>
-var APPS_URL='https://script.google.com/macros/s/AKfycbykZe2S_KzXGD1qdYZMGtgK_HpBNIa218kXvPczwvBa-_l8mYy1waPC9Bc1TQblELclFQ/exec';
-var store={retiro:[],devolucion:[],programacion:[],programapuerto:[]};
-var pgData=[], kpiC={};
-var ppData=[];
-function renderPP(rows){
-  store.programapuerto=rows; ppData=rows;
-  filterPP();
-  var t=rows.length;
-  var e=rows.filter(function(r){return String(r.estado).toUpperCase().replace('ENTREGAO','ENTREGADO')==='ENTREGADO';}).length;
-  var p=rows.filter(function(r){return String(r.estado).toUpperCase()==='PENDIENTE';}).length;
-  var sin=rows.filter(function(r){return !r.transporte&&!r.transportista;}).length;
-  [['pp-tot',t],['pp-ent',e],['pp-pen',p],['pp-sin',sin]].forEach(function(x){var el=document.getElementById(x[0]);if(el)el.textContent=x[1];});
+/* URL base del Web App (GET de datos).
+   Apps Script sirve el HTML y expone ?api=1 para leer datos. */
+const WEB_APP_URL = window.location.href.split('?')[0];
+
+/* ── URL de escritura (POST) ──────────────────────────────────────────
+   Endpoint externo para updateTransporte. Si tu doPost está en el mismo
+   script, esta variable puede ser igual a WEB_APP_URL.               */
+const API_POST_URL = 'https://script.google.com/macros/s/AKfycbxtWK2PTItt35TgvaonsbM7oaq-PxJOgqgIFpBnNwchN2OoW2h2Sg7kh2sYiw4MShirnA/exec';
+
+const ESTADOS = ['Pendiente','Asignado','Retirado','Entregado'];
+let DATA = [];
+let CURRENT_FILTER = 'all';
+let CURRENT_SEARCH = '';
+let CURRENT_ROW = null;
+let SELECTED_ESTADO = 'Pendiente';
+
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+const fmtFecha = (iso) => {
+  if (!iso) return '—';
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('es-CL', { day:'2-digit', month:'short', year:'numeric' });
+};
+
+const escapeHtml = (s='') => String(s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+function toast(msg, type='ok'){
+  const colors = {
+    ok:    { bg:'bg-emerald-600', icon:'M5 13l4 4L19 7' },
+    error: { bg:'bg-red-600',     icon:'M6 18 18 6M6 6l12 12' },
+    info:  { bg:'bg-slate-800',   icon:'M12 8v4M12 16h.01' }
+  };
+  const c = colors[type] || colors.ok;
+  const el = document.createElement('div');
+  el.className = `toast ${c.bg} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 text-sm font-medium min-w-[280px]`;
+  el.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="${c.icon}"/></svg><span>${escapeHtml(msg)}</span>`;
+  $('#toastContainer').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform='translateY(-8px)'; el.style.transition='all .25s'; }, 3000);
+  setTimeout(() => el.remove(), 3300);
 }
-function filterPP(){
-  var fe=document.getElementById('pp-fe')&&document.getElementById('pp-fe').value||'';
-  var rows=ppData.filter(function(r){return !fe||String(r.estado).toUpperCase()===fe.toUpperCase();});
-  var cnt=document.getElementById('pp-cnt');if(cnt)cnt.textContent=rows.length;
-  var html=rows.length?rows.map(function(r){
-    var estPP=r.estado||'';var clsPP=getEstadoClass(estPP);var optsPP=ESTADOS_RETIRO.map(function(s){return '<option value="'+s+'"'+(s===estPP?' selected':'')+'>'+( s||'— Sin estado')+'</option>';}).join('');return '<tr><td>'+r.deposito+'</td><td style="font-family:monospace;font-weight:500">'+r.contenedor+'</td><td>'+r.peso+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td><select class="sel-estado '+clsPP+'" data-hoja="PROGRAMACION PUERTO" data-cont="'+r.contenedor+'" onchange="cambiarEstadoProg(this)">'+optsPP+'</select></td></tr>';
-  }).join(''):'<tr><td colspan="6" class="es">Sin registros</td></tr>';
-  var tb=document.getElementById('pp-tb');if(tb)tb.innerHTML=html;
+
+function setConnState(state, label){
+  const dot = $('#connDot'); const txt = $('#connText');
+  dot.className = 'dot';
+  if (state === 'live')      { dot.classList.add('bg-emerald-500','dot-pulse'); txt.textContent = label || 'En línea'; txt.className='text-xs font-medium text-emerald-700'; }
+  else if (state === 'error'){ dot.classList.add('bg-red-500');                 txt.textContent = label || 'Error';     txt.className='text-xs font-medium text-red-700'; }
+  else                       { dot.classList.add('bg-slate-300');               txt.textContent = label || 'Conectando...'; txt.className='text-xs font-medium text-slate-500'; }
 }
 
+setInterval(() => {
+  $('#liveClock').textContent = new Date().toLocaleTimeString('es-CL', { hour12:false });
+}, 1000);
 
-function tick(){var n=new Date();var el=document.getElementById('clk');if(el)el.textContent=n.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+' · '+n.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});}
-tick();setInterval(tick,30000);
-
-function SP(id){
-  document.querySelectorAll('.page').forEach(function(p){p.style.display='none';});
-  var pg=document.getElementById('page-'+id);
-  if(pg)pg.style.display='block';
-  document.querySelectorAll('.si').forEach(function(i){i.classList.remove('on');});
-  var sb=document.getElementById('sb-'+id);if(sb)sb.classList.add('on');
-  document.querySelectorAll('.nt').forEach(function(t){t.classList.remove('on');});
-  var nt=document.getElementById('nt-'+id);if(nt)nt.classList.add('on');
-  if(id==='qr')genQR();
-  if(id==='contenedores'&&store.programacion.length)renderKPI(store.programacion);
-}
-
-function vtab(m,t){
-  if(m==='retiro'){
-    document.getElementById('retiro-reg').style.display=t==='reg'?'block':'none';
-    document.getElementById('retiro-new').style.display=t==='new'?'block':'none';
-    document.getElementById('brr').className='btn'+(t==='reg'?' blue':'');
-    document.getElementById('brn').className='btn'+(t==='new'?' blue':'');
-  }else{
-    document.getElementById('dev-reg').style.display=t==='reg'?'block':'none';
-    document.getElementById('dev-new').style.display=t==='new'?'block':'none';
-    document.getElementById('bdr').className='btn'+(t==='reg'?' blue':'');
-    document.getElementById('bdn').className='btn'+(t==='new'?' blue':'');
+async function fetchData(){
+  renderSkeleton();
+  setConnState('off', 'Cargando...');
+  try {
+    const res = await fetch(WEB_APP_URL + '?api=1', { method:'GET' });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Error en el backend');
+    DATA = json.data || [];
+    setConnState('live', 'En línea · ' + DATA.length + ' registros');
+    $('#lastSync').textContent = 'Última sincronización: ' + new Date().toLocaleTimeString('es-CL');
+    render();
+  } catch (err) {
+    setConnState('error', 'Error de conexión');
+    toast('No se pudo obtener datos: ' + err.message, 'error');
+    DATA = [];
+    render();
   }
 }
 
-function saveUrl(){var u=document.getElementById('cfgUrl').value.trim();if(u){APPS_URL=u;localStorage.setItem('asUrl',u);cargar();}}
-
-function cargar(){
-  var url=localStorage.getItem('asUrl')||APPS_URL;
-  localStorage.setItem('asUrl',url);APPS_URL=url;
-  var el=document.getElementById('cfgUrl');if(el)el.value=url;
-  fetch(url,{redirect:'follow'})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(d.debug){var b=document.getElementById('dbg-box'),t=document.getElementById('dbg-txt');if(b&&t){b.style.display='block';t.textContent=JSON.stringify(d.debug,null,2);}}
-      if(d.retiro&&d.retiro.length)renderR(d.retiro);
-      if(d.devolucion&&d.devolucion.length)renderD(d.devolucion);
-      if(d.programacion&&d.programacion.length)renderP(d.programacion);
-      if(d.programaPuerto&&d.programaPuerto.length)renderPP(d.programaPuerto);
-    })
-    .catch(function(e){console.warn('Error:',e.message);});
+function computeKPIs(rows){
+  const activos = rows.filter(r => r.estado !== 'Retirado' && r.estado !== 'Entregado');
+  return {
+    total: rows.length,
+    pendientes: rows.filter(r => r.estado === 'Pendiente').length,
+    asignados:  rows.filter(r => r.estado === 'Asignado').length,
+    retirados:  rows.filter(r => r.estado === 'Retirado').length,
+    entregados: rows.filter(r => r.estado === 'Entregado').length,
+    criticos:   activos.filter(r => r.critico).length,
+    vencidos:   activos.filter(r => r.vencido).length
+  };
 }
 
-function pill(e){var s=String(e||'').toUpperCase();var m={ENTREGADO:'pe',PENDIENTE:'pp',REPROGRAMADO:'pr',CANCELADO:'pc',DESCONSOLIDADO:'pd'};return '<span class="'+(m[s]||'pp')+'">'+e+'</span>';}
+function paintKPIs(k){
+  $('#kpiPendientes').textContent = k.pendientes;
+  $('#kpiAsignados').textContent  = k.asignados;
+  $('#kpiCriticos').textContent   = k.criticos + k.vencidos;
+  $('#kpiTotal').textContent      = k.total;
+  $('#kpiRetirados').textContent  = k.retirados;
+  $('#kpiEntregados').textContent = k.entregados;
 
-var ESTADOS_RETIRO=['','RETIRADO','EN RUTA','ENTREGADO','CANCELADO','NO DISPONIBLE'];
-function getEstadoClass(e){var m={'RETIRADO':'retirado','EN RUTA':'en-ruta','ENTREGADO':'entregado','CANCELADO':'cancelado','NO DISPONIBLE':'no-disponible'};return m[String(e).toUpperCase()]||'';}
-function renderR(rows){
-  store.retiro=rows;
-  var h1=rows.map(function(r,i){
-    var est=r.estado||'';
-    var cls=getEstadoClass(est);
-    var opts=ESTADOS_RETIRO.map(function(s){return '<option value="'+s+'"'+(s===est?' selected':'')+'>'+( s||'— Sin estado')+'</option>';}).join('');
-    return '<tr><td>'+r.fecha+'</td><td>'+r.deposito+'</td><td>'+(r.tipo||'—')+'</td><td>'+(r.transportista||r.transporte||'—')+'</td><td>'+r.chofer+'</td><td>'+r.rut+'</td><td>'+r.tracto+'</td><td>'+r.rampla+'</td><td><span class="gps">'+(r.gps||'—')+'</span></td><td><select class="sel-estado '+cls+'" data-rut="'+r.rut+'" data-tracto="'+r.tracto+'" onchange="cambiarEstado(this)">'+opts+'</select></td><td style="font-size:11px;color:#999">'+r.creado+'</td></tr>';
-  }).join('');
-  ['r-tb','d-rtb'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h1||'<tr><td colspan="10" class="es">Sin registros</td></tr>';});
-  ['r-cnt','d-rcnt','c-r'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=rows.length;});
+  const card = $('#kpiCriticosCard');
+  const label = $('#kpiCriticosLabel');
+  const dot = $('#kpiCriticosDot');
+  const foot = $('#kpiCriticosFoot');
+  card.classList.remove('bg-white','bg-red-50','border-red-200');
+
+  if (k.criticos + k.vencidos > 0){
+    card.classList.add('bg-red-50','border-red-200','border');
+    label.className = 'text-[11px] tracking-[.14em] uppercase font-medium text-red-700';
+    dot.className = 'dot bg-red-600 dot-pulse';
+    foot.textContent = k.vencidos > 0 ? `⚠ ${k.vencidos} vencido(s) · ${k.criticos} en riesgo` : `⚠ ${k.criticos} contenedor(es) en riesgo`;
+    foot.className = 'mt-3 text-xs text-red-700 font-medium';
+  } else {
+    card.classList.add('bg-white','border');
+    label.className = 'text-[11px] tracking-[.14em] uppercase font-medium text-slate-500';
+    dot.className = 'dot bg-slate-300';
+    foot.textContent = 'Sin alertas críticas';
+    foot.className = 'mt-3 text-xs text-slate-500';
+  }
 }
 
-function renderD(rows){
-  store.devolucion=rows;
-  var h=rows.map(function(r){return '<tr><td>'+r.fecha+'</td><td>'+r.deposito+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+r.contenedor+'</td><td>'+r.eir+'</td><td style="font-size:11px;color:#999">'+r.creado+'</td></tr>';}).join('');
-  ['dv-tb','d-dtb'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=h||'<tr><td colspan="6" class="es">Sin registros</td></tr>';});
-  ['dv-cnt','d-dcnt'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=rows.length;});
+function badgeEstado(estado){
+  const map = {
+    'Pendiente': ['bg-amber-50','text-amber-700','bg-amber-500'],
+    'Asignado':  ['bg-sky-50','text-sky-700','bg-sky-600'],
+    'Retirado':  ['bg-violet-50','text-violet-700','bg-violet-600'],
+    'Entregado': ['bg-emerald-50','text-emerald-700','bg-emerald-600']
+  };
+  const [bg, txt, dot] = map[estado] || ['bg-slate-100','text-slate-600','bg-slate-400'];
+  return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md ${bg} ${txt} text-xs font-medium"><span class="dot ${dot}"></span>${escapeHtml(estado)}</span>`;
 }
 
-function renderP(rows){
-  store.programacion=rows;pgData=rows;
-  filterPG();
-  var t=rows.length,e=rows.filter(function(r){return String(r.estado).toUpperCase().replace('ENTREGAO','ENTREGADO')==='ENTREGADO';}).length;
-  var p=rows.filter(function(r){return String(r.estado).toUpperCase()==='PENDIENTE';}).length;
-  var dem=rows.filter(function(r){var n=parseInt(r.demurrage);return !isNaN(n)&&n<10&&n>-9999;}).length;
-  var sin=rows.filter(function(r){return !r.transporte&&!r.transportista;}).length;
-  var pct=t>0?Math.round(e/t*100):0;
-  [['pg-t',t],['pg-e',e],['pg-p',p],['pg-d',dem],['d-tot',t],['d-ent',e],['d-pen',p],['d-dem',dem],['m-c',pct+'%'],['m-t',t],['m-d',dem],['m-s',sin]].forEach(function(x){var el=document.getElementById(x[0]);if(el)el.textContent=x[1];});
-  var es={};rows.forEach(function(r){var s=r.estado||'SIN ESTADO';es[s]=(es[s]||0)+1;});
-  var mt=document.getElementById('m-tb');if(mt)mt.innerHTML=Object.keys(es).map(function(s){return '<tr><td>'+pill(s)+'</td><td>'+es[s]+'</td><td>'+(t>0?Math.round(es[s]/t*100):0)+'%</td></tr>';}).join('');
-  renderKPI(rows);
+function badgeDemurrage(r){
+  if (r.estado === 'Retirado' || r.estado === 'Entregado') return '<span class="text-xs text-slate-400">—</span>';
+  if (r.vencido) return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-100 text-red-800 text-xs font-mono font-semibold"><span class="dot bg-red-700 dot-pulse"></span>VENCIDO · ${Math.abs(r.horasRestantes)}h</span>`;
+  if (r.critico) return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 text-red-700 text-xs font-mono font-semibold"><span class="dot bg-red-600 dot-pulse"></span>${r.horasRestantes}h restantes</span>`;
+  if (r.horasRestantes !== null && r.horasRestantes < 96) return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 text-xs font-mono"><span class="dot bg-amber-500"></span>${r.horasRestantes}h</span>`;
+  const dias = Math.floor((r.horasRestantes||0)/24);
+  return `<span class="text-xs text-slate-500 font-mono">${dias}d ${r.horasRestantes%24}h</span>`;
 }
 
-function renderKPI(rows){
-  if(!rows||!rows.length) return;
-  var t=rows.length;
-  var e=rows.filter(function(r){return String(r.estado).toUpperCase().replace('ENTREGAO','ENTREGADO')==='ENTREGADO';}).length;
-  var dem=rows.filter(function(r){var n=parseInt(r.demurrage);return !isNaN(n)&&n>=0&&n<=10;}).length;
-  var pct=t>0?Math.round(e/t*100):0;
-  var ct=document.getElementById('c-tot');if(ct)ct.textContent=t;
-  var cc=document.getElementById('c-cumpl');if(cc)cc.textContent=pct+'%';
-  var cd=document.getElementById('c-dem2');if(cd)cd.textContent=dem;
-  var es={},bod={},dp={};
-  rows.forEach(function(r){
-    var s=(r.estado&&r.estado!=='—'&&r.estado!=='')?r.estado:'POR ARRIBAR';
-    es[s]=(es[s]||0)+1;
-    var b=(r.bodega&&r.bodega!=='—'&&r.bodega!=='')?r.bodega:'SIN BODEGA';
-    bod[b]=(bod[b]||0)+1;
-    var d=r.deposito||'—'; dp[d]=(dp[d]||0)+1;
+function filteredRows(){
+  return DATA.filter(r => {
+    if (CURRENT_FILTER === 'critico'){
+      if (!(r.critico || r.vencido)) return false;
+      if (r.estado === 'Retirado' || r.estado === 'Entregado') return false;
+    } else if (CURRENT_FILTER !== 'all' && r.estado !== CURRENT_FILTER){
+      return false;
+    }
+    if (CURRENT_SEARCH){
+      const q = CURRENT_SEARCH.toLowerCase();
+      const hay = [r.contenedor, r.deposito, r.transporte, r.estado].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
   });
-  var eK=Object.keys(es), bodK=Object.keys(bod).sort(function(a,b){return bod[b]-bod[a];}).slice(0,6);
-  var dK=Object.keys(dp).sort(function(a,b){return dp[b]-dp[a];}).slice(0,6);
-  var eC=['#059669','#6366f1','#f59e0b','#dc2626','#64748b','#3266ad'];
-  var bodC=['#3266ad','#64748b','#94a3b8','#1d6f42','#f59e0b','#dc2626'];
-  var le=document.getElementById('kpi-leg-e');
-  if(le)le.innerHTML=eK.map(function(k,i){return '<span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:'+eC[i%eC.length]+';display:inline-block"></span>'+k+' '+es[k]+'</span>';}).join('');
-  var lt=document.getElementById('kpi-leg-t');
-  if(lt)lt.innerHTML=bodK.map(function(k,i){return '<span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:'+bodC[i%bodC.length]+';display:inline-block"></span>'+k.replace('BODEGA ','').replace('DEPOSITO ','').replace('CD ','')+' '+bod[k]+'</span>';}).join('');
-  if(typeof Chart==='undefined')return;
-  if(kpiC.e)kpiC.e.destroy();if(kpiC.t)kpiC.t.destroy();if(kpiC.d)kpiC.d.destroy();
-  var dO={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'68%'};
-  var c1=document.getElementById('kpi-c1');
-  if(c1)kpiC.e=new Chart(c1,{type:'doughnut',data:{labels:eK,datasets:[{data:eK.map(function(k){return es[k];}),backgroundColor:eC.slice(0,eK.length),borderWidth:0}]},options:dO});
-  var c2=document.getElementById('kpi-c2');
-  if(c2)kpiC.t=new Chart(c2,{type:'doughnut',data:{labels:bodK,datasets:[{data:bodK.map(function(k){return bod[k];}),backgroundColor:bodC.slice(0,bodK.length),borderWidth:0}]},options:dO});
-  var c3=document.getElementById('kpi-c3');
-  if(c3)kpiC.d=new Chart(c3,{type:'bar',data:{labels:dK,datasets:[{data:dK.map(function(k){return dp[k];}),backgroundColor:'#3266ad',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},stepSize:1}}}}});
-  var arows=rows.filter(function(r){var n=parseInt(r.demurrage);return !isNaN(n)&&n>=0&&n<=10;}).sort(function(a,b){return parseInt(a.demurrage)-parseInt(b.demurrage);}).slice(0,5);
-  var ac=document.getElementById('kpi-alerts'),al=document.getElementById('kpi-alert-list');
-  if(ac)ac.style.display=arows.length?'block':'none';
-  if(al&&arows.length)al.innerHTML=arows.map(function(r){var n=parseInt(r.demurrage);var col=n<=3?'background:#fee2e2;color:#991b1b':n<=7?'background:#fef3c7;color:#92400e':'background:#dbeafe;color:#1e40af';return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f8f9ff;border-radius:6px;font-size:12px"><div><div style="font-weight:500;font-family:monospace;font-size:11px">'+r.contenedor+'</div><div style="color:#666;font-size:11px">'+r.deposito+'</div></div><span style="font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;'+col+'">'+n+' días</span></div>';}).join('');
 }
 
-function filterPG(){
-  var ft=document.getElementById('pg-ft')&&document.getElementById('pg-ft').value;
-  var fe=document.getElementById('pg-fe')&&document.getElementById('pg-fe').value;
-  var rows=pgData.filter(function(r){return(!ft||r.tipo===ft)&&(!fe||String(r.estado).toUpperCase()===fe.toUpperCase());});
-  var cnt=document.getElementById('pg-cnt');if(cnt)cnt.textContent=rows.length;
-  var html=rows.length?rows.map(function(r,i){var estPG=r.estado||'';var clsPG=getEstadoClass(estPG);var optsPG=ESTADOS_RETIRO.map(function(s){return '<option value="'+s+'"'+(s===estPG?' selected':'')+'>'+( s||'— Sin estado')+'</option>';}).join('');return '<tr><td>'+(i+1)+'</td><td>'+r.fecha+'</td><td>'+(r.hora||'—')+'</td><td>'+r.deposito+'</td><td>'+r.tipo+'</td><td>'+(r.capacidad||'—')+'</td><td>'+r.contenedor+'</td><td>'+(r.peso||'—')+'</td><td>'+(r.demurrage||'—')+'</td><td>'+(r.bl||'—')+'</td><td>'+(r.sku||'—')+'</td><td>'+(r.descripcion||'—')+'</td><td>'+(r.transporte||r.transportista||'—')+'</td><td>'+(r.bodega||'—')+'</td><td>'+(r.servicio||'—')+'</td><td><select class="sel-estado '+clsPG+'" data-hoja="PROGRAMACION ACTUAL" data-cont="'+r.contenedor+'" onchange="cambiarEstadoProg(this)">'+optsPG+'</select></td></tr>';}).join(''):'<tr><td colspan="16" class="es">Sin registros</td></tr>';
-  var tb=document.getElementById('pg-tb');if(tb)tb.innerHTML=html;
+function render(){
+  paintKPIs(computeKPIs(DATA));
+  const rows = filteredRows();
+  $('#rowCount').textContent = rows.length + ' filas';
+  const tbody = $('#tbody');
+  if (rows.length === 0){
+    tbody.innerHTML = '';
+    $('#emptyState').classList.remove('hidden');
+    return;
+  }
+  $('#emptyState').classList.add('hidden');
+  tbody.innerHTML = rows.map(r => {
+    const rowCls = (r.vencido && r.estado !== 'Retirado' && r.estado !== 'Entregado') ? 'row-vencido' :
+                   (r.critico && r.estado !== 'Retirado' && r.estado !== 'Entregado') ? 'row-critical' : '';
+    const transporte = r.transporte ? `<span class="text-slate-800">${escapeHtml(r.transporte)}</span>` : `<span class="text-slate-400 italic">Sin asignar</span>`;
+    return `<tr class="border-b border-[color:var(--line)] ${rowCls}">
+        <td class="px-6 py-3.5 font-mono text-xs text-slate-600 whitespace-nowrap">${fmtFecha(r.fecha)}</td>
+        <td class="px-6 py-3.5 font-mono font-semibold text-slate-900">${escapeHtml(r.contenedor)}</td>
+        <td class="px-6 py-3.5 text-slate-700">${escapeHtml(r.deposito)}</td>
+        <td class="px-6 py-3.5">${transporte}</td>
+        <td class="px-6 py-3.5">${badgeEstado(r.estado)}</td>
+        <td class="px-6 py-3.5">${badgeDemurrage(r)}</td>
+        <td class="px-6 py-3.5 text-right">
+          <button data-edit="${escapeHtml(r.contenedor)}" class="px-3 py-1.5 rounded-md border border-[color:var(--line)] hover:border-slate-900 hover:bg-[color:var(--ink-900)] hover:text-white text-xs font-medium transition inline-flex items-center gap-1.5">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            Asignar / Editar
+          </button>
+        </td>
+      </tr>`;
+  }).join('');
+  $$('button[data-edit]').forEach(b => b.addEventListener('click', () => openModal(b.dataset.edit)));
 }
 
-function cambiarEstadoProg(sel){
-  var url=localStorage.getItem('asUrl')||APPS_URL;
-  var hoja=sel.getAttribute('data-hoja');
-  var cont=sel.getAttribute('data-cont');
-  var estado=sel.value;
-  var cls=getEstadoClass(estado);
-  sel.className='sel-estado '+(cls||'');
-  fetch(url,{method:'POST',body:JSON.stringify({modulo:'updateEstadoProg',hoja:hoja,contenedor:cont,estado:estado})})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(d.ok){sel.style.boxShadow='0 0 0 2px #34d399';setTimeout(function(){sel.style.boxShadow='';},1500);}
-      else{alert('Error: '+(d.error||'desconocido'));}
-    }).catch(function(){alert('Error de conexión');});
-}
-function cambiarEstado(sel){
-  var url=localStorage.getItem('asUrl')||APPS_URL;
-  var rut=sel.getAttribute('data-rut');
-  var tracto=sel.getAttribute('data-tracto');
-  var estado=sel.value;
-  var cls=getEstadoClass(estado);
-  sel.className='sel-estado '+(cls||'');
-  fetch(url,{method:'POST',body:JSON.stringify({modulo:'updateEstado',rut:rut,tracto:tracto,estado:estado})})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(d.ok){sel.style.boxShadow='0 0 0 2px #34d399';setTimeout(function(){sel.style.boxShadow='';},1500);}
-      else{alert('Error al guardar: '+(d.error||'desconocido'));}
-    }).catch(function(){alert('Error de conexión');});
-}
-function xls(mod,nom){
-  var rows=store[mod];if(!rows||!rows.length){alert('Sin datos para exportar.');return;}
-  var hd,cl;
-  if(mod==='retiro'){hd=['Fecha','Deposito','Tipo','Transporte','Chofer','RUT','Tracto','Rampla','GPS','Creado'];cl=['fecha','deposito','tipo','transportista','chofer','rut','tracto','rampla','gps','creado'];}
-  else if(mod==='devolucion'){hd=['Fecha','Deposito','Transporte','Contenedor','EIR','Creado'];cl=['fecha','deposito','transporte','contenedor','eir','creado'];}
-  else if(mod==='programapuerto'){hd=['Deposito','Contenedor','Peso','Demurrage','Transporte','Estado'];cl=['deposito','contenedor','peso','demurrage','transporte','estado'];}
-  else{hd=['Fecha','Hora','Deposito','Tipo','Cap','Contenedor','Peso','Demurrage','BL','SKU','Descripcion','Transporte','Bodega','Servicio','Estado'];cl=['fecha','hora','deposito','tipo','capacidad','contenedor','peso','demurrage','bl','sku','descripcion','transporte','bodega','servicio','estado'];}
-  var csv='\uFEFF'+hd.join(';')+'\n';
-  rows.forEach(function(r){csv+=cl.map(function(k){return '"'+String(r[k]||'').replace(/"/g,'""')+'"';}).join(';')+'\n';});
-  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-  a.download=nom+'_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);
+function renderSkeleton(){
+  const tbody = $('#tbody');
+  tbody.innerHTML = Array(5).fill(0).map(() => `<tr class="border-b border-[color:var(--line)]">
+      ${Array(6).fill('<td class="px-6 py-4"><div class="sk h-3 w-24"></div></td>').join('')}
+      <td class="px-6 py-4 text-right"><div class="sk h-7 w-24 inline-block"></div></td></tr>`).join('');
+  $('#emptyState').classList.add('hidden');
 }
 
-function saveR(){
-  var url=localStorage.getItem('asUrl')||APPS_URL;
-  var d={fecha:document.getElementById('rf-f').value,tipo:document.getElementById('rf-t').value,deposito:document.getElementById('rf-d').value,transportista:document.getElementById('rf-tr').value,chofer:document.getElementById('rf-ch').value,rut:document.getElementById('rf-ru').value,tel:document.getElementById('rf-te').value,tracto:document.getElementById('rf-tc').value,rampla:document.getElementById('rf-ra').value,reemplazo:document.getElementById('rf-re').value,gps:document.getElementById('rf-gp').value};
-  if(!d.fecha||!d.deposito||!d.transportista||!d.chofer||!d.rut){alert('Completa los campos obligatorios (*).');return;}
-  fetch(url,{method:'POST',body:JSON.stringify({modulo:'retiro',datos:d})}).then(function(){alert('Guardado.');vtab('retiro','reg');cargar();}).catch(function(){alert('Error al guardar.');});
+function openModal(contenedorId){
+  const row = DATA.find(r => r.contenedor === contenedorId);
+  if (!row) return;
+  CURRENT_ROW = row;
+  $('#modalContenedor').textContent = row.contenedor;
+  $('#modalFecha').textContent = fmtFecha(row.fecha);
+  $('#modalDeposito').textContent = row.deposito || '—';
+  $('#inputTransporte').value = row.transporte || '';
+  $('#modalFeedback').textContent = '';
+  $('#guardarLabel').textContent = 'Guardar cambios';
+  $('#btnGuardar').disabled = false;
+  selectEstado(row.estado || 'Pendiente');
+  $('#modal').classList.remove('hidden');
+  setTimeout(() => $('#inputTransporte').focus(), 50);
 }
 
-function saveD(){
-  var url=localStorage.getItem('asUrl')||APPS_URL;
-  var d={fecha:document.getElementById('dv-f').value,deposito:document.getElementById('dv-d').value,transportista:document.getElementById('dv-tr').value,contenedor:document.getElementById('dv-co').value,eir:document.getElementById('dv-ei').value};
-  if(!d.fecha||!d.deposito||!d.transportista||!d.contenedor||!d.eir){alert('Completa los campos obligatorios (*).');return;}
-  fetch(url,{method:'POST',body:JSON.stringify({modulo:'devolucion',datos:d})}).then(function(){alert('Guardado.');vtab('dev','reg');cargar();}).catch(function(){alert('Error al guardar.');});
+function closeModal(){ $('#modal').classList.add('hidden'); CURRENT_ROW = null; }
+
+function selectEstado(estado){
+  SELECTED_ESTADO = estado;
+  $$('.estado-btn').forEach(b => {
+    if (b.dataset.estado === estado){
+      b.classList.add('border-slate-900','bg-slate-900','text-white');
+      b.classList.remove('border-[color:var(--line)]');
+    } else {
+      b.classList.remove('border-slate-900','bg-slate-900','text-white');
+      b.classList.add('border-[color:var(--line)]');
+    }
+  });
 }
 
-function demo(){
-  renderR([{fecha:'02-05-2026',deposito:'SITRANS SAN ANTONIO',tipo:'Ingreso',transportista:'H. BUSTOS',transporte:'H. BUSTOS',chofer:'Juan Perez',rut:'12.345.678-9',tracto:'ABCD-12',rampla:'EFGH-34',gps:'RAMPLA-TRACTO',creado:'02-05-2026 16:28'}]);
-  renderP([{fecha:'05-05-2026',hora:'08:30',deposito:'SITRANS SAN ANTONIO',tipo:'HC',capacidad:'40',contenedor:'TCKU1234567',peso:'24500',demurrage:'5',bl:'BL123456',sku:'7891234',descripcion:'Herramientas',transporte:'H. BUSTOS',bodega:'CD LO ESPEJO',servicio:'DESPACHO',estado:'PENDIENTE'},{fecha:'05-05-2026',hora:'10:00',deposito:'MEDLOG VALPARAISO',tipo:'STD',capacidad:'20',contenedor:'MSCU7654321',peso:'18000',demurrage:'15',bl:'BL654321',sku:'1234567',descripcion:'Linea blanca',transporte:'SITRANS',bodega:'CD LO ESPEJO',servicio:'DESPACHO',estado:'ENTREGADO'}]);
-}
+$$('.estado-btn').forEach(b => b.addEventListener('click', () => selectEstado(b.dataset.estado)));
+$$('[data-close]').forEach(el => el.addEventListener('click', closeModal));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-var qrDone=false;
-function genQR(){
-  if(qrDone)return;
-  var b='https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=1a237e&bgcolor=ffffff&data=';
-  document.getElementById('qr1').src=b+encodeURIComponent('https://sodimac-cd.github.io/transporte/retiro-movil.html');
-  document.getElementById('qr2').src=b+encodeURIComponent('https://sodimac-cd.github.io/transporte/devolucion-movil.html');
-  qrDone=true;
-}
-function pQR(id,tit){
-  var img=document.getElementById(id);
-  var w=window.open('','_blank','width=420,height=500');
-  w.document.write('<!DOCTYPE html><html><head><title>QR</title><style>body{font-family:sans-serif;text-align:center;padding:32px}h2{color:#1a237e}p{color:#666;font-size:13px;margin:6px 0 20px}@media print{button{display:none}}</style></head><body><h2>CD Lo Espejo</h2><p>'+tit+'</p><img src="'+img.src+'" width="220" style="border:2px solid #e0e0e0;border-radius:8px;padding:12px"/><br><br><button onclick="window.print()" style="background:#1a237e;color:#fff;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;margin-top:16px">Imprimir</button></body></html>');
-  w.document.close();
-}
-
-window.addEventListener('load',function(){
-  SP('dashboard');
-  cargar();
+$('#btnGuardar').addEventListener('click', async () => {
+  if (!CURRENT_ROW) return;
+  const transporte = $('#inputTransporte').value.trim();
+  const estado     = SELECTED_ESTADO;
+  if (estado === 'Asignado' && !transporte){
+    $('#modalFeedback').innerHTML = '<span class="text-red-600 font-medium">Indica el transportista para marcar como Asignado.</span>';
+    return;
+  }
+  const payload = {
+    modulo: 'updateTransporte', hoja: 'PROGRAMACION PUERTO',
+    contenedor: CURRENT_ROW.contenedor, transporte, estado
+  };
+  $('#btnGuardar').disabled = true;
+  $('#guardarLabel').innerHTML = '<span class="flex items-center gap-2"><span class="spinner"></span>Guardando...</span>';
+  $('#modalFeedback').textContent = '';
+  try {
+    const res = await fetch(API_POST_URL, {
+      method:'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Error desconocido');
+    toast('Transporte actualizado correctamente', 'ok');
+    closeModal();
+    await fetchData();
+  } catch (err) {
+    $('#modalFeedback').innerHTML = '<span class="text-red-600 font-medium">Error: ' + escapeHtml(err.message) + '</span>';
+    $('#btnGuardar').disabled = false;
+    $('#guardarLabel').textContent = 'Reintentar';
+    toast('No se pudo guardar: ' + err.message, 'error');
+  }
 });
-</script>
 
-<div id="claude-static-indicator-container" style="position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); align-items: center; justify-content: center; padding: 6px 6px 6px 16px; background: rgb(250, 249, 245); border: 0.5px solid rgba(31, 30, 29, 0.3); border-radius: 14px; box-shadow: rgba(0, 0, 0, 0.15) 0px 40px 80px 0px; z-index: 2147483647; pointer-events: none; white-space: nowrap; user-select: none; font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, &quot;Helvetica Neue&quot;, Arial, sans-serif;">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; flex-shrink: 0; margin-right: 8px;">
-        <path d="M3.13946 10.6399L6.28757 8.87462L6.37405 8.73821L6.28757 8.6339H6.13189L5.60432 8.6018L3.80541 8.55366L2.24865 8.48947L0.735135 8.40923H0.492973L0.354595 8.32899L0.181622 8.1685L0.0345946 8.01605L0 7.85557L0.0345946 7.62287L0.138378 7.44634L0.224865 7.40622H0.354595L0.812973 7.44634L1.82486 7.51856L3.34703 7.62287L4.44541 7.68706L6.08 7.85557H6.33946L6.37405 7.75125L6.28757 7.68706L6.21838 7.62287L4.64432 6.55567L2.94054 5.4323L2.04973 4.78235L1.57405 4.45336L1.33189 4.14845L1.22811 3.92377L1.17622 3.69107L1.22811 3.47442L1.33189 3.28185L1.46162 3.13741L1.66054 2.99298H1.87676L2.24865 3.0331L2.39568 3.07322L2.99243 3.53059L4.26378 4.51755L5.92432 5.73721L6.16649 5.93781H6.27892V5.82548L6.16649 5.64092L5.26703 4.01204L4.30703 2.35105L3.87459 1.66098L3.76216 1.25176C3.7391 1.16082 3.69297 0.977332 3.69297 0.970913V0.762287L3.77946 0.505517L3.93513 0.240722L4.18595 0.0882648L4.4627 0H4.67892L4.83459 0.0240722L5.12865 0.0882648L5.4054 0.328987L5.82054 1.27583L6.48649 2.76028L7.52432 4.78235L7.82703 5.38415L7.99135 5.93781L8.05189 6.10632H8.15567V6.01003L8.24216 4.87061L8.39784 3.47442L8.55351 1.67703L8.6054 1.17151L8.85622 0.561685L8.9773 0.417252L9.21946 0.232698H9.35784L9.74703 0.417252L9.97189 0.665998L10.067 0.874624L10.0238 1.17151L9.83351 2.40722L9.46162 4.34102L9.21946 5.64092H9.35784L9.52216 5.47242L10.1795 4.60582L11.2778 3.22568L11.7622 2.68004L12.333 2.07823L12.6962 1.78937L13.0162 1.67703L13.3881 1.78937L13.7168 2.06219L13.8897 2.54363V2.76028L13.6649 3.32197L12.9557 4.22066L12.3676 4.98295L12.0043 5.56871L11.0011 7.02106V7.08526H11.1741L13.0768 6.67603L14.1059 6.49147L15.3341 6.28285L15.5762 6.34704L15.8876 6.53962L15.9481 6.80441L15.8876 7.12538L15.7319 7.34203L14.4173 7.66299L12.8778 7.97593L10.5854 8.51559C10.5705 8.51909 10.56 8.53236 10.56 8.54764C10.56 8.56468 10.573 8.57891 10.59 8.58044L11.6238 8.67402L12.0649 8.69809H13.1459L15.1611 8.85055L15.6886 9.19559L15.9481 9.39619L16 9.62086L15.9481 9.94985L15.8443 10.1023L15.4119 10.3029L15.1351 10.3591L14.0454 10.1023L11.4941 9.49248L10.6205 9.27583H10.4995V9.34804L11.2259 10.0622L12.5665 11.2658L14.2357 12.8225L14.3222 13.0953V13.2076L14.1059 13.5125L13.9243 13.5206L13.8811 13.4804L12.4108 12.3731L12.2984 12.325L11.84 11.8756L10.56 10.7924H10.4735V10.9047L10.7676 11.338L12.333 13.6891L12.4108 14.4112L12.2984 14.6439L11.8919 14.7884L11.667 14.7563L11.4508 14.7081L11.2605 14.5396L10.5254 13.4162L9.5827 11.9719L8.82162 10.672H8.79342C8.76039 10.672 8.73278 10.6972 8.7297 10.73L8.27676 15.5667L8.06919 15.8154L7.6454 16H7.58486L7.17838 15.6951L6.96216 15.1976L7.17838 14.2106L7.43784 12.9268L7.6454 11.9077L7.83567 10.6399L7.95187 10.2164C7.9548 10.2057 7.95069 10.1944 7.94161 10.1881C7.91157 10.1672 7.87034 10.1741 7.84878 10.2037L6.89297 11.5145L5.44 13.4804L4.28973 14.7081L4.01297 14.8205H3.80541L3.5373 14.5717V14.4514L3.58054 14.1304L3.84865 13.7372L5.44 11.7151L6.4 10.4554L7.01872 9.73222C7.04511 9.70139 7.04245 9.65523 7.0127 9.62763C7.00333 9.61894 6.98925 9.61773 6.97854 9.62471L2.75027 12.3811L1.99784 12.4774L1.66919 12.1725L1.71243 11.675L1.86811 11.5145L3.13946 10.6399Z" fill="#D97757"></path>
-      </svg>
-      <span style="vertical-align: middle; color: #141413; font-size: 14px; display: inline-block;">Claude is active in this tab group</span>
-      <div style="display: inline-block; width: 0.5px; height: 32px; background: rgba(31, 30, 29, 0.15); margin: 0 8px; vertical-align: middle;"></div>
-      <button id="claude-static-chat-button" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 6px; background: transparent; border: none; cursor: pointer; pointer-events: auto; vertical-align: middle; width: 32px; height: 32px; border-radius: 8px; transition: background 0.2s;">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="#141413" xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px; display: block;">
-          <path d="M10 2.5C14.1421 2.5 17.5 5.85786 17.5 10C17.5 14.1421 14.1421 17.5 10 17.5H3C2.79779 17.5 2.61549 17.3782 2.53809 17.1914C2.4607 17.0046 2.50349 16.7895 2.64648 16.6465L4.35547 14.9365C3.20124 13.6175 2.5 11.8906 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5ZM10 3.5C6.41015 3.5 3.5 6.41015 3.5 10C3.5 11.7952 4.22659 13.4199 5.40332 14.5967L5.46582 14.6729C5.52017 14.7544 5.5498 14.8508 5.5498 14.9502C5.5498 15.0828 5.49709 15.2099 5.40332 15.3037L4.20703 16.5H10C13.5899 16.5 16.5 13.5899 16.5 10C16.5 6.41015 13.5899 3.5 10 3.5ZM13.29 9.30371C13.3986 9.05001 13.6925 8.93174 13.9463 9.04004C14.2 9.14863 14.3183 9.44253 14.21 9.69629C13.8506 10.536 13.1645 11.25 12.25 11.25C11.6372 11.25 11.128 10.9289 10.75 10.4648C10.372 10.9289 9.86276 11.25 9.25 11.25C8.63724 11.25 8.12801 10.9289 7.75 10.4648C7.37198 10.9289 6.86276 11.25 6.25 11.25C5.97386 11.25 5.75 11.0261 5.75 10.75C5.75 10.4739 5.97386 10.25 6.25 10.25C6.58764 10.25 7.00448 9.97056 7.29004 9.30371L7.32422 9.2373C7.41431 9.09121 7.5749 9 7.75 9C7.9501 9 8.13123 9.11975 8.20996 9.30371L8.32227 9.53516C8.59804 10.0359 8.95442 10.25 9.25 10.25C9.58764 10.25 10.0045 9.97056 10.29 9.30371L10.3242 9.2373C10.4143 9.09121 10.5749 9 10.75 9C10.9501 9 11.1312 9.11975 11.21 9.30371L11.3223 9.53516C11.598 10.0359 11.9544 10.25 12.25 10.25C12.5876 10.25 13.0045 9.97056 13.29 9.30371Z"></path>
-        </svg>
-        <span id="claude-static-chat-tooltip" style="position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); padding: 6px 12px; background: #30302E; color: #FAF9F5; border-radius: 6px; font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Open chat</span>
-      </button>
-      <button id="claude-static-close-button" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 6px; background: transparent; border: none; cursor: pointer; pointer-events: auto; vertical-align: middle; width: 32px; height: 32px; margin-left: 4px; border-radius: 8px; transition: background 0.2s;">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px; display: block;">
-          <path d="M15.1464 4.14642C15.3417 3.95121 15.6582 3.95118 15.8534 4.14642C16.0486 4.34168 16.0486 4.65822 15.8534 4.85346L10.7069 9.99997L15.8534 15.1465C16.0486 15.3417 16.0486 15.6583 15.8534 15.8535C15.6826 16.0244 15.4186 16.0461 15.2245 15.918L15.1464 15.8535L9.99989 10.707L4.85338 15.8535C4.65813 16.0486 4.34155 16.0486 4.14634 15.8535C3.95115 15.6583 3.95129 15.3418 4.14634 15.1465L9.29286 9.99997L4.14634 4.85346C3.95129 4.65818 3.95115 4.34162 4.14634 4.14642C4.34154 3.95128 4.65812 3.95138 4.85338 4.14642L9.99989 9.29294L15.1464 4.14642Z" fill="#141413"></path>
-        </svg>
-        <span id="claude-static-close-tooltip" style="position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); padding: 6px 12px; background: #30302E; color: #FAF9F5; border-radius: 6px; font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Dismiss</span>
-      </button>
-    </div></body></html>
+$$('#filterSeg button').forEach(b => b.addEventListener('click', () => {
+  $$('#filterSeg button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  CURRENT_FILTER = b.dataset.filter;
+  render();
+}));
+$('#searchInput').addEventListener('input', e => { CURRENT_SEARCH = e.target.value; render(); });
+$('#btnRefresh').addEventListener('click', fetchData);
+
+fetchData();
+</script>
+</body>
+</html>
